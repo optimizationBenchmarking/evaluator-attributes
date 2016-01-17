@@ -38,7 +38,7 @@ public final class PropertyValueSelector
    * @param grouper
    *          the grouper
    */
-  private PropertyValueSelector(final String property,
+  public PropertyValueSelector(final String property,
       final PropertyValueGrouper grouper) {
     super(EAttributeType.TEMPORARILY_STORED);
 
