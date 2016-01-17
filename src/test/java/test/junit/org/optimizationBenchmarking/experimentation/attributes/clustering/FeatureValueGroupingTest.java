@@ -24,7 +24,7 @@ public class FeatureValueGroupingTest extends ClusteringTest {
   /** {@inheritDoc} */
   @Override
   protected Attribute<? super IExperimentSet, ? extends IClustering> getAttribute(
-      final IExperimentSet data) {
+      final IExperimentSet experimentSet, final IExperimentSet data) {
     final Random random;
     final EGroupingMode[] modes;
     final EGroupingMode mode;

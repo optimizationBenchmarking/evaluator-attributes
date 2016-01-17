@@ -20,7 +20,8 @@ public class OnlySharedInstancesTest
   @Override
   protected void checkResult(
       final Attribute<? super IExperimentSet, ? extends IExperimentSet> attribute,
-      final IExperimentSet input, final IExperimentSet result) {
+      final IExperimentSet experimentSet, final IExperimentSet input,
+      final IExperimentSet result) {
     DataValidator.checkExperimentSet(result);
   }
 }

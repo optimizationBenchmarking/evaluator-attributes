@@ -30,7 +30,8 @@ public class ClusteringTest
   @Override
   protected void checkResult(
       final Attribute<? super IExperimentSet, ? extends IClustering> attribute,
-      final IExperimentSet input, final IClustering result) {
+      final IExperimentSet experimentSet, final IExperimentSet input,
+      final IClustering result) {
     final ArrayListView<? extends IExperimentSet> list;
 
     Assert.assertNotNull(result);
