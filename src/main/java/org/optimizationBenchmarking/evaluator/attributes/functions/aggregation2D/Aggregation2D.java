@@ -83,8 +83,7 @@ public final class Aggregation2D extends FunctionAttribute<IElementSet> {
    * @param secondary
    *          the secondary aggregate, {@code null} for default (median)
    */
-  protected Aggregation2D(
-      final DimensionTransformation xAxisTransformation,
+  public Aggregation2D(final DimensionTransformation xAxisTransformation,
       final DimensionTransformation yAxisInputTransformation,
       final Transformation yAxisOutputTransformation,
       final StatisticalParameter param,
