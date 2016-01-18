@@ -43,9 +43,12 @@ public class DimensionRelationshipTest extends
     Assert.assertTrue(result.getQuality() > 0d);
   }
 
-  /** {@inheritDoc} */
-  @Override
-  protected boolean canUseAttribute() {
+  /**
+   * Check if dimension relationship modeling can be used
+   *
+   * @return {@code true} if it can be used, {@code false} otherwise
+   */
+  public static final boolean canUse() {
     final ArrayListView<IFunctionFitter> fitters;
     boolean result;
 
@@ -63,6 +66,12 @@ public class DimensionRelationshipTest extends
       }
     }
     return false;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  protected boolean canUseAttribute() {
+    return DimensionRelationshipTest.canUse();
   }
 
   /** {@inheritDoc} */
