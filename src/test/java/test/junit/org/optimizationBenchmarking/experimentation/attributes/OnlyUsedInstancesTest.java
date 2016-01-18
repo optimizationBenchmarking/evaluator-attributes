@@ -1,7 +1,6 @@
 package test.junit.org.optimizationBenchmarking.experimentation.attributes;
 
 import org.optimizationBenchmarking.evaluator.attributes.OnlyUsedInstances;
-import org.optimizationBenchmarking.evaluator.data.spec.Attribute;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperimentSet;
 
 import shared.junit.org.optimizationBenchmarking.evaluator.attributes.ExperimentSetAttributeTest;
@@ -9,7 +8,7 @@ import shared.junit.org.optimizationBenchmarking.evaluator.dataAndIO.DataValidat
 
 /** The test for the "only-used-instances" attribute */
 public class OnlyUsedInstancesTest
-    extends ExperimentSetAttributeTest<IExperimentSet> {
+    extends ExperimentSetAttributeTest<IExperimentSet, OnlyUsedInstances> {
 
   /** create */
   public OnlyUsedInstancesTest() {
@@ -18,8 +17,7 @@ public class OnlyUsedInstancesTest
 
   /** {@inheritDoc} */
   @Override
-  protected void checkResult(
-      final Attribute<? super IExperimentSet, ? extends IExperimentSet> attribute,
+  protected void checkResult(final OnlyUsedInstances attribute,
       final IExperimentSet experimentSet, final IExperimentSet input,
       final IExperimentSet result) {
     DataValidator.checkExperimentSet(result);

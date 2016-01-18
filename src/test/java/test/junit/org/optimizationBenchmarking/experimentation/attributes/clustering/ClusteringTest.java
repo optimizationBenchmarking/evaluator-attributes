@@ -12,8 +12,8 @@ import shared.junit.org.optimizationBenchmarking.evaluator.dataAndIO.DataValidat
 
 /** The test for the "only-shared-instances" attribute */
 @Ignore
-public class ClusteringTest
-    extends ExperimentSetAttributeTest<IClustering> {
+public class ClusteringTest extends
+    ExperimentSetAttributeTest<IClustering, Attribute<? super IExperimentSet, ? extends IClustering>> {
 
   /**
    * create
