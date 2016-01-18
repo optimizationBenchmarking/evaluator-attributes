@@ -57,12 +57,6 @@ public final class FunctionTestUtils {
       final Random random, final MemoryTextOutput mto) {
     switch (random.nextInt(7)) {
       case 0: {
-        mto.append("sqr("); //$NON-NLS-1$
-        FunctionTestUtils.__makeDimString(dimName, random, mto);
-        mto.append(')');
-        return;
-      }
-      case 1: {
         mto.append('(');
         mto.append(random.nextDouble());
         mto.append(random.nextBoolean() ? '+' : '*');
@@ -70,11 +64,11 @@ public final class FunctionTestUtils {
         mto.append(')');
         return;
       }
-      case 2: {
+      case 1: {
         mto.append('(');
         FunctionTestUtils.__makeDimString(dimName, random, mto);
         mto.append(random.nextBoolean() ? '/' : '-');
-        mto.append((1e-5d) + random.nextDouble());
+        mto.append(1d + random.nextDouble());
         mto.append(')');
         return;
       }
