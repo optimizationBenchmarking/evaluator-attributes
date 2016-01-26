@@ -3,7 +3,7 @@
 ##
 ## https://app.wercker.com/#applications/56996b963e708cf42301dfcf
 #
-box: guligo/jdk-maven-ant
+box: optimizationbenchmarking/linux-evaluator-build
 #
 build:
     steps:
