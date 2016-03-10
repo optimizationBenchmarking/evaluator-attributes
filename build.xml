@@ -1,8 +1,9 @@
 <project basedir="." default="build">
 	<description>
 	Build the evaluator-attributes project, the project holding the
-  basic components and specifications of the evaluator, includings its
-	dependencies of group "org.optimizationBenchmarking".
+  basic attributes of the evaluator, i.e., the information which
+  can be computed by the evaluator and which is later presented
+	by the evaluator modules.
 	</description>
 
 	<import>

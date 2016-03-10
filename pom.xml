@@ -6,8 +6,8 @@
 	<artifactId>evaluator-attributes</artifactId>
 	<version>0.8.5-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>Specification of evaluator Components</name>
-	<description>The v the optimizationBenchmarking.org evaluator.</description>
+	<name>Evaluator Attributes</name>
+	<description>The attributes computed by the optimizationBenchmarking.org evaluator.</description>
 
 	<parent>
 		<groupId>org.sonatype.oss</groupId>
