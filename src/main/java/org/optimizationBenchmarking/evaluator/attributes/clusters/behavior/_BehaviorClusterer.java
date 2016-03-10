@@ -160,6 +160,12 @@ abstract class _BehaviorClusterer<CT extends _BehaviorCluster<CCT>, CCT extends 
 
     shared = OnlySharedInstances.INSTANCE.get(data, logger);
     names = this._getElementsToCluster(shared);
+
+    if (names.getData().isEmpty()) {
+      throw new IllegalArgumentException(//
+          "There is not even one benchmark instance for which all experiments contain at least one run. Since there is no such instance, there is no basis for behavior-based clustering.");//$NON-NLS-1$
+    }
+
     categories = this._getRunCategories(shared);
     Arrays.sort(categories);
     shared = null;
