@@ -1,5 +1,6 @@
 package test.junit.org.optimizationBenchmarking.experimentation.attributes.functions;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import org.junit.Assert;
@@ -7,7 +8,6 @@ import org.optimizationBenchmarking.evaluator.attributes.functions.DimensionTran
 import org.optimizationBenchmarking.evaluator.attributes.functions.DimensionTransformationParser;
 import org.optimizationBenchmarking.evaluator.attributes.functions.NamedParameterTransformationParser;
 import org.optimizationBenchmarking.evaluator.attributes.functions.Transformation;
-import org.optimizationBenchmarking.evaluator.data.spec.EDimensionType;
 import org.optimizationBenchmarking.evaluator.data.spec.IDimension;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperimentSet;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
@@ -95,34 +95,33 @@ public final class FunctionTestUtils {
     final MemoryTextOutput mto;
     final DimensionTransformation x, y;
     final Transformation trafo;
-    int looper;
-    IDimension dimX, dimY, dimTemp;
-    EDimensionType typeX, typeY, typeTemp;
+    final IDimension dimX, dimY;
+    ArrayList<IDimension> time, objective;
 
     dims = data.getDimensions().getData();
     Assert.assertNotNull(dims);
     size = dims.size();
     Assert.assertTrue(size > 0);
 
-    looper = 4;
-    findDims: do {
-      dimX = dims.get(random.nextInt(size));
-      typeX = dimX.getDimensionType();
-      dimY = dims.get(random.nextInt(size));
-      typeY = dimY.getDimensionType();
+    time = new ArrayList<>(size);
+    objective = new ArrayList<>(size);
+    for (final IDimension dimension : dims) {
+      if (dimension.getDimensionType().isTimeMeasure()) {
+        time.add(dimension);
+      } else {
+        objective.add(dimension);
+      }
+    }
 
-      if (typeX.isSolutionQualityMeasure() && typeY.isTimeMeasure()) {
-        dimTemp = dimY;
-        dimY = dimX;
-        dimX = dimTemp;
-        typeTemp = typeX;
-        typeX = typeY;
-        typeY = typeTemp;
-      }
-      if (typeX.isTimeMeasure() && typeY.isSolutionQualityMeasure()) {
-        break findDims;
-      }
-    } while ((--looper) > 0);
+    if ((time.size() > 0) && (objective.size() > 0)) {
+      dimX = time.get(random.nextInt(time.size()));
+      dimY = objective.get(random.nextInt(objective.size()));
+    } else {
+      dimX = dims.get(random.nextInt(size));
+      dimY = dims.get(random.nextInt(size));
+    }
+    time = null;
+    objective = null;
 
     dimParser = new DimensionTransformationParser(data);
     mto = new MemoryTextOutput();
