@@ -6,6 +6,7 @@ import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.optimizationBenchmarking.evaluator.attributes.MatrixIteration2DUtils;
 import org.optimizationBenchmarking.evaluator.attributes.functions.DimensionTransformation;
 import org.optimizationBenchmarking.evaluator.attributes.functions.DimensionTransformationParser;
 import org.optimizationBenchmarking.evaluator.attributes.functions.FunctionAttribute;
@@ -23,9 +24,11 @@ import org.optimizationBenchmarking.utils.config.Configuration;
 import org.optimizationBenchmarking.utils.document.spec.IComplexText;
 import org.optimizationBenchmarking.utils.document.spec.IMath;
 import org.optimizationBenchmarking.utils.hash.HashUtils;
-import org.optimizationBenchmarking.utils.math.functions.basic.Identity;
 import org.optimizationBenchmarking.utils.math.matrix.IMatrix;
 import org.optimizationBenchmarking.utils.math.matrix.processing.ColumnTransformedMatrix;
+import org.optimizationBenchmarking.utils.math.matrix.processing.iterator2D.CallableMatrixIteration2DBuilder;
+import org.optimizationBenchmarking.utils.math.statistics.aggregate.Matrix2DAggregate;
+import org.optimizationBenchmarking.utils.math.statistics.aggregate.ScalarAggregate;
 import org.optimizationBenchmarking.utils.math.statistics.parameters.Median;
 import org.optimizationBenchmarking.utils.math.statistics.parameters.StatisticalParameter;
 import org.optimizationBenchmarking.utils.math.statistics.parameters.StatisticalParameterParser;
@@ -221,6 +224,8 @@ public final class Aggregation2D extends FunctionAttribute<IElementSet> {
     final IMatrix result;
     final DimensionTransformation xIn, yIn;
     final Transformation yOut;
+    CallableMatrixIteration2DBuilder<IMatrix> builder;
+    ScalarAggregate aggregate;
     String name;
     int i;
 
@@ -254,12 +259,22 @@ public final class Aggregation2D extends FunctionAttribute<IElementSet> {
     }
 
     yOut = this.getYAxisOutputTransformation();
+    builder = new CallableMatrixIteration2DBuilder<>();
+    MatrixIteration2DUtils.setupDimensionProperties(builder,
+        xIn.getDimension(), yIn.getDimension(), false, false);
+    builder.setXDimension(0);
+    builder.setYDimension(1);
+    builder.setMatrices(matrices);
+    aggregate = this.m_param.createSampleAggregate();
     synchronized (yOut) {
       try (final TransformationFunction yOutputFunction = yOut.use(data)) {
-        result = this.m_param.aggregate2D(matrices, 0, 1, yOutputFunction);
+        result = builder
+            .setVisitor(new Matrix2DAggregate(aggregate, yOutputFunction))//
+            .create().call();
       }
     }
-
+    aggregate = null;
+    builder = null;
     if ((logger != null) && (logger.isLoggable(Level.FINER))) {
       if (name == null) {
         name = this.getNameForLogging(data);
@@ -270,6 +285,31 @@ public final class Aggregation2D extends FunctionAttribute<IElementSet> {
     }
 
     return result;
+  }
+
+  /**
+   * compute the secondary aggregate.
+   *
+   * @param matrices
+   *          the matrices
+   * @param logger
+   *          the logger
+   * @return the aggregation result
+   */
+  private final IMatrix __secondaryAggregate(final IMatrix[] matrices,
+      final Logger logger) {
+    CallableMatrixIteration2DBuilder<IMatrix> builder;
+
+    builder = new CallableMatrixIteration2DBuilder<>();
+    MatrixIteration2DUtils.setupDimensionProperties(builder,
+        this.getXAxisTransformation().getDimension(),
+        this.getYAxisInputTransformation().getDimension(), false, false);
+    builder.setXDimension(0);
+    builder.setYDimension(1);
+    builder.setMatrices(matrices);
+    builder.setVisitor(new Matrix2DAggregate(
+        this.m_second.createSampleAggregate(), null));
+    return builder.create().call();
   }
 
   /**
@@ -310,7 +350,7 @@ public final class Aggregation2D extends FunctionAttribute<IElementSet> {
     matrices = new IMatrix[tasks.length];
     Execute.join(tasks, matrices, 0, true);
 
-    result = this.m_second.aggregate2D(matrices, 0, 1, Identity.INSTANCE);
+    result = this.__secondaryAggregate(matrices, logger);
 
     if ((logger != null) && (logger.isLoggable(Level.FINER))) {
       if (name == null) {
@@ -358,7 +398,7 @@ public final class Aggregation2D extends FunctionAttribute<IElementSet> {
 
     matrices = new IMatrix[tasks.size()];
     Execute.join(tasks, matrices, 0, true);
-    result = this.m_second.aggregate2D(matrices, 0, 1, Identity.INSTANCE);
+    result = this.__secondaryAggregate(matrices, logger);
 
     if ((logger != null) && (logger.isLoggable(Level.FINER))) {
       if (name == null) {

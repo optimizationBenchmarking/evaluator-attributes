@@ -41,8 +41,12 @@ import org.optimizationBenchmarking.utils.document.spec.IMath;
 import org.optimizationBenchmarking.utils.document.spec.IText;
 import org.optimizationBenchmarking.utils.hash.HashUtils;
 import org.optimizationBenchmarking.utils.math.NumericalTypes;
-import org.optimizationBenchmarking.utils.math.functions.basic.Identity;
 import org.optimizationBenchmarking.utils.math.matrix.IMatrix;
+import org.optimizationBenchmarking.utils.math.matrix.processing.iterator2D.CallableMatrixIteration2DBuilder;
+import org.optimizationBenchmarking.utils.math.matrix.processing.iterator2D.EIterationDirection;
+import org.optimizationBenchmarking.utils.math.matrix.processing.iterator2D.EIterationMode;
+import org.optimizationBenchmarking.utils.math.matrix.processing.iterator2D.EMissingValueMode;
+import org.optimizationBenchmarking.utils.math.statistics.aggregate.Matrix2DAggregate;
 import org.optimizationBenchmarking.utils.math.statistics.parameters.ArithmeticMean;
 import org.optimizationBenchmarking.utils.math.statistics.parameters.StatisticalParameter;
 import org.optimizationBenchmarking.utils.math.statistics.parameters.StatisticalParameterParser;
@@ -562,8 +566,7 @@ public final class ECDF extends FunctionAttribute<IElementSet> {
     matrices = new IMatrix[tasks.length];
     Execute.join(tasks, matrices, 0, true);
 
-    result = this.m_aggregate.aggregate2D(matrices, 0, 1,
-        Identity.INSTANCE);
+    result = this.__aggregate(logger, matrices);
 
     if ((logger != null) && (logger.isLoggable(Level.FINER))) {
       if (name == null) {
@@ -578,6 +581,33 @@ public final class ECDF extends FunctionAttribute<IElementSet> {
     }
 
     return result;
+  }
+
+  /**
+   * aggregate over matrices
+   *
+   * @param logger
+   *          the logger
+   * @param matrices
+   *          the matrices
+   * @return the result
+   */
+  private final IMatrix __aggregate(final Logger logger,
+      final IMatrix[] matrices) {
+    return new CallableMatrixIteration2DBuilder<IMatrix>()//
+        .setLogger(logger)//
+        .setStartReplacement(Double.valueOf(0d))//
+        .setEndMode(EMissingValueMode.USE_ITERATION_MODE)//
+        .setIterationMode(EIterationMode.KEEP_PREVIOUS)//
+        .setXDirection(this.getXAxisTransformation().getDimension()
+            .getDirection().isIncreasing() ? EIterationDirection.INCREASING
+                : EIterationDirection.DECREASING)//
+        .setXDimension(0)//
+        .setYDimension(1)//
+        .setMatrices(matrices)//
+        .setVisitor(new Matrix2DAggregate(
+            this.m_aggregate.createSampleAggregate(), null))//
+        .create().call();
   }
 
   /**
@@ -614,8 +644,7 @@ public final class ECDF extends FunctionAttribute<IElementSet> {
     matrices = new IMatrix[tasks.size()];
     Execute.join(tasks, matrices, 0, true);
 
-    result = this.m_aggregate.aggregate2D(matrices, 0, 1,
-        Identity.INSTANCE);
+    result = this.__aggregate(logger, matrices);
 
     if ((logger != null) && (logger.isLoggable(Level.FINER))) {
       if (name == null) {
