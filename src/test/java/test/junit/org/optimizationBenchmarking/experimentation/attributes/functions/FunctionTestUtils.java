@@ -114,8 +114,10 @@ public final class FunctionTestUtils {
     }
 
     if ((time.size() > 0) && (objective.size() > 0)) {
-      dimX = time.get(random.nextInt(time.size()));
-      dimY = objective.get(random.nextInt(objective.size()));
+      dimX = ((random.nextInt(4) > 0) ? time : objective)
+          .get(random.nextInt(time.size()));
+      dimY = ((random.nextInt(4) > 0) ? objective : time)
+          .get(random.nextInt(objective.size()));
     } else {
       dimX = dims.get(random.nextInt(size));
       dimY = dims.get(random.nextInt(size));

@@ -307,6 +307,20 @@ public final class Aggregation2D extends FunctionAttribute<IElementSet> {
     builder.setXDimension(0);
     builder.setYDimension(1);
     builder.setMatrices(matrices);
+    builder.setSkipLeadingAndTrailingNaNsOnXAxis(true);
+    builder.setSkipLeadingAndTrailingNaNsOnYAxis(true);
+
+    if (this.m_second.isDispersionStatistic()) {
+      builder.setNaNReplacementForYAxis(Double.POSITIVE_INFINITY);
+    } else {
+      if (this.m_second.isRepresentativeValueStatistic()) {
+        builder.setNaNReplacementForYAxis(//
+            this.getYAxisInputTransformation().getDimension()
+                .getDirection().isIncreasing() ? Double.NEGATIVE_INFINITY
+                    : Double.POSITIVE_INFINITY);
+      }
+    }
+
     builder.setVisitor(new Matrix2DAggregate(
         this.m_second.createSampleAggregate(), null));
     return builder.create().call();

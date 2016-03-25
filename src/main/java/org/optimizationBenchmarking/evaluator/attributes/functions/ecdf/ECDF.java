@@ -605,6 +605,9 @@ public final class ECDF extends FunctionAttribute<IElementSet> {
         .setXDimension(0)//
         .setYDimension(1)//
         .setMatrices(matrices)//
+        .setSkipLeadingAndTrailingNaNsOnXAxis(true)//
+        .setSkipLeadingAndTrailingNaNsOnYAxis(true)//
+        .setNaNReplacementForYAxis(1)//
         .setVisitor(new Matrix2DAggregate(
             this.m_aggregate.createSampleAggregate(), null))//
         .create().call();
