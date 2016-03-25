@@ -96,7 +96,7 @@ public final class FunctionTestUtils {
     final DimensionTransformation x, y;
     final Transformation trafo;
     final IDimension dimX, dimY;
-    ArrayList<IDimension> time, objective;
+    ArrayList<IDimension> time, objective, use;
 
     dims = data.getDimensions().getData();
     Assert.assertNotNull(dims);
@@ -114,10 +114,10 @@ public final class FunctionTestUtils {
     }
 
     if ((time.size() > 0) && (objective.size() > 0)) {
-      dimX = ((random.nextInt(4) > 0) ? time : objective)
-          .get(random.nextInt(time.size()));
-      dimY = ((random.nextInt(4) > 0) ? objective : time)
-          .get(random.nextInt(objective.size()));
+      use = ((random.nextInt(4) > 0) ? time : objective);
+      dimX = use.get(random.nextInt(use.size()));
+      use = ((random.nextInt(4) > 0) ? objective : time);
+      dimY = use.get(random.nextInt(use.size()));
     } else {
       dimX = dims.get(random.nextInt(size));
       dimY = dims.get(random.nextInt(size));
