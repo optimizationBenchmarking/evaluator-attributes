@@ -1,4 +1,4 @@
-package test.junit.org.optimizationBenchmarking.experimentation.attributes.functions.aggregation2D;
+package test.junit.org.optimizationBenchmarking.evaluator.attributes.functions.aggregation2D;
 
 import java.util.Random;
 
@@ -10,8 +10,8 @@ import org.optimizationBenchmarking.utils.math.matrix.IMatrix;
 
 import shared.junit.CategorySlowTests;
 import shared.junit.org.optimizationBenchmarking.evaluator.attributes.ExperimentSetAttributeTest;
-import test.junit.org.optimizationBenchmarking.experimentation.attributes.functions.FunctionTestUtils;
-import test.junit.org.optimizationBenchmarking.experimentation.attributes.functions.FunctionTestUtils.FunctionParameters;
+import test.junit.org.optimizationBenchmarking.evaluator.attributes.functions.FunctionTestUtils;
+import test.junit.org.optimizationBenchmarking.evaluator.attributes.functions.FunctionTestUtils.FunctionParameters;
 
 /** The test for the aggregation 2D computed over experiment sets */
 public class ExperimentSetAggregation2DTest

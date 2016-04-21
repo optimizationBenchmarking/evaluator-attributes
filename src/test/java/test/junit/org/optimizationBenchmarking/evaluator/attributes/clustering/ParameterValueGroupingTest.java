@@ -1,4 +1,4 @@
-package test.junit.org.optimizationBenchmarking.experimentation.attributes.clustering;
+package test.junit.org.optimizationBenchmarking.evaluator.attributes.clustering;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -9,15 +9,15 @@ import org.optimizationBenchmarking.evaluator.attributes.clusters.propertyValueG
 import org.optimizationBenchmarking.evaluator.attributes.clusters.propertyValueGroups.PropertyValueSelector;
 import org.optimizationBenchmarking.evaluator.data.spec.Attribute;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperimentSet;
-import org.optimizationBenchmarking.evaluator.data.spec.IFeature;
-import org.optimizationBenchmarking.evaluator.data.spec.IFeatureValue;
+import org.optimizationBenchmarking.evaluator.data.spec.IParameter;
+import org.optimizationBenchmarking.evaluator.data.spec.IParameterValue;
 import org.optimizationBenchmarking.utils.math.NumericalTypes;
 
-/** Test the clustering by feature group */
-public class FeatureValueGroupingTest extends ClusteringTest {
+/** Test the clustering by parameter group */
+public class ParameterValueGroupingTest extends ClusteringTest {
 
   /** create */
-  public FeatureValueGroupingTest() {
+  public ParameterValueGroupingTest() {
     super(null);
   }
 
@@ -31,15 +31,15 @@ public class FeatureValueGroupingTest extends ClusteringTest {
     final int min, max;
     final double numParam;
     final boolean pickNum;
-    final ArrayList<IFeature> numerical, plain, pick;
+    final ArrayList<IParameter> numerical, plain, pick;
 
     random = new Random();
 
     numerical = new ArrayList<>();
     plain = new ArrayList<>();
-    outer: for (final IFeature param : data.getFeatures().getData()) {
+    outer: for (final IParameter param : data.getParameters().getData()) {
 
-      for (final IFeatureValue value : param.getData()) {
+      for (final IParameterValue value : param.getData()) {
         if (!(value instanceof Number)) {
           plain.add(param);
           continue outer;

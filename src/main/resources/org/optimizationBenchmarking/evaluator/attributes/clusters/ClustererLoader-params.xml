@@ -20,6 +20,6 @@
 	</cd:instance>
 
 	<cd:inherit
-		class="org.optimizationBenchmarking.experimentation.attributes.clusters.propertyValueGroups.PropertyValueSelector" />
+		class="org.optimizationBenchmarking.evaluator.attributes.clusters.propertyValueGroups.PropertyValueSelector" />
 
 </cd:configurationDefinition>

@@ -1,4 +1,4 @@
-package test.junit.org.optimizationBenchmarking.experimentation.attributes.clustering;
+package test.junit.org.optimizationBenchmarking.evaluator.attributes.clustering;
 
 import org.optimizationBenchmarking.evaluator.attributes.clusters.byInstance.ByInstanceGrouping;
 

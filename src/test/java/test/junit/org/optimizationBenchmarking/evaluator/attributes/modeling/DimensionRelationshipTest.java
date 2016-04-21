@@ -1,4 +1,4 @@
-package test.junit.org.optimizationBenchmarking.experimentation.attributes.modeling;
+package test.junit.org.optimizationBenchmarking.evaluator.attributes.modeling;
 
 import java.util.Random;
 

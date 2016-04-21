@@ -1,4 +1,4 @@
-package test.junit.org.optimizationBenchmarking.experimentation.attributes.functions;
+package test.junit.org.optimizationBenchmarking.evaluator.attributes.functions;
 
 import java.util.ArrayList;
 import java.util.Random;

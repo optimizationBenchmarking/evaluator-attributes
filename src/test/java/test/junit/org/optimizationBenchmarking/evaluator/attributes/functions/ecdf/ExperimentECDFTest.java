@@ -1,25 +1,26 @@
-package test.junit.org.optimizationBenchmarking.experimentation.attributes.functions.aggregation2D;
+package test.junit.org.optimizationBenchmarking.evaluator.attributes.functions.ecdf;
 
 import java.util.Random;
 
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.optimizationBenchmarking.evaluator.attributes.functions.aggregation2D.Aggregation2D;
+import org.optimizationBenchmarking.evaluator.attributes.functions.ecdf.ECDF;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperiment;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperimentSet;
+import org.optimizationBenchmarking.utils.comparison.EComparison;
 import org.optimizationBenchmarking.utils.math.matrix.IMatrix;
 
 import shared.junit.CategorySlowTests;
 import shared.junit.org.optimizationBenchmarking.evaluator.attributes.ExperimentAttributeTest;
-import test.junit.org.optimizationBenchmarking.experimentation.attributes.functions.FunctionTestUtils;
-import test.junit.org.optimizationBenchmarking.experimentation.attributes.functions.FunctionTestUtils.FunctionParameters;
+import test.junit.org.optimizationBenchmarking.evaluator.attributes.functions.FunctionTestUtils;
+import test.junit.org.optimizationBenchmarking.evaluator.attributes.functions.FunctionTestUtils.FunctionParameters;
 
-/** The test for the aggregation 2D computed over experiments */
-public class ExperimentAggregation2DTest
-    extends ExperimentAttributeTest<IMatrix, Aggregation2D> {
+/** The test for the ECDF computed over whole experiments */
+public class ExperimentECDFTest
+    extends ExperimentAttributeTest<IMatrix, ECDF> {
 
   /** create */
-  public ExperimentAggregation2DTest() {
+  public ExperimentECDFTest() {
     super(null);
   }
 
@@ -31,7 +32,7 @@ public class ExperimentAggregation2DTest
 
   /** {@inheritDoc} */
   @Override
-  protected void checkResult(final Aggregation2D attribute,
+  protected void checkResult(final ECDF attribute,
       final IExperimentSet experimentSet, final IExperiment input,
       final IMatrix result) {
     FunctionTestUtils.checkFunctionMatrix(result);
@@ -47,7 +48,7 @@ public class ExperimentAggregation2DTest
 
   /** {@inheritDoc} */
   @Override
-  protected Aggregation2D getAttribute(final IExperimentSet experimentSet,
+  protected ECDF getAttribute(final IExperimentSet experimentSet,
       final IExperiment data) {
     final Random random;
     final FunctionParameters params;
@@ -56,11 +57,15 @@ public class ExperimentAggregation2DTest
     params = FunctionTestUtils.createFunctionParameters(experimentSet,
         random);
 
-    return new Aggregation2D(//
+    return new ECDF(//
         params.xAxisTransformation, //
         params.yAxisInputTransformation, //
         params.yAxisOutputTransformation, //
-        FunctionTestUtils.getStatisticalParameter(random), //
+        Double.valueOf(random.nextDouble()), //
+        (params.yDim.getDirection().isIncreasing() ? //
+            EComparison.GREATER_OR_EQUAL
+            : //
+            EComparison.LESS_OR_EQUAL), //
         FunctionTestUtils.getStatisticalParameter(random)//
     );
   }

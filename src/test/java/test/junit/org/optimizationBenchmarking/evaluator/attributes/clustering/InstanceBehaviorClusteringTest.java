@@ -1,4 +1,4 @@
-package test.junit.org.optimizationBenchmarking.experimentation.attributes.clustering;
+package test.junit.org.optimizationBenchmarking.evaluator.attributes.clustering;
 
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -6,7 +6,7 @@ import org.optimizationBenchmarking.evaluator.attributes.clusters.behavior.Insta
 import org.optimizationBenchmarking.utils.ml.clustering.impl.DefaultClusterer;
 
 import shared.junit.CategorySlowTests;
-import test.junit.org.optimizationBenchmarking.experimentation.attributes.modeling.DimensionRelationshipTest;
+import test.junit.org.optimizationBenchmarking.evaluator.attributes.modeling.DimensionRelationshipTest;
 
 /** Test the clustering by instance behavior */
 public class InstanceBehaviorClusteringTest extends ClusteringTest {

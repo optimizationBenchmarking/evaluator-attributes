@@ -1,4 +1,4 @@
-package test.junit.org.optimizationBenchmarking.experimentation.attributes.functions.aggregation2D;
+package test.junit.org.optimizationBenchmarking.evaluator.attributes.functions.aggregation2D;
 
 import java.util.Random;
 
@@ -8,8 +8,8 @@ import org.optimizationBenchmarking.evaluator.data.spec.IInstanceRuns;
 import org.optimizationBenchmarking.utils.math.matrix.IMatrix;
 
 import shared.junit.org.optimizationBenchmarking.evaluator.attributes.InstanceRunsAttributeTest;
-import test.junit.org.optimizationBenchmarking.experimentation.attributes.functions.FunctionTestUtils;
-import test.junit.org.optimizationBenchmarking.experimentation.attributes.functions.FunctionTestUtils.FunctionParameters;
+import test.junit.org.optimizationBenchmarking.evaluator.attributes.functions.FunctionTestUtils;
+import test.junit.org.optimizationBenchmarking.evaluator.attributes.functions.FunctionTestUtils.FunctionParameters;
 
 /** The test for the aggregation 2D computed over instance runs */
 public class InstanceRunsAggregation2DTest

@@ -1,4 +1,4 @@
-package test.junit.org.optimizationBenchmarking.experimentation.attributes;
+package test.junit.org.optimizationBenchmarking.evaluator.attributes;
 
 import org.optimizationBenchmarking.evaluator.attributes.OnlySharedInstances;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperimentSet;

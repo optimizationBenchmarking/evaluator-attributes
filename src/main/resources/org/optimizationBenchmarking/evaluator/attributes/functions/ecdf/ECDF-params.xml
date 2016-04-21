@@ -63,5 +63,5 @@
 	</cd:instance>
 
 	<cd:inherit
-		class="org.optimizationBenchmarking.experimentation.attributes.functions.FunctionAttribute" />
+		class="org.optimizationBenchmarking.evaluator.attributes.functions.FunctionAttribute" />
 </cd:configurationDefinition>
