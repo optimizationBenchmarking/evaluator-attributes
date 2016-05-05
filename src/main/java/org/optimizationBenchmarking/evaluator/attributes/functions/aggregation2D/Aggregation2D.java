@@ -308,16 +308,19 @@ public final class Aggregation2D extends FunctionAttribute<IElementSet> {
     builder.setYDimension(1);
     builder.setMatrices(matrices);
     builder.setSkipLeadingAndTrailingNaNsOnXAxis(true);
-    builder.setSkipLeadingAndTrailingNaNsOnYAxis(true);
 
     if (this.m_second.isDispersionStatistic()) {
+      builder.setSkipLeadingAndTrailingNaNsOnYAxis(false);
       builder.setNaNReplacementForYAxis(Double.POSITIVE_INFINITY);
     } else {
       if (this.m_second.isRepresentativeValueStatistic()) {
+        builder.setSkipLeadingAndTrailingNaNsOnYAxis(false);
         builder.setNaNReplacementForYAxis(//
             this.getYAxisInputTransformation().getDimension()
                 .getDirection().isIncreasing() ? Double.NEGATIVE_INFINITY
                     : Double.POSITIVE_INFINITY);
+      } else {
+        builder.setSkipLeadingAndTrailingNaNsOnYAxis(true);
       }
     }
 
@@ -477,6 +480,43 @@ public final class Aggregation2D extends FunctionAttribute<IElementSet> {
   protected final String getLongName() {
     return (this.m_second.getLongName() + " of " + //$NON-NLS-1$
         (this.m_param.getLongName() + 's'));
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public ETextCase printLongName(final ITextOutput textOut,
+      final ETextCase textCase) {
+    final boolean isComplex;
+    DimensionTransformation trafo;
+    ETextCase nextCase;
+
+    nextCase = textCase.appendWords(this.getLongName(), textOut);
+    textOut.append(' ');
+    nextCase = nextCase.appendWord("of", textOut); //$NON-NLS-1$
+    textOut.append(' ');
+    trafo = this.getYAxisInputTransformation();
+    isComplex = (textOut instanceof IComplexText);
+    if (isComplex) {
+      try (final IMath math = ((IComplexText) textOut).inlineMath()) {
+        trafo.mathRender(math, null);
+      }
+    } else {
+      trafo.mathRender(textOut, null);
+    }
+
+    textOut.append(' ');
+    nextCase = nextCase.appendWord("over", textOut); //$NON-NLS-1$
+    textOut.append(' ');
+
+    trafo = this.getXAxisTransformation();
+    if (isComplex) {
+      try (final IMath math = ((IComplexText) textOut).inlineMath()) {
+        trafo.mathRender(math, null);
+      }
+    } else {
+      trafo.mathRender(textOut, null);
+    }
+    return nextCase;
   }
 
   /**

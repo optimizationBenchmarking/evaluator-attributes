@@ -447,6 +447,53 @@ public final class ECDF extends FunctionAttribute<IElementSet> {
     return "estimated cumulative distribution function"; //$NON-NLS-1$
   }
 
+  /** {@inheritDoc} */
+  @Override
+  public ETextCase printLongName(final ITextOutput textOut,
+      final ETextCase textCase) {
+    final boolean isComplex;
+    DimensionTransformation trafo;
+    ETextCase nextCase;
+
+    nextCase = textCase.appendWords(this.getLongName(), textOut);
+    textOut.append(' ');
+    nextCase = nextCase.appendWord("with", textOut); //$NON-NLS-1$
+    textOut.append(' ');
+    nextCase = nextCase.appendWord("goal", textOut); //$NON-NLS-1$
+    textOut.append(' ');
+    trafo = this.getYAxisInputTransformation();
+    isComplex = (textOut instanceof IComplexText);
+    if (isComplex) {
+      try (final IMath math = ((IComplexText) textOut).inlineMath()) {
+        trafo.mathRender(math, null);
+      }
+    } else {
+      trafo.mathRender(textOut, null);
+    }
+    textOut.append('-');
+    nextCase = nextCase.appendWord("value", textOut); //$NON-NLS-1$
+    textOut.append(' ');
+    if (this.m_useLongGoal) {
+      textOut.append(this.m_goalValueLong);
+    } else {
+      textOut.append(this.m_goalValueDouble);
+    }
+
+    textOut.append(' ');
+    nextCase = nextCase.appendWord("over", textOut); //$NON-NLS-1$
+    textOut.append(' ');
+
+    trafo = this.getXAxisTransformation();
+    if (isComplex) {
+      try (final IMath math = ((IComplexText) textOut).inlineMath()) {
+        trafo.mathRender(math, null);
+      }
+    } else {
+      trafo.mathRender(textOut, null);
+    }
+    return nextCase;
+  }
+
   /**
    * Compute the raw matrix for an instance run set
    *
