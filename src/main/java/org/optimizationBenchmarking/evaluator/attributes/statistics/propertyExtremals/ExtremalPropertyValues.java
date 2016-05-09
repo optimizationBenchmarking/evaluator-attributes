@@ -68,7 +68,7 @@ public final class ExtremalPropertyValues<PT extends IPropertyValue>
    * @return the minimum property value
    */
   public final PT getMinimum() {
-    return this.m_max;
+    return this.m_min;
   }
 
   /**
