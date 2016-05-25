@@ -13,7 +13,7 @@ public class AlgorithmBehaviorClusteringTest extends ClusteringTest {
 
   /** create */
   public AlgorithmBehaviorClusteringTest() {
-    super(AlgorithmBehaviorClusterer.INSTANCE);
+    super(new AlgorithmBehaviorClusterer(-1, -1));
   }
 
   /** {@inheritDoc} */

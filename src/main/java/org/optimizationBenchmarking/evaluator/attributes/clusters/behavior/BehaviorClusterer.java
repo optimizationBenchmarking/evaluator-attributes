@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.optimizationBenchmarking.evaluator.attributes.OnlySharedInstances;
+import org.optimizationBenchmarking.evaluator.attributes.clusters.IClustering;
 import org.optimizationBenchmarking.evaluator.attributes.modeling.DimensionRelationshipAndData;
 import org.optimizationBenchmarking.evaluator.attributes.modeling.DimensionRelationshipData;
 import org.optimizationBenchmarking.evaluator.data.spec.Attribute;
@@ -19,24 +20,63 @@ import org.optimizationBenchmarking.evaluator.data.spec.INamedElement;
 import org.optimizationBenchmarking.evaluator.data.spec.INamedElementSet;
 import org.optimizationBenchmarking.utils.MemoryUtils;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
+import org.optimizationBenchmarking.utils.config.Configuration;
+import org.optimizationBenchmarking.utils.hash.HashUtils;
 import org.optimizationBenchmarking.utils.math.matrix.impl.DistanceMatrix;
 import org.optimizationBenchmarking.utils.ml.clustering.impl.DefaultClusterer;
+import org.optimizationBenchmarking.utils.ml.clustering.spec.IClusteringJob;
+import org.optimizationBenchmarking.utils.ml.clustering.spec.IDistanceClusteringJobBuilder;
 import org.optimizationBenchmarking.utils.parallel.Execute;
+import org.optimizationBenchmarking.utils.text.textOutput.MemoryTextOutput;
 
 /**
  * Cluster experimental data based on the runtime behavior of algorithms.
  *
- * @param <CT>
- *          the cluster type
  * @param <CCT>
  *          the clustering type
  */
-abstract class _BehaviorClusterer<CT extends _BehaviorCluster<CCT>, CCT extends _BehaviorClustering<CT>>
+public abstract class BehaviorClusterer<CCT extends IClustering>
     extends Attribute<IExperimentSet, CCT> {
 
-  /** create the clusterer */
-  _BehaviorClusterer() {
+  /** the minimum number of clusters to use */
+  public static final String PARAM_MIN_CLUSTERS = "minClusters"; //$NON-NLS-1$
+  /** the maximum number of clusters to use */
+  public static final String PARAM_MAX_CLUSTERS = "maxClusters"; //$NON-NLS-1$
+
+  /**
+   * the minimum number of clusters ot be used, {@code -1} for undefined
+   */
+  private final int m_minClusters;
+  /**
+   * the maximum number of clusters ot be used, {@code -1} for undefined
+   */
+  private final int m_maxClusters;
+
+  /**
+   * create the clusterer
+   *
+   * @param minClusters
+   *          the minimum number of clusters ot be used, {@code -1} for
+   *          undefined
+   * @param maxClusters
+   *          the minimum number of clusters ot be used, {@code -1} for
+   *          undefined
+   */
+  BehaviorClusterer(final int minClusters, final int maxClusters) {
     super(EAttributeType.TEMPORARILY_STORED);
+    this.m_minClusters = minClusters;
+    this.m_maxClusters = maxClusters;
+  }
+
+  /**
+   * create the clusterer
+   *
+   * @param config
+   *          the configuration
+   */
+  BehaviorClusterer(final Configuration config) {
+    this(config.getInt(BehaviorClusterer.PARAM_MIN_CLUSTERS, 1, 100, -1), //
+        config.getInt(BehaviorClusterer.PARAM_MAX_CLUSTERS, 1, 100, -1));
   }
 
   /**
@@ -149,6 +189,7 @@ abstract class _BehaviorClusterer<CT extends _BehaviorCluster<CCT>, CCT extends 
     final int size;
     final String what;
     final CCT result;
+    IDistanceClusteringJobBuilder clusterBuilder;
     String[] categories;
     IExperimentSet shared;
     DistanceMatrix distances;
@@ -157,6 +198,8 @@ abstract class _BehaviorClusterer<CT extends _BehaviorCluster<CCT>, CCT extends 
     DimensionRelationshipData[][][] fittings;
     DimensionRelationshipAndData[] attrs;
     int[] clusters;
+    MemoryTextOutput textOut;
+    IClusteringJob job;
 
     shared = OnlySharedInstances.INSTANCE.get(data, logger);
     names = this._getElementsToCluster(shared);
@@ -187,7 +230,7 @@ abstract class _BehaviorClusterer<CT extends _BehaviorCluster<CCT>, CCT extends 
       what = null;
     }
 
-    attrs = _BehaviorClusterer.__getFittingAttributes(data);
+    attrs = BehaviorClusterer.__getFittingAttributes(data);
 
     elements = names.getData();
     size = elements.size();
@@ -214,15 +257,41 @@ abstract class _BehaviorClusterer<CT extends _BehaviorCluster<CCT>, CCT extends 
 
     if ((logger != null) && (what != null)
         && logger.isLoggable(Level.FINER)) {
-      logger.finer(//
-          "Distance matrix computed, now we cluster" + //$NON-NLS-1$
-              what + " based on this matrix.");//$NON-NLS-1$
+      textOut = new MemoryTextOutput(512);
+      textOut.append("Distance matrix computed, now we cluster"); //$NON-NLS-1$
+      textOut.append(what);
+      textOut.append(" based on this matrix");//$NON-NLS-1$
+      if ((this.m_minClusters > 0) || (this.m_maxClusters > 0)) {
+        textOut.append(" into [");//$NON-NLS-1$
+        if (this.m_minClusters > 0) {
+          textOut.append(this.m_minClusters);
+        }
+        textOut.append(',');
+        if (this.m_maxClusters > 0) {
+          textOut.append(this.m_maxClusters);
+        }
+        textOut.append(" clusters.");//$NON-NLS-1$
+      } else {
+        textOut.append('.');
+      }
+      logger.finer(textOut.toString());
+      textOut = null;
     }
 
-    clusters = DefaultClusterer.getDistanceInstance().use()//
-        .setLogger(logger).setDistanceMatrix(distances)//
-        .create().call().getClustersRef();
+    clusterBuilder = DefaultClusterer.getDistanceInstance().use()//
+        .setLogger(logger)//
+        .setDistanceMatrix(distances);
     distances = null;
+    if (this.m_minClusters > 0) {
+      clusterBuilder.setMinClusters(this.m_minClusters);
+    }
+    if (this.m_maxClusters > 0) {
+      clusterBuilder.setMaxClusters(this.m_maxClusters);
+    }
+    job = clusterBuilder.create();
+    clusterBuilder = null;
+    clusters = job.call().getClustersRef();
+    job = null;
 
     if ((logger != null) && (what != null)
         && logger.isLoggable(Level.FINER)) {
@@ -252,5 +321,31 @@ abstract class _BehaviorClusterer<CT extends _BehaviorCluster<CCT>, CCT extends 
     result = this.__compute(data, logger);
     MemoryUtils.fullGC();
     return result;
+  }
+
+  /** {@inheritDoc} */
+  @SuppressWarnings("unchecked")
+  @Override
+  public final boolean equals(final Object o) {
+    BehaviorClusterer<CCT> other;
+    if (o == null) {
+      return false;
+    }
+    if (o == this) {
+      return true;
+    }
+    if (o.getClass() == this.getClass()) {
+      other = ((BehaviorClusterer<CCT>) o);
+      return ((this.m_minClusters == other.m_minClusters)//
+          && (this.m_maxClusters == other.m_maxClusters));
+    }
+    return true;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  protected int calcHashCode() {
+    return HashUtils.combineHashes(HashUtils.hashCode(this.m_maxClusters),
+        HashUtils.hashCode(this.m_minClusters));
   }
 }

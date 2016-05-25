@@ -8,12 +8,14 @@ import org.optimizationBenchmarking.evaluator.data.spec.IInstanceRuns;
 import org.optimizationBenchmarking.evaluator.data.spec.INamedElement;
 import org.optimizationBenchmarking.evaluator.data.spec.INamedElementSet;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
+import org.optimizationBenchmarking.utils.config.Configuration;
+import org.optimizationBenchmarking.utils.hash.HashUtils;
 
 /**
  * A clusterer for clustering via instance behavior.
  */
-public final class InstanceBehaviorClusterer extends
-    _BehaviorClusterer<InstanceBehaviorCluster, InstanceBehaviorClustering> {
+public final class InstanceBehaviorClusterer
+    extends BehaviorClusterer<InstanceBehaviorClustering> {
 
   /**
    * indicate that clustering should be performed by instance, based on the
@@ -21,12 +23,29 @@ public final class InstanceBehaviorClusterer extends
    */
   public static final String CHOICE_INSTANCES_BY_ALGORITHM_BEHAVIOR = "instances by algorithm behavior"; //$NON-NLS-1$
 
-  /** the instance behavior clusterer instance */
-  public static final InstanceBehaviorClusterer INSTANCE = new InstanceBehaviorClusterer();
+  /**
+   * create instance behavior clusterer
+   *
+   * @param minClusters
+   *          the minimum number of clusters ot be used, {@code -1} for
+   *          undefined
+   * @param maxClusters
+   *          the minimum number of clusters ot be used, {@code -1} for
+   *          undefined
+   */
+  public InstanceBehaviorClusterer(final int minClusters,
+      final int maxClusters) {
+    super(minClusters, maxClusters);
+  }
 
-  /** create the instance behavior clusterer */
-  private InstanceBehaviorClusterer() {
-    super();
+  /**
+   * create the instance behavior clusterer from a given configuration
+   *
+   * @param config
+   *          the configuration
+   */
+  public InstanceBehaviorClusterer(final Configuration config) {
+    super(config);
   }
 
   /** {@inheritDoc} */
@@ -46,7 +65,7 @@ public final class InstanceBehaviorClusterer extends
   /** {@inheritDoc} */
   @Override
   public final String toString() {
-    return "by instances according to algorithm performance"; //$NON-NLS-1$
+    return InstanceBehaviorClusterer.CHOICE_INSTANCES_BY_ALGORITHM_BEHAVIOR;
   }
 
   /** {@inheritDoc} */
@@ -95,5 +114,11 @@ public final class InstanceBehaviorClusterer extends
       strings[index] = experiments.get(index).getName();
     }
     return strings;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  protected final int calcHashCode() {
+    return HashUtils.combineHashes(74346553, super.calcHashCode());
   }
 }

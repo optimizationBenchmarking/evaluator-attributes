@@ -13,7 +13,7 @@ public class InstanceBehaviorClusteringTest extends ClusteringTest {
 
   /** create */
   public InstanceBehaviorClusteringTest() {
-    super(InstanceBehaviorClusterer.INSTANCE);
+    super(new InstanceBehaviorClusterer(-1, -1));
   }
 
   /** {@inheritDoc} */

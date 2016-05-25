@@ -9,25 +9,44 @@ import org.optimizationBenchmarking.evaluator.data.spec.IInstanceRuns;
 import org.optimizationBenchmarking.evaluator.data.spec.INamedElement;
 import org.optimizationBenchmarking.evaluator.data.spec.INamedElementSet;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
+import org.optimizationBenchmarking.utils.config.Configuration;
+import org.optimizationBenchmarking.utils.hash.HashUtils;
 
 /**
  * A clusterer for clustering via algorithm behavior.
  */
-public final class AlgorithmBehaviorClusterer extends
-    _BehaviorClusterer<AlgorithmBehaviorCluster, AlgorithmBehaviorClustering> {
+public final class AlgorithmBehaviorClusterer
+    extends BehaviorClusterer<AlgorithmBehaviorClustering> {
 
   /**
    * indicate that clustering should be performed by algorithm, based on
    * their runtime behavior
    */
-  public static final String CHOICE_INSTANCES_BY_ALGORITHM_BEHAVIOR = "algorithms by behavior"; //$NON-NLS-1$
+  public static final String CHOICE_ALGORITHMS_BY_ALGORITHM_BEHAVIOR = "algorithms by behavior"; //$NON-NLS-1$
 
-  /** the algorithm behavior clusterer instance */
-  public static final AlgorithmBehaviorClusterer INSTANCE = new AlgorithmBehaviorClusterer();
+  /**
+   * create algorithm behavior clusterer
+   *
+   * @param minClusters
+   *          the minimum number of clusters ot be used, {@code -1} for
+   *          undefined
+   * @param maxClusters
+   *          the minimum number of clusters ot be used, {@code -1} for
+   *          undefined
+   */
+  public AlgorithmBehaviorClusterer(final int minClusters,
+      final int maxClusters) {
+    super(minClusters, maxClusters);
+  }
 
-  /** create the instance behavior clusterer */
-  private AlgorithmBehaviorClusterer() {
-    super();
+  /**
+   * create the algorithm behavior clusterer from a given configuration
+   *
+   * @param config
+   *          the configuration
+   */
+  public AlgorithmBehaviorClusterer(final Configuration config) {
+    super(config);
   }
 
   /** {@inheritDoc} */
@@ -48,7 +67,7 @@ public final class AlgorithmBehaviorClusterer extends
   /** {@inheritDoc} */
   @Override
   public final String toString() {
-    return "by algorithm performance"; //$NON-NLS-1$
+    return AlgorithmBehaviorClusterer.CHOICE_ALGORITHMS_BY_ALGORITHM_BEHAVIOR;
   }
 
   /** {@inheritDoc} */
@@ -87,5 +106,11 @@ public final class AlgorithmBehaviorClusterer extends
       strings[index] = instances.get(index).getName();
     }
     return strings;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  protected final int calcHashCode() {
+    return HashUtils.combineHashes(973543481, super.calcHashCode());
   }
 }

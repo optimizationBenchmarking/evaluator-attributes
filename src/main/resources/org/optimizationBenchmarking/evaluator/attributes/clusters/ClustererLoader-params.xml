@@ -22,4 +22,7 @@
 	<cd:inherit
 		class="org.optimizationBenchmarking.evaluator.attributes.clusters.propertyValueGroups.PropertyValueSelector" />
 
+	<cd:inherit
+		class="org.optimizationBenchmarking.evaluator.attributes.clusters.behavior.BehaviorClusterer" />
+
 </cd:configurationDefinition>
