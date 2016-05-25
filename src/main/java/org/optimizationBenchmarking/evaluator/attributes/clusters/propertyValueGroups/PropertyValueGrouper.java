@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.optimizationBenchmarking.evaluator.attributes.clusters.ClustererLoader;
 import org.optimizationBenchmarking.evaluator.data.impl.shadow.DataSelection;
 import org.optimizationBenchmarking.evaluator.data.spec.Attribute;
 import org.optimizationBenchmarking.evaluator.data.spec.EAttributeType;
@@ -14,9 +15,13 @@ import org.optimizationBenchmarking.evaluator.data.spec.IParameterValue;
 import org.optimizationBenchmarking.evaluator.data.spec.IProperty;
 import org.optimizationBenchmarking.evaluator.data.spec.IPropertyValue;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
+import org.optimizationBenchmarking.utils.comparison.Compare;
 import org.optimizationBenchmarking.utils.config.Configuration;
 import org.optimizationBenchmarking.utils.hash.HashUtils;
 import org.optimizationBenchmarking.utils.math.NumericalTypes;
+import org.optimizationBenchmarking.utils.parsers.AnyNumberParser;
+import org.optimizationBenchmarking.utils.text.TextUtils;
+import org.optimizationBenchmarking.utils.text.tokenizers.WordBasedStringIterator;
 
 /**
  * An attribute which can group property values. The groups are generated
@@ -47,6 +52,17 @@ public final class PropertyValueGrouper
   private static final int DEFAULT_MAX_GROUPS = 10;
   /** the default grouping mode */
   private static final EGroupingMode DEFAULT_GROUPING_MODE = EGroupingMode.ANY;
+
+  /** the constant for the multiples mode */
+  private static final String MULTIPLES = "multiples";//$NON-NLS-1$
+  /** the constant for the powers mode */
+  private static final String POWERS = "powers";//$NON-NLS-1$
+  /** the constant for the distinct mode */
+  private static final String DISTINCT = "distinct";//$NON-NLS-1$
+  /** the constant for the any mode */
+  private static final String ANY = "any";//$NON-NLS-1$
+  /** the constant for "of" */
+  private static final String OF = "of";//$NON-NLS-1$
 
   /** The default value grouper for experiment parameters */
   public static final PropertyValueGrouper DEFAULT_GROUPER//
@@ -304,30 +320,127 @@ public final class PropertyValueGrouper
    */
   public static final PropertyValueGrouper configure(
       final IProperty property, final Configuration config) {
-    final PropertyValueGrouper all;
-    final String name;
+    final String propertyName;
+    final Number defParam;
+    final WordBasedStringIterator iterator;
+    int minGroups, maxGroups;
+    EGroupingMode mode;
+    String current, currentLC;
+    Number param;
+    String grouping;
 
     if (config == null) {
       throw new IllegalArgumentException(//
           "Configuration cannot be null."); //$NON-NLS-1$
     }
 
-    all = config.get(PropertyValueGrouper.PARAM_DEFAULT_GROUPING, //
-        _PropertyValueGrouperParser.DEFAULT_GROUPER_PARSER, //
-        PropertyValueGrouper.DEFAULT_GROUPER);
+    grouping = TextUtils.prepare(config
+        .getString(PropertyValueGrouper.PARAM_DEFAULT_GROUPING, null));
     if (property != null) {
-      name = property.getName();
-      if (name == null) {
+      propertyName = property.getName();
+      if (propertyName == null) {
         throw new IllegalStateException(//
             "Property name cannot be null.");//$NON-NLS-1$
       }
-      return config.get(
+      grouping = TextUtils.prepare(config.getString(
           (property.getName()//
               + PropertyValueGrouper.PARAM_GROUPING_SUFFIX), //
-          _PropertyValueGrouperParser.DEFAULT_GROUPER_PARSER, //
-          all);
+          grouping));
     }
-    return all;
+
+    minGroups = config.getInt(ClustererLoader.PARAM_MIN_GROUPS, -1,
+        ClustererLoader.MAX_GROUPS, -1); //
+    maxGroups = config.getInt(ClustererLoader.PARAM_MIN_GROUPS, -1,
+        ClustererLoader.MAX_GROUPS, -1);
+
+    if (minGroups <= 0) {
+      if ((maxGroups <= 0)
+          || (maxGroups >= PropertyValueGrouper.DEFAULT_MIN_GROUPS)) {
+        minGroups = PropertyValueGrouper.DEFAULT_MIN_GROUPS;
+      } else {
+        minGroups = maxGroups;
+      }
+    }
+    if (maxGroups <= 0) {
+      if (minGroups <= PropertyValueGrouper.DEFAULT_MAX_GROUPS) {
+        maxGroups = PropertyValueGrouper.DEFAULT_MAX_GROUPS;
+      } else {
+        maxGroups = minGroups;
+      }
+    }
+
+    if ((minGroups == PropertyValueGrouper.DEFAULT_MIN_GROUPS) && //
+        (maxGroups == PropertyValueGrouper.DEFAULT_MAX_GROUPS) && //
+        ((grouping == null) || (PropertyValueGrouper.DEFAULT_GROUPING_MODE
+            .toString().equalsIgnoreCase(grouping)))) {
+      return PropertyValueGrouper.DEFAULT_GROUPER;
+    }
+
+    mode = PropertyValueGrouper.DEFAULT_GROUPING_MODE;
+    param = defParam = //
+    PropertyValueGrouper.DEFAULT_GROUPER.getGroupingParameter();
+
+    try {
+      iterator = new WordBasedStringIterator(grouping);
+
+      current = iterator.next();
+      currentLC = TextUtils.toLowerCase(current);
+
+      define: {
+        switch (currentLC) {
+          case MULTIPLES: {
+            mode = EGroupingMode.MULTIPLES;
+            break;
+          }
+          case POWERS: {
+            mode = EGroupingMode.POWERS;
+            break;
+          }
+          case DISTINCT: {
+            mode = EGroupingMode.DISTINCT;
+            break define;
+          }
+          case ANY: {
+            mode = EGroupingMode.ANY;
+            break define;
+          }
+          default: {
+            throw new IllegalArgumentException(((//
+            "Unexpected token '" //$NON-NLS-1$
+                + currentLC) + '\'') + '.');
+          }
+        }
+
+        // the grouping parameter (may) follow
+
+        if (iterator.hasNext()) {
+
+          current = iterator.next();
+          if (!(PropertyValueGrouper.OF.equalsIgnoreCase(current))) {
+            throw new IllegalArgumentException((((//
+            '\'' + PropertyValueGrouper.OF) + "' expected, but '")//$NON-NLS-1$
+                + current) + "' found.");//$NON-NLS-1$
+          }
+
+          param = AnyNumberParser.INSTANCE.parseObject(iterator.next());
+        }
+      }
+
+      if ((minGroups == PropertyValueGrouper.DEFAULT_MIN_GROUPS) && //
+          (maxGroups == PropertyValueGrouper.DEFAULT_MAX_GROUPS) && //
+          Compare.equals(mode, PropertyValueGrouper.DEFAULT_GROUPING_MODE)
+          && //
+          Compare.equals(param, defParam)) {
+        return PropertyValueGrouper.DEFAULT_GROUPER;
+      }
+
+      return new PropertyValueGrouper(mode, param, minGroups, maxGroups);
+    } catch (final Throwable cause) {
+      throw new IllegalArgumentException(
+          (("The string '" + grouping) + //$NON-NLS-1$
+              "' is not a valid grouping definition."), //$NON-NLS-1$
+          cause);
+    }
   }
 
   /** {@inheritDoc} */

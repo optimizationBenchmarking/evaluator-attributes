@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.optimizationBenchmarking.evaluator.attributes.OnlySharedInstances;
+import org.optimizationBenchmarking.evaluator.attributes.clusters.ClustererLoader;
 import org.optimizationBenchmarking.evaluator.attributes.clusters.IClustering;
 import org.optimizationBenchmarking.evaluator.attributes.modeling.DimensionRelationshipAndData;
 import org.optimizationBenchmarking.evaluator.attributes.modeling.DimensionRelationshipData;
@@ -35,13 +36,8 @@ import org.optimizationBenchmarking.utils.text.textOutput.MemoryTextOutput;
  * @param <CCT>
  *          the clustering type
  */
-public abstract class BehaviorClusterer<CCT extends IClustering>
+abstract class _BehaviorClusterer<CCT extends IClustering>
     extends Attribute<IExperimentSet, CCT> {
-
-  /** the minimum number of clusters to use */
-  public static final String PARAM_MIN_CLUSTERS = "minClusters"; //$NON-NLS-1$
-  /** the maximum number of clusters to use */
-  public static final String PARAM_MAX_CLUSTERS = "maxClusters"; //$NON-NLS-1$
 
   /**
    * the minimum number of clusters ot be used, {@code -1} for undefined
@@ -62,8 +58,20 @@ public abstract class BehaviorClusterer<CCT extends IClustering>
    *          the minimum number of clusters ot be used, {@code -1} for
    *          undefined
    */
-  BehaviorClusterer(final int minClusters, final int maxClusters) {
+  _BehaviorClusterer(final int minClusters, final int maxClusters) {
     super(EAttributeType.TEMPORARILY_STORED);
+
+    if ((minClusters > 0) && (maxClusters > 0)
+        && (minClusters > maxClusters)) {
+      throw new IllegalArgumentException((((((//
+      "The minimum number of clusters ("//$NON-NLS-1$
+          + minClusters) + //
+          ") cannot be bigger than the maximum number of clusters (")//$NON-NLS-1$
+          + maxClusters) + //
+          ") in behavior-based grouping of ") + //$NON-NLS-1$
+          this.toString()) + '.');
+    }
+
     this.m_minClusters = minClusters;
     this.m_maxClusters = maxClusters;
   }
@@ -74,9 +82,12 @@ public abstract class BehaviorClusterer<CCT extends IClustering>
    * @param config
    *          the configuration
    */
-  BehaviorClusterer(final Configuration config) {
-    this(config.getInt(BehaviorClusterer.PARAM_MIN_CLUSTERS, 1, 100, -1), //
-        config.getInt(BehaviorClusterer.PARAM_MAX_CLUSTERS, 1, 100, -1));
+  _BehaviorClusterer(final Configuration config) {
+    this(
+        config.getInt(ClustererLoader.PARAM_MIN_GROUPS, -1,
+            ClustererLoader.MAX_GROUPS, -1), //
+        config.getInt(ClustererLoader.PARAM_MIN_GROUPS, -1,
+            ClustererLoader.MAX_GROUPS, -1));
   }
 
   /**
@@ -230,7 +241,7 @@ public abstract class BehaviorClusterer<CCT extends IClustering>
       what = null;
     }
 
-    attrs = BehaviorClusterer.__getFittingAttributes(data);
+    attrs = _BehaviorClusterer.__getFittingAttributes(data);
 
     elements = names.getData();
     size = elements.size();
@@ -327,7 +338,7 @@ public abstract class BehaviorClusterer<CCT extends IClustering>
   @SuppressWarnings("unchecked")
   @Override
   public final boolean equals(final Object o) {
-    BehaviorClusterer<CCT> other;
+    _BehaviorClusterer<CCT> other;
     if (o == null) {
       return false;
     }
@@ -335,7 +346,7 @@ public abstract class BehaviorClusterer<CCT extends IClustering>
       return true;
     }
     if (o.getClass() == this.getClass()) {
-      other = ((BehaviorClusterer<CCT>) o);
+      other = ((_BehaviorClusterer<CCT>) o);
       return ((this.m_minClusters == other.m_minClusters)//
           && (this.m_maxClusters == other.m_maxClusters));
     }

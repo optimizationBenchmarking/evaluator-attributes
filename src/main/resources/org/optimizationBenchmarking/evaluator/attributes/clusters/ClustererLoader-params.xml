@@ -19,10 +19,14 @@
 			description="We take an experiment parameter and divide it into several intervals, which are used to form groups containing the experiments exhibiting the corresponding values of the given parameter." />
 	</cd:instance>
 
+	<cd:int name="minGroups" min="1" max="100" default="1"
+		description="The minimum number of groups to generate." />
+
+	<cd:int name="maxGroups" min="2" max="100" default="12"
+		description="The maximum number of groups to generate." />
+
 	<cd:inherit
 		class="org.optimizationBenchmarking.evaluator.attributes.clusters.propertyValueGroups.PropertyValueSelector" />
 
-	<cd:inherit
-		class="org.optimizationBenchmarking.evaluator.attributes.clusters.behavior.BehaviorClusterer" />
 
 </cd:configurationDefinition>

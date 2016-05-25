@@ -16,6 +16,15 @@ import org.optimizationBenchmarking.utils.text.TextUtils;
 public final class ClustererLoader {
   /** The the group-by parameter: {@value} */
   public static final String PARAM_GROUPING = "grouping"; //$NON-NLS-1$
+  /** the minimum number of groups to use */
+  public static final String PARAM_MIN_GROUPS = "minGroups"; //$NON-NLS-1$
+  /** the maximum number of clusters to use */
+  public static final String PARAM_MAX_GROUPS = "maxGroups"; //$NON-NLS-1$
+  /**
+   * the maximum value for parameters {@link #PARAM_MAX_GROUPS} and
+   * {@link #PARAM_MIN_GROUPS}
+   */
+  public static final int MAX_GROUPS = 100;
 
   /**
    * Obtain the attribute used to get the clustering

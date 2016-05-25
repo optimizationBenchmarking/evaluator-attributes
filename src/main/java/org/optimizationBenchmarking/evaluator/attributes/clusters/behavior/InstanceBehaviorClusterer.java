@@ -15,7 +15,7 @@ import org.optimizationBenchmarking.utils.hash.HashUtils;
  * A clusterer for clustering via instance behavior.
  */
 public final class InstanceBehaviorClusterer
-    extends BehaviorClusterer<InstanceBehaviorClustering> {
+    extends _BehaviorClusterer<InstanceBehaviorClustering> {
 
   /**
    * indicate that clustering should be performed by instance, based on the

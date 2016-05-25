@@ -16,7 +16,7 @@ import org.optimizationBenchmarking.utils.hash.HashUtils;
  * A clusterer for clustering via algorithm behavior.
  */
 public final class AlgorithmBehaviorClusterer
-    extends BehaviorClusterer<AlgorithmBehaviorClustering> {
+    extends _BehaviorClusterer<AlgorithmBehaviorClustering> {
 
   /**
    * indicate that clustering should be performed by algorithm, based on
