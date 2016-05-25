@@ -18,7 +18,7 @@ public final class PropertyValueSelector
     extends Attribute<IExperimentSet, PropertyValueGroups> {
 
   /** The the group-by parameter: {@value} */
-  private static final String PARAM_GROUP_BY = "groupBy"; //$NON-NLS-1$
+  private static final String PARAM_GROUP_BY = "groupByValuesOf"; //$NON-NLS-1$
   /** The the group-by instances property parameter: {@value} */
   public static final String CHOICE_INSTANCES_BY_FEATURE_VALUE = "instances by feature values"; //$NON-NLS-1$
   /** The the group-by experiments property parameter: {@value} */

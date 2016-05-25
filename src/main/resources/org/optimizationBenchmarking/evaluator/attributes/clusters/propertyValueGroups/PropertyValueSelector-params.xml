@@ -3,10 +3,10 @@
 	xmlns:cd="http://www.optimizationBenchmarking.org/formats/configuration/configurationDef.1.0.xsd"
 	allowsMore="true">
 
-	<cd:string name="groupBy"
+	<cd:string name="groupByValuesOf"
 		description="The name of the benchmark instance feature or algorithm parameter by which the setups should be grouped. The default heuristic for this grouping can be overridden via the 'defaultGrouping' parameter in general or for a specific parameter or feature with name 'zzz' with a parameter 'zzzGrouping'." />
 
-	<cd:string name="defaultGrouping"
-		description="The default grouping to be applied by 'groupBy'. The syntax is 'distinct|multiples|powers|any [of [#]]'.&#xD;'distinct' generates a separate group for each value of the feature/parameter and ignores settings of 'minGroups' and 'maxGroups'.&#xD;'multiples [of [#]]]' groups the feature/parameter values into groups which are multiples of the number # (or tries to find a good number if # is not specified). If # is 2, this could creates groups such as [0,2),[2,4),[4,6)...&#xD;'powers [of [#]]' does the same with powers. If # was set to 2, it may produce groups such as [1,2),[2,4),[4,8),[8,16),...&#xD;'any' uses either multiples or powers.&#xD;If # is specified, 'minGroups' and 'maxGroups' are ignored. Otherwise, we try to find a good value of # which respects their setting.&#xD;You can also specify this grouping for a specific parameter or feature with name 'zzz' with a parameter 'zzzGrouping'." />
+	<cd:string name="valueGroupingStructure"
+		description="The default structuring policy to be applied by 'groupBy'. The syntax is 'distinct|multiples|powers|any [of [#]]'.&#xD;'distinct' generates a separate group for each value of the feature/parameter and ignores settings of 'minGroups' and 'maxGroups'.&#xD;'multiples [of [#]]]' groups the feature/parameter values into groups which are multiples of the number # (or tries to find a good number if # is not specified). If # is 2, this could creates groups such as [0,2),[2,4),[4,6)...&#xD;'powers [of [#]]' does the same with powers. If # was set to 2, it may produce groups such as [1,2),[2,4),[4,8),[8,16),...&#xD;'any' uses either multiples or powers.&#xD;If # is specified, 'minGroups' and 'maxGroups' are ignored. Otherwise, we try to find a good value of # which respects their setting.&#xD;You can also specify this grouping for a specific parameter or feature with name 'zzz' with a parameter 'zzzValueGroupingStructure'." />
 
 </cd:configurationDefinition>

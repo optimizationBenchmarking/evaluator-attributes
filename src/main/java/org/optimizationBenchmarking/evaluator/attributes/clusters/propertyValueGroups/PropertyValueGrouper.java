@@ -40,11 +40,13 @@ public final class PropertyValueGrouper
     extends Attribute<IProperty, PropertyValueGroups> {
 
   /** The suffix of the grouping parameter: {@value} */
-  public static final String PARAM_GROUPING_SUFFIX = "Grouping"; //$NON-NLS-1$
+  public static final String PARAM_GROUPING_SUFFIX = "ValueGroupingStructure"; //$NON-NLS-1$
 
   /** The default parameter for all grouping */
   public static final String PARAM_DEFAULT_GROUPING = //
-  ("default" + PropertyValueGrouper.PARAM_GROUPING_SUFFIX);//$NON-NLS-1$
+  (Character.toLowerCase(//
+      PropertyValueGrouper.PARAM_GROUPING_SUFFIX.charAt(0))
+      + PropertyValueGrouper.PARAM_GROUPING_SUFFIX.substring(1));
 
   /** the default minimum number of anticipated groups */
   private static final int DEFAULT_MIN_GROUPS = 2;
@@ -327,25 +329,32 @@ public final class PropertyValueGrouper
     EGroupingMode mode;
     String current, currentLC;
     Number param;
-    String grouping;
+    String grouping, origGrouping, sourceParam, sourceParam2, message;
 
     if (config == null) {
       throw new IllegalArgumentException(//
           "Configuration cannot be null."); //$NON-NLS-1$
     }
 
-    grouping = TextUtils.prepare(config
-        .getString(PropertyValueGrouper.PARAM_DEFAULT_GROUPING, null));
+    sourceParam = PropertyValueGrouper.PARAM_DEFAULT_GROUPING;
+    origGrouping = grouping = TextUtils.prepare(//
+        config.getString(sourceParam, null));
     if (property != null) {
       propertyName = property.getName();
       if (propertyName == null) {
         throw new IllegalStateException(//
             "Property name cannot be null.");//$NON-NLS-1$
       }
-      grouping = TextUtils.prepare(config.getString(
-          (property.getName()//
-              + PropertyValueGrouper.PARAM_GROUPING_SUFFIX), //
-          grouping));
+      sourceParam2 = (property.getName()
+          + PropertyValueGrouper.PARAM_GROUPING_SUFFIX);
+      grouping = TextUtils.prepare(//
+          config.getString(sourceParam2, grouping));
+      if (grouping != origGrouping) {
+        sourceParam = sourceParam2;
+        sourceParam2 = null;
+      }
+    } else {
+      sourceParam2 = null;
     }
 
     minGroups = config.getInt(ClustererLoader.PARAM_MIN_GROUPS, -1,
@@ -374,6 +383,12 @@ public final class PropertyValueGrouper
         ((grouping == null) || (PropertyValueGrouper.DEFAULT_GROUPING_MODE
             .toString().equalsIgnoreCase(grouping)))) {
       return PropertyValueGrouper.DEFAULT_GROUPER;
+    }
+
+    if (grouping == null) {
+      return new PropertyValueGrouper(
+          PropertyValueGrouper.DEFAULT_GROUPING_MODE, null, minGroups,
+          maxGroups);
     }
 
     mode = PropertyValueGrouper.DEFAULT_GROUPING_MODE;
@@ -414,7 +429,6 @@ public final class PropertyValueGrouper
         // the grouping parameter (may) follow
 
         if (iterator.hasNext()) {
-
           current = iterator.next();
           if (!(PropertyValueGrouper.OF.equalsIgnoreCase(current))) {
             throw new IllegalArgumentException((((//
@@ -436,10 +450,15 @@ public final class PropertyValueGrouper
 
       return new PropertyValueGrouper(mode, param, minGroups, maxGroups);
     } catch (final Throwable cause) {
-      throw new IllegalArgumentException(
-          (("The string '" + grouping) + //$NON-NLS-1$
-              "' is not a valid grouping definition."), //$NON-NLS-1$
-          cause);
+      message = ((("The string '" + grouping) + //$NON-NLS-1$
+          "' is not valid for ") + sourceParam);//$NON-NLS-1$
+      if (sourceParam2 != null) {
+        message += " or " + sourceParam2;//$NON-NLS-1$
+      }
+      if (property != null) {
+        message += (" and property " + property);//$NON-NLS-1$
+      }
+      throw new IllegalArgumentException((message + '.'), cause);
     }
   }
 
