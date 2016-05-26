@@ -208,8 +208,8 @@ public final class PropertyValueGrouper
   final String _createMessage(final String data) {
     return ((((((((("the values of " + //$NON-NLS-1$
         data + " using mode '") + this.m_groupingMode) + //$NON-NLS-1$
-        " and parameter ") + this.m_groupingParameter) + //$NON-NLS-1$
-        "' into [") + //$NON-NLS-1$
+        "' and parameter ") + this.m_groupingParameter) + //$NON-NLS-1$
+        " into [") + //$NON-NLS-1$
         this.m_minGroups) + ',') + this.m_maxGroups) + "] groups");//$NON-NLS-1$
   }
 
