@@ -231,7 +231,7 @@ abstract class _BehaviorClusterer<CCT extends IClustering>
               : ((names instanceof IExperimentSet)//
                   ? " experiments" //$NON-NLS-1$
                   : "? i am confused?")));//$NON-NLS-1$
-      logger.finer("Beginning to cluster" + what + //$NON-NLS-1$
+      logger.fine("Beginning to cluster" + what + //$NON-NLS-1$
           " based on algorithm runtime behavior.");//$NON-NLS-1$
       if (logger.isLoggable(Level.FINER)) {
         logger.finer(//
@@ -316,7 +316,7 @@ abstract class _BehaviorClusterer<CCT extends IClustering>
     clusters = null;
     if ((logger != null) && (what != null)
         && (logger.isLoggable(Level.FINE))) {
-      logger.finer("Finished clustering" + what + //$NON-NLS-1$
+      logger.fine("Finished clustering" + what + //$NON-NLS-1$
           " based on algorithm performance fingerprints, obtained "//$NON-NLS-1$
           + result.getData().size() + " clusters.");//$NON-NLS-1$
     }
