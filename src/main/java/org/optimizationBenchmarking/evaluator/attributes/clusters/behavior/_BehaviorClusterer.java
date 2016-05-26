@@ -86,7 +86,7 @@ abstract class _BehaviorClusterer<CCT extends IClustering>
     this(
         config.getInt(ClustererLoader.PARAM_MIN_GROUPS, -1,
             ClustererLoader.MAX_GROUPS, -1), //
-        config.getInt(ClustererLoader.PARAM_MIN_GROUPS, -1,
+        config.getInt(ClustererLoader.PARAM_MAX_GROUPS, -1,
             ClustererLoader.MAX_GROUPS, -1));
   }
 
