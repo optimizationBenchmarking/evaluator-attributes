@@ -359,4 +359,26 @@ abstract class _BehaviorClusterer<CCT extends IClustering>
     return HashUtils.combineHashes(HashUtils.hashCode(this.m_maxClusters),
         HashUtils.hashCode(this.m_minClusters));
   }
+
+  /** {@inheritDoc} */
+  @Override
+  public String toString() {
+    final MemoryTextOutput textOut;
+
+    if ((this.m_minClusters <= 0) && (this.m_maxClusters <= 0)) {
+      return ""; //$NON-NLS-1$
+    }
+
+    textOut = new MemoryTextOutput();
+    textOut.append("into [");//$NON-NLS-1$
+    if (this.m_minClusters > 0) {
+      textOut.append(this.m_minClusters);
+    }
+    textOut.append(',');
+    if (this.m_maxClusters > 0) {
+      textOut.append(this.m_maxClusters);
+    }
+    textOut.append("] groups");//$NON-NLS-1$
+    return textOut.toString();
+  }
 }

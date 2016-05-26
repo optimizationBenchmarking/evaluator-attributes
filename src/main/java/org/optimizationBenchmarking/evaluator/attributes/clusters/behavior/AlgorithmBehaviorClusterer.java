@@ -67,7 +67,8 @@ public final class AlgorithmBehaviorClusterer
   /** {@inheritDoc} */
   @Override
   public final String toString() {
-    return AlgorithmBehaviorClusterer.CHOICE_ALGORITHMS_BY_ALGORITHM_BEHAVIOR;
+    return (AlgorithmBehaviorClusterer.CHOICE_ALGORITHMS_BY_ALGORITHM_BEHAVIOR
+        + super.toString());
   }
 
   /** {@inheritDoc} */

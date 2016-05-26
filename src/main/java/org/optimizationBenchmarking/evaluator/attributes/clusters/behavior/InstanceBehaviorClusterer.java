@@ -65,7 +65,8 @@ public final class InstanceBehaviorClusterer
   /** {@inheritDoc} */
   @Override
   public final String toString() {
-    return InstanceBehaviorClusterer.CHOICE_INSTANCES_BY_ALGORITHM_BEHAVIOR;
+    return (InstanceBehaviorClusterer.CHOICE_INSTANCES_BY_ALGORITHM_BEHAVIOR
+        + super.toString());
   }
 
   /** {@inheritDoc} */

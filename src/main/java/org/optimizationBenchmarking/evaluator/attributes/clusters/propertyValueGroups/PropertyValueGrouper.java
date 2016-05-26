@@ -198,6 +198,35 @@ public final class PropertyValueGrouper
     return values;
   }
 
+  /**
+   * create the message
+   *
+   * @param data
+   *          the property name to create the message for
+   * @return the message
+   */
+  final String _createMessage(final String data) {
+    return ((((((((("the values of " + //$NON-NLS-1$
+        data + " using mode ") + this.m_groupingMode) + //$NON-NLS-1$
+        " and parameter ") + this.m_groupingParameter) + //$NON-NLS-1$
+        " into [") + //$NON-NLS-1$
+        this.m_minGroups) + ',') + this.m_maxGroups) + "] groups");//$NON-NLS-1$
+  }
+
+  /**
+   * create the message
+   *
+   * @param data
+   *          the data to create the message for
+   * @return the message
+   */
+  private final String __createMessage(final IProperty data) {
+    return this._createMessage(((data instanceof IFeature)//
+        ? "instance feature " //$NON-NLS-1$
+        : "experiment parameter ")//$NON-NLS-1$
+        + data.getName());
+  }
+
   /** {@inheritDoc} */
   @SuppressWarnings("unused")
   @Override
@@ -205,21 +234,21 @@ public final class PropertyValueGrouper
       final Logger logger) {
     final _Groups groups;
     final IExperimentSet set;
+    final PropertyValueGroups result;
     Object[] objData;
     Number[] numberData;
     _Group[] buffer;
     int index, type;
+    String message;
     Object value;
     DataSelection unspecified;
     IParameterValue pv;
 
-    if ((logger != null) && (logger.isLoggable(Level.FINER))) {
-      logger.log(Level.FINE, //
-          "Now grouping data by the values of " + //$NON-NLS-1$
-              ((data instanceof IFeature)//
-                  ? "instance feature " //$NON-NLS-1$
-                  : "experiment parameter ")//$NON-NLS-1$
-              + data.getName() + '.');
+    if ((logger != null) && (logger.isLoggable(Level.FINE))) {
+      message = this.__createMessage(data);
+      logger.fine(("Now grouping data by " + message) + '.');//$NON-NLS-1$
+    } else {
+      message = null;
     }
 
     // extract all values
@@ -296,12 +325,14 @@ public final class PropertyValueGrouper
 
     switch (groups.m_groupingMode) {
       case DISTINCT: {
-        return new DistinctValueGroups(data, groups, unspecified, value);
+        result = new DistinctValueGroups(data, groups, unspecified, value);
+        break;
       }
 
       case POWERS:
       case MULTIPLES: {
-        return new ValueRangeGroups(data, groups, unspecified, value);
+        result = new ValueRangeGroups(data, groups, unspecified, value);
+        break;
       }
 
       default: {
@@ -309,6 +340,22 @@ public final class PropertyValueGrouper
             "Unknown grouping mode: " + groups.m_groupingMode); //$NON-NLS-1$
       }
     }
+
+    if ((logger != null) && (logger.isLoggable(Level.FINE))) {
+      if (message == null) {
+        message = this.__createMessage(data);
+      }
+      message = (((("Finished grouping data by " + message) + //$NON-NLS-1$
+          " created ") + result.getData().size())//$NON-NLS-1$
+          + " regular groups");//$NON-NLS-1$
+      if (result.getUnspecifiedGroup() != null) {
+        message += " and one group for the unspecified parameter value.";//$NON-NLS-1$
+      } else {
+        message += '.';
+      }
+      logger.fine(message);
+    }
+    return result;
   }
 
   /**
@@ -465,6 +512,6 @@ public final class PropertyValueGrouper
   /** {@inheritDoc} */
   @Override
   public final String toString() {
-    return this.m_groupingMode.toString();
+    return this._createMessage("a property");//$NON-NLS-1$
   }
 }

@@ -144,6 +144,6 @@ public final class PropertyValueSelector
   /** {@inheritDoc} */
   @Override
   public final String toString() {
-    return this.m_property + " by " + this.m_grouper.toString();//$NON-NLS-1$
+    return this.m_grouper._createMessage(this.m_property);
   }
 }
