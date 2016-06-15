@@ -3,6 +3,7 @@ package org.optimizationBenchmarking.evaluator.attributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
@@ -12,7 +13,6 @@ import org.optimizationBenchmarking.evaluator.data.spec.IExperiment;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperimentSet;
 import org.optimizationBenchmarking.evaluator.data.spec.IInstance;
 import org.optimizationBenchmarking.evaluator.data.spec.IInstanceRuns;
-import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
 import org.optimizationBenchmarking.utils.parallel.Execute;
 
 /**
@@ -24,7 +24,7 @@ import org.optimizationBenchmarking.utils.parallel.Execute;
 public final class PerInstanceRuns<R> {
 
   /** the internal hash map */
-  private final HashMap<String, HashMap<String, __Holder>> m_map;
+  private final HashMap<String, HashMap<String, __Holder<R>>> m_map;
 
   /**
    * Create the per-instance runs
@@ -42,7 +42,7 @@ public final class PerInstanceRuns<R> {
     super();
 
     int experimentIndex, instanceIndex;
-    HashMap<String, __Holder> map;
+    HashMap<String, __Holder<R>> map;
 
     this.m_map = new HashMap<>();
     experimentIndex = (-1);
@@ -53,8 +53,8 @@ public final class PerInstanceRuns<R> {
       this.m_map.remove(experiment.getName(), map);
       for (final IInstanceRuns runs : experiment.getData()) {
         map.put(runs.getInstance().getName(),
-            new __Holder(//
-                experimentIndex, ++instanceIndex, //
+            new __Holder<>(//
+                runs, experimentIndex, ++instanceIndex, //
                 Execute.parallel(attribute.getter(runs, logger))));
       }
     }
@@ -69,10 +69,9 @@ public final class PerInstanceRuns<R> {
    *          the instance name
    * @return the result
    */
-  @SuppressWarnings("unchecked")
-  public final R get(final String experimentName,
+  public final Map.Entry<IInstanceRuns, R> get(final String experimentName,
       final String instanceName) {
-    return ((R) (this.m_map.get(experimentName).get(instanceName)._get()));
+    return this.m_map.get(experimentName).get(instanceName);
   }
 
   /**
@@ -84,8 +83,8 @@ public final class PerInstanceRuns<R> {
    *          the instance
    * @return the result
    */
-  public final R get(final IExperiment experiment,
-      final IInstance instance) {
+  public final Map.Entry<IInstanceRuns, R> get(
+      final IExperiment experiment, final IInstance instance) {
     return this.get(experiment.getName(), instance.getName());
   }
 
@@ -96,27 +95,8 @@ public final class PerInstanceRuns<R> {
    *          the instance runs
    * @return the result
    */
-  public final R get(final IInstanceRuns runs) {
+  public final Map.Entry<IInstanceRuns, R> get(final IInstanceRuns runs) {
     return this.get(runs.getOwner(), runs.getInstance());
-  }
-
-  /**
-   * finalize a data array
-   *
-   * @param data
-   *          the array
-   * @return the list view
-   */
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  private static final <X> ArrayListView<X> __finalize(
-      final Object[] data) {
-    int index;
-
-    Arrays.sort(data);
-    for (index = data.length; (--index) >= 0;) {
-      data[index] = ((__Holder) (data[index]))._get();
-    }
-    return new ArrayListView(data);
   }
 
   /**
@@ -126,7 +106,7 @@ public final class PerInstanceRuns<R> {
    *          the experiment
    * @return the results
    */
-  public final ArrayListView<R> getAllForExperiment(
+  public final Map.Entry<IInstanceRuns, R>[] getAllForExperiment(
       final IExperiment experiment) {
     return this.getAllForExperiment(experiment.getName());
   }
@@ -138,13 +118,15 @@ public final class PerInstanceRuns<R> {
    *          the experiment name
    * @return the results
    */
-  public final ArrayListView<R> getAllForExperiment(
+  public final Map.Entry<IInstanceRuns, R>[] getAllForExperiment(
       final String experimentName) {
-    final HashMap<String, __Holder> map;
+    final HashMap<String, __Holder<R>> map;
+    final Map.Entry<IInstanceRuns, R>[] entries;
 
     map = this.m_map.get(experimentName);
-    return PerInstanceRuns
-        .__finalize(map.values().toArray(new Object[map.size()]));
+    entries = map.values().toArray(new Map.Entry[map.size()]);
+    Arrays.sort(entries);
+    return entries;
   }
 
   /**
@@ -154,16 +136,17 @@ public final class PerInstanceRuns<R> {
    *          the instance name
    * @return the results
    */
-  public final ArrayListView<R> getAllForInstance(
+  @SuppressWarnings("unchecked")
+  public final Map.Entry<IInstanceRuns, R>[] getAllForInstance(
       final String instanceName) {
-    Object[] data, temp;
+    Map.Entry<IInstanceRuns, R>[] data, temp;
     int index, size;
-    __Holder holder;
+    __Holder<R> holder;
 
     size = this.m_map.size();
-    data = new Object[size];
+    data = new Map.Entry[size];
     index = 0;
-    for (final HashMap<String, __Holder> map : this.m_map.values()) {
+    for (final HashMap<String, __Holder<R>> map : this.m_map.values()) {
       holder = map.get(instanceName);
       if (holder != null) {
         data[index++] = holder;
@@ -171,11 +154,12 @@ public final class PerInstanceRuns<R> {
     }
 
     if (index != size) {
-      temp = new Object[index];
+      temp = new Map.Entry[index];
       System.arraycopy(data, 0, temp, 0, index);
       data = temp;
     }
-    return PerInstanceRuns.__finalize(data);
+    Arrays.sort(data);
+    return data;
   }
 
   /**
@@ -185,7 +169,7 @@ public final class PerInstanceRuns<R> {
    *          the instance
    * @return the results
    */
-  public final ArrayListView<R> getAllForInstance(
+  public final Map.Entry<IInstanceRuns, R>[] getAllForInstance(
       final IInstance instance) {
     return this.getAllForInstance(instance.getName());
   }
@@ -195,24 +179,34 @@ public final class PerInstanceRuns<R> {
    *
    * @return the results
    */
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  public final ArrayListView<R> getAll() {
-    final ArrayList list;
+  public final Map.Entry<IInstanceRuns, R>[] getAll() {
+    ArrayList<Map.Entry<IInstanceRuns, R>> list;
+    Map.Entry<IInstanceRuns, R>[] data;
 
     list = new ArrayList<>();
-    for (final HashMap<String, __Holder> map : this.m_map.values()) {
+    for (final HashMap<String, __Holder<R>> map : this.m_map.values()) {
       list.addAll(map.values());
     }
-    return PerInstanceRuns
-        .__finalize(list.toArray(new Object[list.size()]));
+    data = list.toArray(new Map.Entry[list.size()]);
+    list = null;
+    Arrays.sort(data);
+    return data;
   }
 
-  /** a holder */
-  private static final class __Holder implements Comparable<__Holder> {
+  /**
+   * a holder
+   *
+   * @param <X>
+   *          the return type
+   */
+  private static final class __Holder<X>
+      implements Comparable<__Holder<?>>, Map.Entry<IInstanceRuns, X> {
     /** the experiment index */
     final int m_experimentIndex;
     /** the instance index */
     final int m_instanceIndex;
+    /** the owning instance runs */
+    private final IInstanceRuns m_instanceRuns;
     /** the data */
     private Object m_data;
 
@@ -223,24 +217,41 @@ public final class PerInstanceRuns<R> {
      *          the experiment index
      * @param instanceIndex
      *          the instance index
+     * @param instanceRuns
+     *          the instance runs
      * @param data
      *          the data
      */
-    __Holder(final int experimentIndex, final int instanceIndex,
-        final Future<?> data) {
+    __Holder(final IInstanceRuns instanceRuns, final int experimentIndex,
+        final int instanceIndex, final Future<X> data) {
       super();
+      this.m_instanceRuns = instanceRuns;
       this.m_experimentIndex = experimentIndex;
       this.m_instanceIndex = instanceIndex;
       this.m_data = data;
     }
 
-    /**
-     * get the value
-     *
-     * @return the result
-     */
-    @SuppressWarnings("rawtypes")
-    final Object _get() {
+    /** {@inheritDoc} */
+    @Override
+    public final int compareTo(final __Holder<?> o) {
+      final int r;
+      r = Integer.compare(this.m_experimentIndex, o.m_experimentIndex);
+      if (r != 0) {
+        return r;
+      }
+      return Integer.compare(this.m_instanceIndex, o.m_instanceIndex);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public final IInstanceRuns getKey() {
+      return this.m_instanceRuns;
+    }
+
+    /** {@inheritDoc} */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @Override
+    public synchronized final X getValue() {
       Throwable cause;
 
       if (this.m_data instanceof Future) {
@@ -254,26 +265,24 @@ public final class PerInstanceRuns<R> {
             if (cause instanceof RuntimeException) {
               throw ((RuntimeException) cause);
             }
-            throw new IllegalStateException(
-                "Error while obtaining attribute job result.", //$NON-NLS-1$
+            throw new IllegalStateException(((((((///
+            "Error while obtaining attribute job result for instance '") //$NON-NLS-1$
+                + this.m_instanceRuns.getInstance().getName())
+                + "' and experiment '") + //$NON-NLS-1$
+                this.m_instanceRuns.getOwner().getName()) + '\'') + '.'),
                 exec);
           }
 
           break loop;
         }
       }
-      return this.m_data;
+      return ((X) (this.m_data));
     }
 
-    /** {@inheritDoc} */
     @Override
-    public final int compareTo(final __Holder o) {
-      final int r;
-      r = Integer.compare(this.m_experimentIndex, o.m_experimentIndex);
-      if (r != 0) {
-        return r;
-      }
-      return Integer.compare(this.m_instanceIndex, o.m_instanceIndex);
+    public X setValue(final X value) {
+      throw new UnsupportedOperationException(//
+          "Cannot set value of per-instance-runs job holder.");//$NON-NLS-1$
     }
   }
 }
