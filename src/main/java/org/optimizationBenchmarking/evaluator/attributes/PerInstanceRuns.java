@@ -21,7 +21,7 @@ import org.optimizationBenchmarking.utils.parallel.Execute;
  * @param <R>
  *          the result type
  */
-public final class PerInstanceRun<R> {
+public final class PerInstanceRuns<R> {
 
   /** the internal hash map */
   private final HashMap<String, HashMap<String, __Holder>> m_map;
@@ -36,7 +36,7 @@ public final class PerInstanceRun<R> {
    * @param logger
    *          the logger to use
    */
-  public PerInstanceRun(final IExperimentSet data,
+  public PerInstanceRuns(final IExperimentSet data,
       final Attribute<? super IInstanceRuns, R> attribute,
       final Logger logger) {
     super();
@@ -143,7 +143,7 @@ public final class PerInstanceRun<R> {
     final HashMap<String, __Holder> map;
 
     map = this.m_map.get(experimentName);
-    return PerInstanceRun
+    return PerInstanceRuns
         .__finalize(map.values().toArray(new Object[map.size()]));
   }
 
@@ -175,7 +175,7 @@ public final class PerInstanceRun<R> {
       System.arraycopy(data, 0, temp, 0, index);
       data = temp;
     }
-    return PerInstanceRun.__finalize(data);
+    return PerInstanceRuns.__finalize(data);
   }
 
   /**
@@ -203,7 +203,7 @@ public final class PerInstanceRun<R> {
     for (final HashMap<String, __Holder> map : this.m_map.values()) {
       list.addAll(map.values());
     }
-    return PerInstanceRun
+    return PerInstanceRuns
         .__finalize(list.toArray(new Object[list.size()]));
   }
 
