@@ -104,7 +104,8 @@ public final class PerInstanceRuns<R> {
    *
    * @param experiment
    *          the experiment
-   * @return the results
+   * @return the results, or {@code null} if no data exists for that
+   *         experiment
    */
   public final Map.Entry<IInstanceRuns, R>[] getAllForExperiment(
       final IExperiment experiment) {
@@ -116,15 +117,24 @@ public final class PerInstanceRuns<R> {
    *
    * @param experimentName
    *          the experiment name
-   * @return the results
+   * @return the results, or {@code null} if no data exists for that
+   *         experiment
    */
   public final Map.Entry<IInstanceRuns, R>[] getAllForExperiment(
       final String experimentName) {
     final HashMap<String, __Holder<R>> map;
     final Map.Entry<IInstanceRuns, R>[] entries;
+    final int size;
 
     map = this.m_map.get(experimentName);
-    entries = map.values().toArray(new Map.Entry[map.size()]);
+    if (map == null) {
+      return null;
+    }
+    size = map.size();
+    if (size <= 0) {
+      return null;
+    }
+    entries = map.values().toArray(new Map.Entry[size]);
     Arrays.sort(entries);
     return entries;
   }
@@ -134,7 +144,8 @@ public final class PerInstanceRuns<R> {
    *
    * @param instanceName
    *          the instance name
-   * @return the results
+   * @return the results, or {@code null} if no data exists for that
+   *         instance
    */
   @SuppressWarnings("unchecked")
   public final Map.Entry<IInstanceRuns, R>[] getAllForInstance(
@@ -153,6 +164,10 @@ public final class PerInstanceRuns<R> {
       }
     }
 
+    if (index <= 0) {
+      return null;
+    }
+
     if (index != size) {
       temp = new Map.Entry[index];
       System.arraycopy(data, 0, temp, 0, index);
@@ -167,7 +182,8 @@ public final class PerInstanceRuns<R> {
    *
    * @param instance
    *          the instance
-   * @return the results
+   * @return the results, or {@code null} if no data exists for that
+   *         instance
    */
   public final Map.Entry<IInstanceRuns, R>[] getAllForInstance(
       final IInstance instance) {
@@ -177,17 +193,25 @@ public final class PerInstanceRuns<R> {
   /**
    * Get all results
    *
-   * @return the results
+   * @return the results, or {@code null} if no data exists
    */
   public final Map.Entry<IInstanceRuns, R>[] getAll() {
+    final int size;
     ArrayList<Map.Entry<IInstanceRuns, R>> list;
     Map.Entry<IInstanceRuns, R>[] data;
 
+    if (this.m_map.size() <= 0) {
+      return null;
+    }
     list = new ArrayList<>();
     for (final HashMap<String, __Holder<R>> map : this.m_map.values()) {
       list.addAll(map.values());
     }
-    data = list.toArray(new Map.Entry[list.size()]);
+    size = list.size();
+    if (size <= 0) {
+      return null;
+    }
+    data = list.toArray(new Map.Entry[size]);
     list = null;
     Arrays.sort(data);
     return data;
