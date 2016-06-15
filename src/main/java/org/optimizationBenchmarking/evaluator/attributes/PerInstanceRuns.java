@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
@@ -50,7 +49,7 @@ public final class PerInstanceRuns<R> {
       ++experimentIndex;
       instanceIndex = (-1);
       map = new HashMap<>();
-      this.m_map.remove(experiment.getName(), map);
+      this.m_map.put(experiment.getName(), map);
       for (final IInstanceRuns runs : experiment.getData()) {
         map.put(runs.getInstance().getName(),
             new __Holder<>(//
@@ -231,8 +230,10 @@ public final class PerInstanceRuns<R> {
     final int m_instanceIndex;
     /** the owning instance runs */
     private final IInstanceRuns m_instanceRuns;
+    /** the future */
+    private Future<X> m_future;
     /** the data */
-    private Object m_data;
+    private X m_data;
 
     /**
      * create
@@ -243,16 +244,17 @@ public final class PerInstanceRuns<R> {
      *          the instance index
      * @param instanceRuns
      *          the instance runs
-     * @param data
-     *          the data
+     * @param future
+     *          the future
      */
     __Holder(final IInstanceRuns instanceRuns, final int experimentIndex,
-        final int instanceIndex, final Future<X> data) {
+        final int instanceIndex, final Future<X> future) {
       super();
       this.m_instanceRuns = instanceRuns;
       this.m_experimentIndex = experimentIndex;
       this.m_instanceIndex = instanceIndex;
-      this.m_data = data;
+      this.m_future = future;
+      this.m_data = null;
     }
 
     /** {@inheritDoc} */
@@ -273,34 +275,34 @@ public final class PerInstanceRuns<R> {
     }
 
     /** {@inheritDoc} */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
-    public synchronized final X getValue() {
-      Throwable cause;
+    public final synchronized X getValue() {
+      X result;
+      Future<X> future;
 
-      if (this.m_data instanceof Future) {
-        loop: for (;;) {
-          try {
-            this.m_data = ((Future) (this.m_data)).get();
-          } catch (@SuppressWarnings("unused") final InterruptedException interExp) {
-            continue loop;
-          } catch (final ExecutionException exec) {
-            cause = exec.getCause();
-            if (cause instanceof RuntimeException) {
-              throw ((RuntimeException) cause);
+      result = this.m_data;
+      if (result == null) {
+        future = this.m_future;
+        this.m_future = null;
+        if (future != null) {
+          loop: for (;;) {
+            try {
+              this.m_data = result = future.get();
+            } catch (@SuppressWarnings("unused") final InterruptedException interExp) {
+              continue loop;
+            } catch (final Throwable exec) {
+              throw new IllegalStateException(((((((///
+              "Error while obtaining attribute job result for instance '") //$NON-NLS-1$
+                  + this.m_instanceRuns.getInstance().getName())
+                  + "' and experiment '") + //$NON-NLS-1$
+                  this.m_instanceRuns.getOwner().getName()) + '\'') + '.'),
+                  exec);
             }
-            throw new IllegalStateException(((((((///
-            "Error while obtaining attribute job result for instance '") //$NON-NLS-1$
-                + this.m_instanceRuns.getInstance().getName())
-                + "' and experiment '") + //$NON-NLS-1$
-                this.m_instanceRuns.getOwner().getName()) + '\'') + '.'),
-                exec);
           }
-
-          break loop;
         }
       }
-      return ((X) (this.m_data));
+
+      return result;
     }
 
     @Override
