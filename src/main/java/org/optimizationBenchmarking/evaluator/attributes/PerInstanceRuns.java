@@ -23,7 +23,7 @@ import org.optimizationBenchmarking.utils.parallel.Execute;
 public final class PerInstanceRuns<R> {
 
   /** the internal hash map */
-  private final HashMap<String, HashMap<String, __Holder<R>>> m_map;
+  private final HashMap<String, HashMap<String, Map.Entry<IInstanceRuns, R>>> m_map;
 
   /**
    * Create the per-instance runs
@@ -35,13 +35,14 @@ public final class PerInstanceRuns<R> {
    * @param logger
    *          the logger to use
    */
+  @SuppressWarnings("unchecked")
   public PerInstanceRuns(final IExperimentSet data,
       final Attribute<? super IInstanceRuns, R> attribute,
       final Logger logger) {
     super();
 
     int experimentIndex, instanceIndex;
-    HashMap<String, __Holder<R>> map;
+    HashMap<String, Map.Entry<IInstanceRuns, R>> map;
 
     this.m_map = new HashMap<>();
     experimentIndex = (-1);
@@ -52,7 +53,7 @@ public final class PerInstanceRuns<R> {
       this.m_map.put(experiment.getName(), map);
       for (final IInstanceRuns runs : experiment.getData()) {
         map.put(runs.getInstance().getName(),
-            new __Holder<>(//
+            new __Holder(//
                 runs, experimentIndex, ++instanceIndex, //
                 Execute.parallel(attribute.getter(runs, logger))));
       }
@@ -121,7 +122,7 @@ public final class PerInstanceRuns<R> {
    */
   public final Map.Entry<IInstanceRuns, R>[] getAllForExperiment(
       final String experimentName) {
-    final HashMap<String, __Holder<R>> map;
+    final HashMap<String, Map.Entry<IInstanceRuns, R>> map;
     final Map.Entry<IInstanceRuns, R>[] entries;
     final int size;
 
@@ -151,12 +152,13 @@ public final class PerInstanceRuns<R> {
       final String instanceName) {
     Map.Entry<IInstanceRuns, R>[] data, temp;
     int index, size;
-    __Holder<R> holder;
+    Map.Entry<IInstanceRuns, R> holder;
 
     size = this.m_map.size();
     data = new Map.Entry[size];
     index = 0;
-    for (final HashMap<String, __Holder<R>> map : this.m_map.values()) {
+    for (final HashMap<String, Map.Entry<IInstanceRuns, R>> map : this.m_map
+        .values()) {
       holder = map.get(instanceName);
       if (holder != null) {
         data[index++] = holder;
@@ -203,7 +205,8 @@ public final class PerInstanceRuns<R> {
       return null;
     }
     list = new ArrayList<>();
-    for (final HashMap<String, __Holder<R>> map : this.m_map.values()) {
+    for (final HashMap<String, Map.Entry<IInstanceRuns, R>> map : this.m_map
+        .values()) {
       list.addAll(map.values());
     }
     size = list.size();
@@ -216,24 +219,18 @@ public final class PerInstanceRuns<R> {
     return data;
   }
 
-  /**
-   * a holder
-   *
-   * @param <X>
-   *          the return type
-   */
-  private static final class __Holder<X>
-      implements Comparable<__Holder<?>>, Map.Entry<IInstanceRuns, X> {
+  /** a holder */
+  @SuppressWarnings("rawtypes")
+  private static final class __Holder
+      implements Comparable<__Holder>, Map.Entry {
     /** the experiment index */
     final int m_experimentIndex;
     /** the instance index */
     final int m_instanceIndex;
     /** the owning instance runs */
     private final IInstanceRuns m_instanceRuns;
-    /** the future */
-    private Future<X> m_future;
-    /** the data */
-    private X m_data;
+    /** the data object */
+    private Object m_data;
 
     /**
      * create
@@ -248,18 +245,17 @@ public final class PerInstanceRuns<R> {
      *          the future
      */
     __Holder(final IInstanceRuns instanceRuns, final int experimentIndex,
-        final int instanceIndex, final Future<X> future) {
+        final int instanceIndex, final Future future) {
       super();
       this.m_instanceRuns = instanceRuns;
       this.m_experimentIndex = experimentIndex;
       this.m_instanceIndex = instanceIndex;
-      this.m_future = future;
-      this.m_data = null;
+      this.m_data = future;
     }
 
     /** {@inheritDoc} */
     @Override
-    public final int compareTo(final __Holder<?> o) {
+    public final int compareTo(final __Holder o) {
       final int r;
       r = Integer.compare(this.m_experimentIndex, o.m_experimentIndex);
       if (r != 0) {
@@ -276,37 +272,33 @@ public final class PerInstanceRuns<R> {
 
     /** {@inheritDoc} */
     @Override
-    public final synchronized X getValue() {
-      X result;
-      Future<X> future;
+    public final Object getValue() {
+      Object data;
 
-      result = this.m_data;
-      if (result == null) {
-        future = this.m_future;
-        this.m_future = null;
-        if (future != null) {
-          loop: for (;;) {
-            try {
-              this.m_data = result = future.get();
-            } catch (@SuppressWarnings("unused") final InterruptedException interExp) {
-              continue loop;
-            } catch (final Throwable exec) {
-              throw new IllegalStateException(((((((///
-              "Error while obtaining attribute job result for instance '") //$NON-NLS-1$
-                  + this.m_instanceRuns.getInstance().getName())
-                  + "' and experiment '") + //$NON-NLS-1$
-                  this.m_instanceRuns.getOwner().getName()) + '\'') + '.'),
-                  exec);
-            }
+      data = this.m_data;
+      if (data instanceof Future) {
+        loop: for (;;) {
+          try {
+            this.m_data = data = ((Future) data).get();
+            return data;
+          } catch (@SuppressWarnings("unused") final InterruptedException interExp) {
+            continue loop;
+          } catch (final Throwable exec) {
+            throw new IllegalStateException(((((((///
+            "Error while obtaining attribute job result for instance '") //$NON-NLS-1$
+                + this.m_instanceRuns.getInstance().getName())
+                + "' and experiment '") + //$NON-NLS-1$
+                this.m_instanceRuns.getOwner().getName()) + '\'') + '.'),
+                exec);
           }
         }
       }
 
-      return result;
+      return data;
     }
 
     @Override
-    public X setValue(final X value) {
+    public Object setValue(final Object value) {
       throw new UnsupportedOperationException(//
           "Cannot set value of per-instance-runs job holder.");//$NON-NLS-1$
     }
