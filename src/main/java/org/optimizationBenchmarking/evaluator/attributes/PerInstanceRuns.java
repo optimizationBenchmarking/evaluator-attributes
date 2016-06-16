@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
@@ -12,7 +14,6 @@ import org.optimizationBenchmarking.evaluator.data.spec.IExperiment;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperimentSet;
 import org.optimizationBenchmarking.evaluator.data.spec.IInstance;
 import org.optimizationBenchmarking.evaluator.data.spec.IInstanceRuns;
-import org.optimizationBenchmarking.utils.parallel.Execute;
 
 /**
  * This class allows us to obtain one attribute value for each instance run
@@ -41,10 +42,14 @@ public final class PerInstanceRuns<R> {
       final Logger logger) {
     super();
 
+    final boolean inForkJoinPool;
+    Callable<R> call;
+    Object submit;
     int experimentIndex, instanceIndex;
     HashMap<String, Map.Entry<IInstanceRuns, R>> map;
 
     this.m_map = new HashMap<>();
+    inForkJoinPool = ForkJoinTask.inForkJoinPool();
     experimentIndex = (-1);
     for (final IExperiment experiment : data.getData()) {
       ++experimentIndex;
@@ -52,10 +57,20 @@ public final class PerInstanceRuns<R> {
       map = new HashMap<>();
       this.m_map.put(experiment.getName(), map);
       for (final IInstanceRuns runs : experiment.getData()) {
+        call = attribute.getter(runs, logger);
+        if (inForkJoinPool) {
+          submit = ForkJoinTask.adapt(call).fork();
+        } else {
+          try {
+            submit = call.call();
+          } catch (final RuntimeException rexec) {
+            throw rexec;
+          } catch (final Throwable error) {
+            throw new IllegalStateException(error);
+          }
+        }
         map.put(runs.getInstance().getName(),
-            new __Holder(//
-                runs, experimentIndex, ++instanceIndex, //
-                Execute.parallel(attribute.getter(runs, logger))));
+            new __Holder(runs, experimentIndex, ++instanceIndex, submit));
       }
     }
   }
@@ -241,16 +256,16 @@ public final class PerInstanceRuns<R> {
      *          the instance index
      * @param instanceRuns
      *          the instance runs
-     * @param future
-     *          the future
+     * @param submit
+     *          the submit
      */
     __Holder(final IInstanceRuns instanceRuns, final int experimentIndex,
-        final int instanceIndex, final Future future) {
+        final int instanceIndex, final Object submit) {
       super();
       this.m_instanceRuns = instanceRuns;
       this.m_experimentIndex = experimentIndex;
       this.m_instanceIndex = instanceIndex;
-      this.m_data = future;
+      this.m_data = submit;
     }
 
     /** {@inheritDoc} */
