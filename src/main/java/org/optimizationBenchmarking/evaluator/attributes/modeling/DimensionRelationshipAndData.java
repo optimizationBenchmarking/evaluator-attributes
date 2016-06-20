@@ -56,7 +56,6 @@ public final class DimensionRelationshipAndData
     }
 
     // No fitting has been computed yet. Let's do it.
-
     res = this._compute(data, logger);
 
     // Since computing the fitting is very expensive, we try to preserve

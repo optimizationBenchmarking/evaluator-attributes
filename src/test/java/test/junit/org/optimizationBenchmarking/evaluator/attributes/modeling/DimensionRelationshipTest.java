@@ -40,7 +40,7 @@ public class DimensionRelationshipTest extends
     Assert.assertNotNull(result.getFittedFunction());
     Assert.assertNotNull(result.getFittedParametersRef());
     Assert.assertTrue(MathUtils.isFinite(result.getQuality()));
-    Assert.assertTrue(result.getQuality() > 0d);
+    Assert.assertTrue(result.getQuality() >= 0d);
   }
 
   /**
