@@ -13,6 +13,7 @@ import org.optimizationBenchmarking.evaluator.data.spec.INamedElementSet;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
 import org.optimizationBenchmarking.utils.text.ETextCase;
 import org.optimizationBenchmarking.utils.text.numbers.AlphabeticNumberAppender;
+import org.optimizationBenchmarking.utils.text.textOutput.ITextOutput;
 
 /**
  * A behavior-based clustering uses algorithm behavior to divide algorithms
@@ -125,5 +126,14 @@ abstract class _BehaviorClustering<CT extends _BehaviorCluster<?>>
   @Override
   public final ArrayListView<CT> getData() {
     return this.m_data;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public ETextCase printDescription(final ITextOutput textOut,
+      final ETextCase textCase) {
+    textOut.append(
+        "Therefore, we first try to model the relationships of the different measurement dimensions by fitting different models, by applying several different fitting strategies. Based on these models, we cluster the data by using several different clustering algorithms. The number of clusters is dynamically decided in order to achieve the best average silhouette width."); //$NON-NLS-1$
+    return ETextCase.IN_SENTENCE;
   }
 }

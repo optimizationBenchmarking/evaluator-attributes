@@ -53,7 +53,7 @@ class _BehaviorCluster<CCT extends _BehaviorClustering<?>>
 
   /** {@inheritDoc} */
   @Override
-  public final ETextCase printDescription(final ITextOutput textOut,
+  public ETextCase printDescription(final ITextOutput textOut,
       final ETextCase textCase) {
     return textCase.appendWord(this.m_name, textOut);
   }

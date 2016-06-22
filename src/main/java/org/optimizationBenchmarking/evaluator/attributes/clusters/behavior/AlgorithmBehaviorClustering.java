@@ -59,8 +59,9 @@ public final class AlgorithmBehaviorClustering
   @Override
   public ETextCase printDescription(final ITextOutput textOut,
       final ETextCase textCase) {
-    return textCase.appendWord("Clustering by Algorithm Behavior", //$NON-NLS-1$
-        textOut);
+    textOut.append(
+        "The experiments, i.e., algorithm setups, are divided into groups according to their runtime behavior. "); //$NON-NLS-1$
+    return super.printDescription(textOut, textCase);
   }
 
   /** {@inheritDoc} */

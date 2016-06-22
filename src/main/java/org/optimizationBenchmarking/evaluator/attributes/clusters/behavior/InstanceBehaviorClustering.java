@@ -58,7 +58,9 @@ public final class InstanceBehaviorClustering
   @Override
   public ETextCase printDescription(final ITextOutput textOut,
       final ETextCase textCase) {
-    return textCase.appendWord("Clustering by Instance Behavior", textOut); //$NON-NLS-1$
+    textOut.append(
+        "The benchmark instances are divided into groups according to the runtime behavior of the algorithm setups applied to them. "); //$NON-NLS-1$
+    return super.printDescription(textOut, textCase);
   }
 
   /** {@inheritDoc} */
