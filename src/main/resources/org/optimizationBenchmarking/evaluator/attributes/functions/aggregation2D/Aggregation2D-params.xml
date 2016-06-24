@@ -38,6 +38,8 @@
 			description="Plot the difference between the upper and lower quartile, i.e., the difference between the values which separate the top and bottom 25% of the data from the rest. This is a more robust measure of variation as the standard deviation." />
 		<cd:choice name="standard deviation"
 			description="Plot the standard deviation of the different data." />
+    <cd:choice name="coefficient of variation"
+      description="Plot the coefficient of variation, i.e., the ratio of the standard deviation to the absolute value of the arithmetic mean of the different data." />
 		<cd:choice name="variance" description="Plot the variance of the different data." />
 	</cd:instance>
 
