@@ -3,6 +3,9 @@ package org.optimizationBenchmarking.evaluator.attributes.modeling;
 import org.optimizationBenchmarking.evaluator.data.spec.IDimension;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
 import org.optimizationBenchmarking.utils.error.ErrorUtils;
+import org.optimizationBenchmarking.utils.ml.fitting.models.CubicModel;
+import org.optimizationBenchmarking.utils.ml.fitting.models.ExpLinearModel;
+import org.optimizationBenchmarking.utils.ml.fitting.models.ExpLinearModelOverLogX;
 import org.optimizationBenchmarking.utils.ml.fitting.models.ExponentialDecayModel;
 import org.optimizationBenchmarking.utils.ml.fitting.models.LogisticModelWithOffsetOverLogX;
 import org.optimizationBenchmarking.utils.ml.fitting.models.QuadraticModel;
@@ -77,7 +80,10 @@ public final class DimensionRelationshipModels {
     static final ArrayListView<ParametricUnaryFunction> MODELS = //
     new ArrayListView<>(new ParametricUnaryFunction[] { //
         new LogisticModelWithOffsetOverLogX(), //
-        new ExponentialDecayModel(),//
+        new ExponentialDecayModel(), //
+        new ExpLinearModel(), //
+        new ExpLinearModelOverLogX(), //
+        new CubicModel(), //
     });
   }
 
