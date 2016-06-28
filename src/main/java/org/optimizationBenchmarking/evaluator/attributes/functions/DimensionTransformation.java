@@ -32,14 +32,12 @@ public final class DimensionTransformation extends Transformation
    *
    * @param function
    *          the function to be applied
-   * @param constants
-   *          the constants
    * @param dimension
    *          the dimension
    */
   DimensionTransformation(final UnaryFunction function,
-      final _DataBasedConstant[] constants, final IDimension dimension) {
-    super(function, constants);
+      final IDimension dimension) {
+    super(function);
 
     if (dimension == null) {
       throw new IllegalArgumentException(//
@@ -62,7 +60,7 @@ public final class DimensionTransformation extends Transformation
    *          the dimension
    */
   public DimensionTransformation(final IDimension dimension) {
-    this(Identity.INSTANCE, null, dimension);
+    this(Identity.INSTANCE, dimension);
   }
 
   /**

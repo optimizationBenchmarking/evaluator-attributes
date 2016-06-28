@@ -1,10 +1,9 @@
 package org.optimizationBenchmarking.evaluator.attributes.functions;
 
-import java.util.Arrays;
-
 import org.optimizationBenchmarking.evaluator.data.spec.IDataElement;
+import org.optimizationBenchmarking.utils.ICloneable;
+import org.optimizationBenchmarking.utils.comparison.Compare;
 import org.optimizationBenchmarking.utils.hash.HashObject;
-import org.optimizationBenchmarking.utils.hash.HashUtils;
 import org.optimizationBenchmarking.utils.math.functions.UnaryFunction;
 import org.optimizationBenchmarking.utils.math.functions.basic.Identity;
 import org.optimizationBenchmarking.utils.math.text.DefaultParameterRenderer;
@@ -20,24 +19,13 @@ public class Transformation extends HashObject {
   /** the function to be applied to the input data */
   final UnaryFunction m_func;
 
-  /** the internal property-based constants */
-  private final _DataBasedConstant[] m_constants;
-
-  /**
-   * the marker that this transformation is blocked because it is in use
-   */
-  private volatile boolean m_isInUse;
-
   /**
    * Create the data transformation
    *
    * @param function
    *          the function to be applied
-   * @param constants
-   *          the constants
    */
-  Transformation(final UnaryFunction function,
-      final _DataBasedConstant[] constants) {
+  Transformation(final UnaryFunction function) {
     super();
 
     if (function == null) {
@@ -46,23 +34,19 @@ public class Transformation extends HashObject {
     }
 
     this.m_func = function;
-    this.m_constants = (((constants == null) || (constants.length <= 0))
-        ? null : constants);
   }
 
   /**
    * Create the identity transformation
    */
   public Transformation() {
-    this(Identity.INSTANCE, null);
+    this(Identity.INSTANCE);
   }
 
   /** {@inheritDoc} */
   @Override
   protected int calcHashCode() {
-    return HashUtils.combineHashes(//
-        HashUtils.hashCode(this.m_func), //
-        HashUtils.hashCode(this.m_constants));
+    return this.m_func.hashCode();
   }
 
   /**
@@ -96,36 +80,35 @@ public class Transformation extends HashObject {
    *          the data element
    * @return the transformation function
    */
-  public synchronized final TransformationFunction use(
-      final IDataElement element) {
+  public final TransformationFunction use(final IDataElement element) {
+    UnaryFunction useFunction;
 
-    if (this.m_constants != null) {
-      if (this.m_isInUse) {
-        throw new IllegalStateException("The data transformation " + //$NON-NLS-1$
-            this.m_func + " is already in use concurrently."); //$NON-NLS-1$
-      }
+    useFunction = ((this.m_func instanceof ICloneable)
+        ? ((UnaryFunction) (((ICloneable) (this.m_func)).clone()))
+        : this.m_func);
 
-      for (final _DataBasedConstant constant : this.m_constants) {
-        constant._update(element);
-      }
-    }
-
-    this.m_isInUse = true;
-    return new TransformationFunction(this);
+    Transformation.__use(useFunction, element);
+    return new TransformationFunction(this, useFunction);
   }
 
-  /** notice that a function application has been finished */
-  synchronized final void _endUse() {
-    final boolean isInUse;
-
-    isInUse = this.m_isInUse;
-    this.m_isInUse = false;
-
-    if (isInUse) {
-      if (this.m_constants != null) {
-        for (final _DataBasedConstant constant : this.m_constants) {
-          constant._clear();
-        }
+  /**
+   * recursively iterate over the elements of a function to set up all
+   * nested data-based constants
+   *
+   * @param setup
+   *          the object to set up
+   * @param element
+   *          the data element
+   */
+  @SuppressWarnings("rawtypes")
+  private static final void __use(final Object setup,
+      final IDataElement element) {
+    if (setup instanceof _DataBasedConstant) {
+      ((_DataBasedConstant) setup)._update(element);
+    }
+    if (setup instanceof Iterable) {
+      for (final Object object : ((Iterable) setup)) {
+        Transformation.__use(object, element);
       }
     }
   }
@@ -133,16 +116,13 @@ public class Transformation extends HashObject {
   /** {@inheritDoc} */
   @Override
   public final boolean equals(final Object o) {
-    final Transformation other;
     if (o == this) {
       return true;
     }
     if (o instanceof Transformation) {
-      other = ((Transformation) o);
-      return ((this.m_func.equals(other.m_func)) && //
-          (Arrays.equals(this.m_constants, other.m_constants)));
+      return Compare.equals(this.m_func, ((Transformation) o).m_func);
     }
-    return true;
+    return false;
   }
 
   /** {@inheritDoc} */
@@ -154,4 +134,5 @@ public class Transformation extends HashObject {
     this.m_func.mathRender(mto, DefaultParameterRenderer.INSTANCE);
     return mto.toString();
   }
+
 }

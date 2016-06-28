@@ -53,8 +53,8 @@ public final class NamedParameterTransformationParser
 
   /** {@inheritDoc} */
   @Override
-  final Transformation _createTransformation(final UnaryFunction function,
-      final _DataBasedConstant[] constants) {
+  final Transformation _createTransformation(
+      final UnaryFunction function) {
     final UnaryFunction func;
 
     func = this.m_unary;
@@ -63,7 +63,7 @@ public final class NamedParameterTransformationParser
       throw new IllegalArgumentException(//
           "You must specify and use the source of a named source transformation."); //$NON-NLS-1$
     }
-    return new Transformation(function, constants);
+    return new Transformation(function);
   }
 
   /** {@inheritDoc} */

@@ -507,7 +507,7 @@ public final class ECDF extends FunctionAttribute<IElementSet> {
       final Logger logger) {
     final _List list;
     final DimensionTransformation xIn, yIn;
-    final Transformation yOut;
+    TransformationFunction yInFunc, xInFunc, yOutFunc;
     final IDimension timeDim, goalDim;
     final IMatrix result;
     String name;
@@ -520,59 +520,50 @@ public final class ECDF extends FunctionAttribute<IElementSet> {
     }
 
     xIn = this.getXAxisTransformation();
+    timeDim = xIn.getDimension();
+
     yIn = this.getYAxisInputTransformation();
-    synchronized (yIn) {
-      try (final TransformationFunction yInFunc = yIn.use(data)) {
+    yInFunc = yIn.use(data);
+    goalDim = yIn.getDimension();
 
-        timeDim = xIn.getDimension();
-        goalDim = yIn.getDimension();
-
-        if (goalDim.getDataType().isInteger()
-            && yInFunc.isLongArithmeticAccurate()) {
-          if (timeDim.getDataType().isInteger()) {
-            list = new _LongTimeLongGoal(timeDim, goalDim,
-                this.m_criterion, yInFunc, this.m_goalValueLong);
-          } else {
-            list = new _DoubleTimeLongGoal(timeDim, goalDim,
-                this.m_criterion, yInFunc, this.m_goalValueLong);
-          }
-        } else {
-          if (timeDim.getDataType().isInteger()) {
-            list = new _LongTimeDoubleGoal(timeDim, goalDim,
-                this.m_criterion, yInFunc, this.m_goalValueDouble);
-          } else {
-            list = new _DoubleTimeDoubleGoal(timeDim, goalDim,
-                this.m_criterion, yInFunc, this.m_goalValueDouble);
-          }
-        }
-
-        for (final IRun run : data.getData()) {
-          list._addRun(run);
-        }
+    if (goalDim.getDataType().isInteger()
+        && yInFunc.isLongArithmeticAccurate()) {
+      if (timeDim.getDataType().isInteger()) {
+        list = new _LongTimeLongGoal(timeDim, goalDim, this.m_criterion,
+            yInFunc, this.m_goalValueLong);
+      } else {
+        list = new _DoubleTimeLongGoal(timeDim, goalDim, this.m_criterion,
+            yInFunc, this.m_goalValueLong);
       }
-
-      synchronized (xIn) {
-        try (final TransformationFunction xInFunc = xIn.use(data)) {
-          yOut = this.getYAxisOutputTransformation();
-          synchronized (yOut) {
-            try (final TransformationFunction yOutFunc = yOut.use(data)) {
-              result = list._toMatrix(xInFunc, yOutFunc);
-            }
-          }
-        }
+    } else {
+      if (timeDim.getDataType().isInteger()) {
+        list = new _LongTimeDoubleGoal(timeDim, goalDim, this.m_criterion,
+            yInFunc, this.m_goalValueDouble);
+      } else {
+        list = new _DoubleTimeDoubleGoal(timeDim, goalDim,
+            this.m_criterion, yInFunc, this.m_goalValueDouble);
       }
-
-      if ((logger != null) && (logger.isLoggable(Level.FINER))) {
-        if (name == null) {
-          name = this.getNameForLogging(data);
-        }
-        logger.finer("Finished computing the " + name + //$NON-NLS-1$
-            ", resulting in a " + result.m() + '*' + result.n() + //$NON-NLS-1$
-            " matrix.");//$NON-NLS-1$
-      }
-
-      return result;
     }
+
+    for (final IRun run : data.getData()) {
+      list._addRun(run);
+    }
+
+    xInFunc = xIn.use(data);
+    yOutFunc = this.getYAxisOutputTransformation().use(data);
+
+    result = list._toMatrix(xInFunc, yOutFunc);
+
+    if ((logger != null) && (logger.isLoggable(Level.FINER))) {
+      if (name == null) {
+        name = this.getNameForLogging(data);
+      }
+      logger.finer("Finished computing the " + name + //$NON-NLS-1$
+          ", resulting in a " + result.m() + '*' + result.n() + //$NON-NLS-1$
+          " matrix.");//$NON-NLS-1$
+    }
+
+    return result;
   }
 
   /**

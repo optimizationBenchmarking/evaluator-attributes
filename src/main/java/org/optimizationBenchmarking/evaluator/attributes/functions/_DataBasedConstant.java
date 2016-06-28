@@ -1,6 +1,7 @@
 package org.optimizationBenchmarking.evaluator.attributes.functions;
 
 import org.optimizationBenchmarking.evaluator.data.spec.IDataElement;
+import org.optimizationBenchmarking.utils.ICloneable;
 import org.optimizationBenchmarking.utils.math.BasicNumber;
 import org.optimizationBenchmarking.utils.math.NumericalTypes;
 import org.optimizationBenchmarking.utils.math.text.NamedConstant;
@@ -8,7 +9,8 @@ import org.optimizationBenchmarking.utils.math.text.NamedConstant;
 /**
  * A constant based on some data.
  */
-abstract class _DataBasedConstant extends NamedConstant {
+abstract class _DataBasedConstant extends NamedConstant
+    implements ICloneable {
 
   /** the serial version uid */
   private static final long serialVersionUID = 1L;
@@ -23,6 +25,17 @@ abstract class _DataBasedConstant extends NamedConstant {
   /** create the data-based constant */
   _DataBasedConstant() {
     super();
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public final Object clone() {
+    try {
+      return super.clone();
+    } catch (final Throwable error) {
+      throw new IllegalStateException("Cloning should have worked...", //$NON-NLS-1$
+          error);
+    }
   }
 
   /**

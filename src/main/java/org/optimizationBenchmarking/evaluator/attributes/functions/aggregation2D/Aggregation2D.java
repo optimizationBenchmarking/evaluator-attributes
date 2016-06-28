@@ -24,6 +24,7 @@ import org.optimizationBenchmarking.utils.config.Configuration;
 import org.optimizationBenchmarking.utils.document.spec.IComplexText;
 import org.optimizationBenchmarking.utils.document.spec.IMath;
 import org.optimizationBenchmarking.utils.hash.HashUtils;
+import org.optimizationBenchmarking.utils.math.functions.basic.Identity;
 import org.optimizationBenchmarking.utils.math.matrix.IMatrix;
 import org.optimizationBenchmarking.utils.math.matrix.processing.ColumnTransformedMatrix;
 import org.optimizationBenchmarking.utils.math.matrix.processing.iterator2D.CallableMatrixIteration2DBuilder;
@@ -224,6 +225,10 @@ public final class Aggregation2D extends FunctionAttribute<IElementSet> {
     final IMatrix result;
     final DimensionTransformation xIn, yIn;
     final Transformation yOut;
+    final TransformationFunction xFunction, yInputFunction,
+        yOutputFunction;
+    final boolean useX, useY;
+    IMatrix current;
     CallableMatrixIteration2DBuilder<IMatrix> builder;
     ScalarAggregate aggregate;
     String name;
@@ -237,25 +242,25 @@ public final class Aggregation2D extends FunctionAttribute<IElementSet> {
     }
 
     xIn = this.getXAxisTransformation();
-    synchronized (xIn) {
-      try (final TransformationFunction xFunction = xIn.use(data)) {
-        yIn = this.getYAxisInputTransformation();
-        synchronized (yIn) {
-          try (final TransformationFunction yInputFunction = yIn
-              .use(data)) {
+    xFunction = xIn.use(data);
+    useX = (!(xFunction.isIdentityTransformation()));
 
-            runs = data.getData();
-            i = runs.size();
-            matrices = new IMatrix[i];
+    yIn = this.getYAxisInputTransformation();
+    yInputFunction = yIn.use(data);
+    useY = (!(yInputFunction.isIdentityTransformation()));
 
-            for (; (--i) >= 0;) {
-              matrices[i] = new ColumnTransformedMatrix(//
-                  runs.get(i).selectColumns(this.m_xIndex, this.m_yIndex), //
-                  xFunction, yInputFunction).copy();
-            }
-          }
-        }
+    runs = data.getData();
+    i = runs.size();
+    matrices = new IMatrix[i];
+
+    for (; (--i) >= 0;) {
+      current = runs.get(i).selectColumns(this.m_xIndex, this.m_yIndex);
+      if (useX || useY) {
+        current = new ColumnTransformedMatrix(current, //
+            useX ? xFunction : Identity.INSTANCE, //
+            useY ? yInputFunction : Identity.INSTANCE).copy();
       }
+      matrices[i] = current.copy();
     }
 
     yOut = this.getYAxisOutputTransformation();
@@ -266,13 +271,12 @@ public final class Aggregation2D extends FunctionAttribute<IElementSet> {
     builder.setYDimension(1);
     builder.setMatrices(matrices);
     aggregate = this.m_param.createSampleAggregate();
-    synchronized (yOut) {
-      try (final TransformationFunction yOutputFunction = yOut.use(data)) {
-        result = builder
-            .setVisitor(new Matrix2DAggregate(aggregate, yOutputFunction))//
-            .create().call();
-      }
-    }
+
+    yOutputFunction = yOut.use(data);
+    result = builder
+        .setVisitor(new Matrix2DAggregate(aggregate, yOutputFunction))//
+        .create().call();
+
     aggregate = null;
     builder = null;
     if ((logger != null) && (logger.isLoggable(Level.FINER))) {

@@ -4,7 +4,6 @@ import org.optimizationBenchmarking.evaluator.data.spec.IDimension;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperimentSet;
 import org.optimizationBenchmarking.evaluator.data.spec.IFeature;
 import org.optimizationBenchmarking.evaluator.data.spec.IParameter;
-import org.optimizationBenchmarking.utils.collections.maps.StringMapCI;
 import org.optimizationBenchmarking.utils.math.functions.MathematicalFunction;
 import org.optimizationBenchmarking.utils.math.functions.UnaryFunction;
 import org.optimizationBenchmarking.utils.math.functions.compound.FunctionBuilder;
@@ -37,7 +36,7 @@ abstract class _TransformationParser<TT extends Transformation>
 
   /**
    * the unary function for the parameter: must be reset to {@code null} by
-   * {@link #_createTransformation(UnaryFunction, _DataBasedConstant[])}
+   * {@link #_createTransformation(UnaryFunction)}
    */
   transient UnaryFunction m_unary;
 
@@ -67,8 +66,7 @@ abstract class _TransformationParser<TT extends Transformation>
     final UnaryFunction function;
 
     function = this.m_functionParser.parseString(string);
-    return this._createTransformation(function,
-        this.m_resolver._getConstants());
+    return this._createTransformation(function);
   }
 
   /**
@@ -76,12 +74,9 @@ abstract class _TransformationParser<TT extends Transformation>
    *
    * @param function
    *          the parsed function
-   * @param constants
-   *          the property constants it contains
    * @return the created transformation
    */
-  abstract TT _createTransformation(final UnaryFunction function,
-      final _DataBasedConstant[] constants);
+  abstract TT _createTransformation(final UnaryFunction function);
 
   /**
    * Resolve an otherwise unassigned name
@@ -92,44 +87,17 @@ abstract class _TransformationParser<TT extends Transformation>
    *          the function builder
    * @return the function corresponding to the name
    */
-  abstract UnaryFunction _resolveUnknownName(final String name,
-      final FunctionBuilder<UnaryFunction> builder);
+  UnaryFunction _resolveUnknownName(final String name,
+      final FunctionBuilder<UnaryFunction> builder) {
+    return null;
+  }
 
   /** the internal entity resolver */
   private final class __PropertyResolver extends AbstractNameResolver {
 
-    /** the resolved properties */
-    private final StringMapCI<__Resolved> m_resolved;
-
     /** create the internal property resolver */
     __PropertyResolver() {
       super();
-      this.m_resolved = new StringMapCI<>();
-    }
-
-    /**
-     * Obtain the parsed constants, after parsing is done.
-     *
-     * @return the constants
-     */
-    synchronized _DataBasedConstant[] _getConstants() {
-      final int size;
-      final _DataBasedConstant[] constants;
-      int index;
-
-      size = this.m_resolved.size();
-      if (size <= 0) {
-        return null;
-      }
-
-      constants = new _DataBasedConstant[size];
-      index = 0;
-      for (final __Resolved resolved : this.m_resolved.values()) {
-        constants[index++] = resolved.m_constant;
-      }
-
-      this.m_resolved.clear();
-      return constants;
     }
 
     /** {@inheritDoc} */
@@ -137,7 +105,6 @@ abstract class _TransformationParser<TT extends Transformation>
     @Override
     public synchronized final MathematicalFunction resolve(
         final String name, final FunctionBuilder<?> builder) {
-      __Resolved resolved;
       final String processed, lower, use;
       _DataBasedConstant constant;
       final IDimension dim;
@@ -148,11 +115,6 @@ abstract class _TransformationParser<TT extends Transformation>
       boolean upper;
 
       processed = TextUtils.prepare(name);
-
-      resolved = this.m_resolved.get(processed);
-      if (resolved != null) {
-        return resolved.m_func;
-      }
 
       if (processed != null) {
         constant = null;
@@ -194,10 +156,7 @@ abstract class _TransformationParser<TT extends Transformation>
         }
 
         if (constant != null) {
-          resolved = new __Resolved(constant,
-              ((UnaryFunction) (builder.constant(constant))));
-          this.m_resolved.put(name, resolved);
-          return resolved.m_func;
+          return builder.constant(constant);
         }
 
         namedConst = AbstractNameResolver.resolveDefaultConstant(name);
@@ -213,29 +172,6 @@ abstract class _TransformationParser<TT extends Transformation>
       }
 
       return super.resolve(name, builder);
-    }
-  }
-
-  /** a record for resolved properties */
-  private static final class __Resolved {
-    /** the constant */
-    final _DataBasedConstant m_constant;
-    /** the function */
-    final UnaryFunction m_func;
-
-    /**
-     * Create the resolved record
-     *
-     * @param constant
-     *          the constant
-     * @param func
-     *          the function
-     */
-    __Resolved(final _DataBasedConstant constant,
-        final UnaryFunction func) {
-      super();
-      this.m_constant = constant;
-      this.m_func = func;
     }
   }
 }

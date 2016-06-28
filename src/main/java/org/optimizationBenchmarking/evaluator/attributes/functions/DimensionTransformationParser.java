@@ -32,7 +32,7 @@ public final class DimensionTransformationParser
   /** {@inheritDoc} */
   @Override
   final DimensionTransformation _createTransformation(
-      final UnaryFunction function, final _DataBasedConstant[] constants) {
+      final UnaryFunction function) {
     final IDimension dim;
 
     dim = this.m_dimension;
@@ -43,7 +43,7 @@ public final class DimensionTransformationParser
       throw new IllegalArgumentException(//
           "You must specify a source dimension for a dimension transformation source."); //$NON-NLS-1$
     }
-    return new DimensionTransformation(function, constants, dim);
+    return new DimensionTransformation(function, dim);
   }
 
   /** {@inheritDoc} */
