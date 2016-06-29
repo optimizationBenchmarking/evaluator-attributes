@@ -4,11 +4,9 @@ import org.optimizationBenchmarking.evaluator.data.spec.IDimension;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
 import org.optimizationBenchmarking.utils.error.ErrorUtils;
 import org.optimizationBenchmarking.utils.ml.fitting.models.CubicModel;
-import org.optimizationBenchmarking.utils.ml.fitting.models.ExpLinearModel;
 import org.optimizationBenchmarking.utils.ml.fitting.models.ExpLinearModelOverLogX;
 import org.optimizationBenchmarking.utils.ml.fitting.models.ExponentialDecayModel;
 import org.optimizationBenchmarking.utils.ml.fitting.models.LogisticModelWithOffsetOverLogX;
-import org.optimizationBenchmarking.utils.ml.fitting.models.QuadraticModel;
 import org.optimizationBenchmarking.utils.ml.fitting.spec.ParametricUnaryFunction;
 
 /** This class provides models for relationships between dimensions. */
@@ -81,7 +79,6 @@ public final class DimensionRelationshipModels {
     new ArrayListView<>(new ParametricUnaryFunction[] { //
         new LogisticModelWithOffsetOverLogX(), //
         new ExponentialDecayModel(), //
-        new ExpLinearModel(), //
         new ExpLinearModelOverLogX(), //
         new CubicModel(), //
     });
@@ -93,7 +90,7 @@ public final class DimensionRelationshipModels {
     /** The models attempted for relationships of equal-type dimensions */
     static final ArrayListView<ParametricUnaryFunction> MODELS = //
     new ArrayListView<>(new ParametricUnaryFunction[] { //
-        new QuadraticModel(),//
+        new CubicModel(),//
     });
   }
 
