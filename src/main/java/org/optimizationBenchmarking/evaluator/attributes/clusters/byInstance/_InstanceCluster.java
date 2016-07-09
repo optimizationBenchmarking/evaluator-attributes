@@ -3,7 +3,10 @@ package org.optimizationBenchmarking.evaluator.attributes.clusters.byInstance;
 import org.optimizationBenchmarking.evaluator.attributes.clusters.ICluster;
 import org.optimizationBenchmarking.evaluator.data.impl.shadow.DataSelection;
 import org.optimizationBenchmarking.evaluator.data.impl.shadow.ShadowExperimentSet;
+import org.optimizationBenchmarking.evaluator.data.spec.IExperiment;
 import org.optimizationBenchmarking.evaluator.data.spec.IInstance;
+import org.optimizationBenchmarking.evaluator.data.spec.IInstanceRuns;
+import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
 import org.optimizationBenchmarking.utils.document.impl.SemanticComponentUtils;
 import org.optimizationBenchmarking.utils.document.spec.IMath;
 import org.optimizationBenchmarking.utils.document.spec.IParameterRenderer;
@@ -30,8 +33,23 @@ final class _InstanceCluster extends ShadowExperimentSet<_InstanceGroups>
   /** {@inheritDoc} */
   @Override
   public final String getPathComponentSuggestion() {
-    return this.getInstances().getData().get(0)
-        .getPathComponentSuggestion();
+    final ArrayListView<? extends IExperiment> experiments;
+    final ArrayListView<? extends IInstanceRuns> runs;
+    final IInstance instance;
+
+    findInstance: {
+      experiments = this.getData();
+      if (!(experiments.isEmpty())) {
+        runs = experiments.get(0).getData();
+        if (!(runs.isEmpty())) {
+          instance = runs.get(0).getInstance();
+          break findInstance;
+        }
+      }
+      instance = this.getInstances().getData().get(0);
+    }
+
+    return instance.getPathComponentSuggestion(); // $NON-NLS-1$
   }
 
   /** {@inheritDoc} */
