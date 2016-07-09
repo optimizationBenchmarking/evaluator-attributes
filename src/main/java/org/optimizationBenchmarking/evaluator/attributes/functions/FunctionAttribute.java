@@ -469,7 +469,7 @@ public abstract class FunctionAttribute<DT extends IElementSet>
     mto = new MemoryTextOutput();
     this.m_yAxisOutputTransformation.m_func.mathRender(mto,
         this.__getYAxisPathComponentRenderer());
-    return PathUtils.sanitizePathComponent(mto.toString());
+    return PathUtils.sanitizePathComponent(mto.toString(), false);
   }
 
   /**

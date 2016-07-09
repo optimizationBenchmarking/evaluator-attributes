@@ -150,7 +150,7 @@ public final class DimensionTransformation extends Transformation
     final MemoryTextOutput mto;
     mto = new MemoryTextOutput();
     this.mathRender(mto, this.__getParameterRenderer());
-    return PathUtils.sanitizePathComponent(mto.toString());
+    return PathUtils.sanitizePathComponent(mto.toString(), false);
   }
 
   /** {@inheritDoc} */
