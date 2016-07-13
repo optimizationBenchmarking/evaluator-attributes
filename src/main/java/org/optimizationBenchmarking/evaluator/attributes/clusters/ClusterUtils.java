@@ -21,7 +21,7 @@ public final class ClusterUtils {
    *          the text case
    * @param textOut
    *          the text destination the next text case
-   * @return
+   * @return the next text case
    */
   public static final ETextCase listInstances(final ICluster cluster,
       final ETextCase textCase, final ITextOutput textOut) {
@@ -71,7 +71,7 @@ public final class ClusterUtils {
    *          the text case
    * @param textOut
    *          the text destination the next text case
-   * @return
+   * @return the next text case
    */
   public static final ETextCase listExperiments(final ICluster cluster,
       final ETextCase textCase, final ITextOutput textOut) {
