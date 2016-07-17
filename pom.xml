@@ -4,7 +4,7 @@
 
 	<groupId>org.optimizationBenchmarking</groupId>
 	<artifactId>evaluator-attributes</artifactId>
-	<version>0.8.6</version>
+	<version>0.8.7</version>
 	<packaging>jar</packaging>
 	<name>Evaluator Attributes</name>
 	<description>The attributes computed by the optimizationBenchmarking.org evaluator.</description>
