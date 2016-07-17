@@ -12,7 +12,6 @@ import org.optimizationBenchmarking.evaluator.attributes.functions.DimensionTran
 import org.optimizationBenchmarking.evaluator.attributes.functions.FunctionAttribute;
 import org.optimizationBenchmarking.evaluator.attributes.functions.NamedParameterTransformationParser;
 import org.optimizationBenchmarking.evaluator.attributes.functions.Transformation;
-import org.optimizationBenchmarking.evaluator.attributes.functions.TransformationFunction;
 import org.optimizationBenchmarking.evaluator.data.spec.EAttributeType;
 import org.optimizationBenchmarking.evaluator.data.spec.IElementSet;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperiment;
@@ -24,6 +23,7 @@ import org.optimizationBenchmarking.utils.config.Configuration;
 import org.optimizationBenchmarking.utils.document.spec.IComplexText;
 import org.optimizationBenchmarking.utils.document.spec.IMath;
 import org.optimizationBenchmarking.utils.hash.HashUtils;
+import org.optimizationBenchmarking.utils.math.functions.UnaryFunction;
 import org.optimizationBenchmarking.utils.math.functions.basic.Identity;
 import org.optimizationBenchmarking.utils.math.matrix.IMatrix;
 import org.optimizationBenchmarking.utils.math.matrix.processing.ColumnTransformedMatrix;
@@ -225,9 +225,8 @@ public final class Aggregation2D extends FunctionAttribute<IElementSet> {
     final IMatrix result;
     final DimensionTransformation xIn, yIn;
     final Transformation yOut;
-    final TransformationFunction xFunction, yInputFunction,
-        yOutputFunction;
-    final boolean useX, useY;
+    final UnaryFunction xFunction, yInputFunction, yOutputFunction;
+    boolean doTransform;
     IMatrix current;
     CallableMatrixIteration2DBuilder<IMatrix> builder;
     ScalarAggregate aggregate;
@@ -241,13 +240,22 @@ public final class Aggregation2D extends FunctionAttribute<IElementSet> {
       name = null;
     }
 
+    doTransform = false;
     xIn = this.getXAxisTransformation();
-    xFunction = xIn.use(data);
-    useX = (!(xFunction.isIdentityTransformation()));
+    if (xIn.isIdentityTransformation()) {
+      xFunction = Identity.INSTANCE;
+    } else {
+      doTransform = true;
+      xFunction = xIn.use(data);
+    }
 
     yIn = this.getYAxisInputTransformation();
-    yInputFunction = yIn.use(data);
-    useY = (!(yInputFunction.isIdentityTransformation()));
+    if (yIn.isIdentityTransformation()) {
+      yInputFunction = Identity.INSTANCE;
+    } else {
+      yInputFunction = yIn.use(data);
+      doTransform = true;
+    }
 
     runs = data.getData();
     i = runs.size();
@@ -255,10 +263,9 @@ public final class Aggregation2D extends FunctionAttribute<IElementSet> {
 
     for (; (--i) >= 0;) {
       current = runs.get(i).selectColumns(this.m_xIndex, this.m_yIndex);
-      if (useX || useY) {
+      if (doTransform) {
         current = new ColumnTransformedMatrix(current, //
-            useX ? xFunction : Identity.INSTANCE, //
-            useY ? yInputFunction : Identity.INSTANCE).copy();
+            xFunction, yInputFunction).copy();
       }
       matrices[i] = current.copy();
     }

@@ -11,7 +11,6 @@ import org.optimizationBenchmarking.evaluator.attributes.functions.DimensionTran
 import org.optimizationBenchmarking.evaluator.attributes.functions.FunctionAttribute;
 import org.optimizationBenchmarking.evaluator.attributes.functions.NamedParameterTransformationParser;
 import org.optimizationBenchmarking.evaluator.attributes.functions.Transformation;
-import org.optimizationBenchmarking.evaluator.attributes.functions.TransformationFunction;
 import org.optimizationBenchmarking.evaluator.data.spec.EAttributeType;
 import org.optimizationBenchmarking.evaluator.data.spec.IDimension;
 import org.optimizationBenchmarking.evaluator.data.spec.IElementSet;
@@ -41,6 +40,7 @@ import org.optimizationBenchmarking.utils.document.spec.IMath;
 import org.optimizationBenchmarking.utils.document.spec.IText;
 import org.optimizationBenchmarking.utils.hash.HashUtils;
 import org.optimizationBenchmarking.utils.math.NumericalTypes;
+import org.optimizationBenchmarking.utils.math.functions.UnaryFunction;
 import org.optimizationBenchmarking.utils.math.matrix.IMatrix;
 import org.optimizationBenchmarking.utils.math.matrix.processing.iterator2D.CallableMatrixIteration2DBuilder;
 import org.optimizationBenchmarking.utils.math.matrix.processing.iterator2D.EIterationDirection;
@@ -507,7 +507,7 @@ public final class ECDF extends FunctionAttribute<IElementSet> {
       final Logger logger) {
     final _List list;
     final DimensionTransformation xIn, yIn;
-    TransformationFunction yInFunc, xInFunc, yOutFunc;
+    UnaryFunction yInFunc, xInFunc, yOutFunc;
     final IDimension timeDim, goalDim;
     final IMatrix result;
     String name;

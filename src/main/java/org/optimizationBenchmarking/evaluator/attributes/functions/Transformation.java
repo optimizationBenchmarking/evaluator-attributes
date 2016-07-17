@@ -80,7 +80,7 @@ public class Transformation extends HashObject {
    *          the data element
    * @return the transformation function
    */
-  public final TransformationFunction use(final IDataElement element) {
+  public final UnaryFunction use(final IDataElement element) {
     UnaryFunction useFunction;
 
     useFunction = ((this.m_func instanceof ICloneable)
@@ -88,7 +88,7 @@ public class Transformation extends HashObject {
         : this.m_func);
 
     Transformation.__use(useFunction, element);
-    return new TransformationFunction(this, useFunction);
+    return useFunction;
   }
 
   /**

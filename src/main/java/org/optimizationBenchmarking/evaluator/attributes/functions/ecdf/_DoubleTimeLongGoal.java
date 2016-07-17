@@ -1,6 +1,5 @@
 package org.optimizationBenchmarking.evaluator.attributes.functions.ecdf;
 
-import org.optimizationBenchmarking.evaluator.attributes.functions.TransformationFunction;
 import org.optimizationBenchmarking.evaluator.data.spec.IDataPoint;
 import org.optimizationBenchmarking.evaluator.data.spec.IDimension;
 import org.optimizationBenchmarking.evaluator.data.spec.IRun;
@@ -28,8 +27,8 @@ final class _DoubleTimeLongGoal extends _Doubles {
    *          the goal
    */
   _DoubleTimeLongGoal(final IDimension timeDim, final IDimension goalDim,
-      final EComparison criterion,
-      final TransformationFunction goalTransform, final long goal) {
+      final EComparison criterion, final UnaryFunction goalTransform,
+      final long goal) {
     super(timeDim, goalDim, criterion, goalTransform);
     this.m_goal = goal;
   }

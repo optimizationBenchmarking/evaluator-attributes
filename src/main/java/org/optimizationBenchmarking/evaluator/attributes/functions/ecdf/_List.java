@@ -1,10 +1,10 @@
 package org.optimizationBenchmarking.evaluator.attributes.functions.ecdf;
 
-import org.optimizationBenchmarking.evaluator.attributes.functions.TransformationFunction;
 import org.optimizationBenchmarking.evaluator.data.spec.IDimension;
 import org.optimizationBenchmarking.evaluator.data.spec.IRun;
 import org.optimizationBenchmarking.utils.comparison.EComparison;
 import org.optimizationBenchmarking.utils.math.functions.UnaryFunction;
+import org.optimizationBenchmarking.utils.math.functions.basic.Identity;
 import org.optimizationBenchmarking.utils.math.matrix.impl.DoubleMatrix1D;
 
 /** a list */
@@ -53,8 +53,7 @@ abstract class _List {
    *          the goal transformation
    */
   _List(final IDimension timeDim, final IDimension goalDim,
-      final EComparison criterion,
-      final TransformationFunction goalTransform) {
+      final EComparison criterion, final UnaryFunction goalTransform) {
     super();
     this.m_timeIndex = timeDim.getIndex();
     this.m_goalIndex = goalDim.getIndex();
@@ -63,7 +62,7 @@ abstract class _List {
 
     setTransform: {
 
-      if (goalTransform.isIdentityTransformation()) {
+      if (goalTransform instanceof Identity) {
         setNoTransform: {
           switcher: switch (criterion) {
             case LESS_OR_EQUAL: {
