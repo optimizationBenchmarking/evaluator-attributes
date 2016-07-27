@@ -31,7 +31,7 @@ final class _InstanceGroups extends DataElement implements IClustering {
     super();
 
     this.m_owner = owner;
-    this.m_data = new ArrayListView<>(data, false);
+    this.m_data = new ArrayListView<>(data);
   }
 
   /** {@inheritDoc} */
