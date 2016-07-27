@@ -81,7 +81,7 @@ public final class DimensionRelationshipModels {
         new ExponentialDecayModel(), //
         new ExpLinearModelOverLogX(), //
         new CubicModel(), //
-    });
+    }, false);
   }
 
   /** the holder for relationships of equally-typed dimensions */
@@ -91,7 +91,7 @@ public final class DimensionRelationshipModels {
     static final ArrayListView<ParametricUnaryFunction> MODELS = //
     new ArrayListView<>(new ParametricUnaryFunction[] { //
         new CubicModel(),//
-    });
+    }, false);
   }
 
 }

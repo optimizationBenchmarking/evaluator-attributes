@@ -75,7 +75,7 @@ public abstract class PropertyValueGroups extends DataElement
       list[index++] = this._group(group);
     }
 
-    this.m_data = new ArrayListView(list);
+    this.m_data = new ArrayListView(list, false);
     this.m_property = property;
     this.m_groupingMode = groups.m_groupingMode;
 
