@@ -59,7 +59,7 @@ abstract class _BehaviorClusterer<CCT extends IClustering>
    *          undefined
    */
   _BehaviorClusterer(final int minClusters, final int maxClusters) {
-    super(EAttributeType.TEMPORARILY_STORED);
+    super(EAttributeType.PERMANENTLY_STORED);
 
     if ((minClusters > 0) && (maxClusters > 0)
         && (minClusters > maxClusters)) {

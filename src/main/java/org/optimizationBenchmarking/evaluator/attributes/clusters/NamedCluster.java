@@ -1,6 +1,5 @@
-package org.optimizationBenchmarking.evaluator.attributes.clusters.behavior;
+package org.optimizationBenchmarking.evaluator.attributes.clusters;
 
-import org.optimizationBenchmarking.evaluator.attributes.clusters.ICluster;
 import org.optimizationBenchmarking.evaluator.data.impl.shadow.DataSelection;
 import org.optimizationBenchmarking.evaluator.data.impl.shadow.ShadowExperimentSet;
 import org.optimizationBenchmarking.utils.document.spec.IMath;
@@ -10,13 +9,13 @@ import org.optimizationBenchmarking.utils.text.ETextCase;
 import org.optimizationBenchmarking.utils.text.textOutput.ITextOutput;
 
 /**
- * A cluster based on algorithm behavior.
+ * A basic, named cluster
  *
- * @param <CCT>
+ * @param <OT>
  *          the clustering type
  */
-class _BehaviorCluster<CCT extends _BehaviorClustering<?>>
-    extends ShadowExperimentSet<CCT> implements ICluster {
+public class NamedCluster<OT extends IClustering>
+    extends ShadowExperimentSet<OT> implements ICluster {
 
   /** the name of the cluster */
   private final String m_name;
@@ -31,52 +30,61 @@ class _BehaviorCluster<CCT extends _BehaviorClustering<?>>
    * @param selection
    *          the data selection
    */
-  _BehaviorCluster(final CCT owner, final String name,
+  protected NamedCluster(final OT owner, final String name,
       final DataSelection selection) {
     super(owner, selection);
     this.m_name = name;
+  }
+
+  /**
+   * Get the name of this cluster
+   *
+   * @return the name of this cluster
+   */
+  public String getName() {
+    return this.m_name;
   }
 
   /** {@inheritDoc} */
   @Override
   public ETextCase printShortName(final ITextOutput textOut,
       final ETextCase textCase) {
-    return textCase.appendWord(this.m_name, textOut);
+    return textCase.appendWord(this.getName(), textOut);
   }
 
   /** {@inheritDoc} */
   @Override
   public ETextCase printLongName(final ITextOutput textOut,
       final ETextCase textCase) {
-    return textCase.appendWord(this.m_name, textOut);
+    return textCase.appendWord(this.getName(), textOut);
   }
 
   /** {@inheritDoc} */
   @Override
   public ETextCase printDescription(final ITextOutput textOut,
       final ETextCase textCase) {
-    return textCase.appendWord(this.m_name, textOut);
+    return textCase.appendWord(this.getName(), textOut);
   }
 
   /** {@inheritDoc} */
   @Override
-  public final String getPathComponentSuggestion() {
-    return this.m_name;
+  public String getPathComponentSuggestion() {
+    return this.getName();
   }
 
   /** {@inheritDoc} */
   @Override
-  public final void mathRender(final ITextOutput out,
+  public void mathRender(final ITextOutput out,
       final IParameterRenderer renderer) {
-    out.append(this.m_name);
+    out.append(this.getName());
   }
 
   /** {@inheritDoc} */
   @Override
-  public final void mathRender(final IMath out,
+  public void mathRender(final IMath out,
       final IParameterRenderer renderer) {
     try (final IMathName name = out.name()) {
-      name.append(this.m_name);
+      name.append(this.getName());
     }
   }
 }

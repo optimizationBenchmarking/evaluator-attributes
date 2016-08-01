@@ -1,6 +1,7 @@
 package org.optimizationBenchmarking.evaluator.attributes.clusters.behavior;
 
 import org.optimizationBenchmarking.evaluator.attributes.clusters.ClusterUtils;
+import org.optimizationBenchmarking.evaluator.attributes.clusters.NamedCluster;
 import org.optimizationBenchmarking.evaluator.data.impl.shadow.DataSelection;
 import org.optimizationBenchmarking.utils.text.ETextCase;
 import org.optimizationBenchmarking.utils.text.textOutput.ITextOutput;
@@ -11,7 +12,7 @@ import org.optimizationBenchmarking.utils.text.textOutput.ITextOutput;
  * on them.
  */
 public class InstanceBehaviorCluster
-    extends _BehaviorCluster<InstanceBehaviorClustering> {
+    extends NamedCluster<InstanceBehaviorClustering> {
 
   /**
    * create the instance behavior cluster

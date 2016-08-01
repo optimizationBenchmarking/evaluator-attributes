@@ -3,6 +3,7 @@ package org.optimizationBenchmarking.evaluator.attributes.clusters.behavior;
 import java.util.ArrayList;
 
 import org.optimizationBenchmarking.evaluator.attributes.clusters.IClustering;
+import org.optimizationBenchmarking.evaluator.attributes.clusters.NamedCluster;
 import org.optimizationBenchmarking.evaluator.data.impl.shadow.DataSelection;
 import org.optimizationBenchmarking.evaluator.data.spec.DataElement;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperiment;
@@ -22,7 +23,7 @@ import org.optimizationBenchmarking.utils.text.textOutput.ITextOutput;
  * @param <CT>
  *          the cluster type
  */
-abstract class _BehaviorClustering<CT extends _BehaviorCluster<?>>
+abstract class _BehaviorClustering<CT extends NamedCluster<?>>
     extends DataElement implements IClustering {
 
   /** the owning experiment set */
@@ -133,7 +134,7 @@ abstract class _BehaviorClustering<CT extends _BehaviorCluster<?>>
   public ETextCase printDescription(final ITextOutput textOut,
       final ETextCase textCase) {
     textOut.append(
-        "Therefore, we first try to model the relationships of the different measurement dimensions by fitting different models, by applying several different fitting strategies. Based on these models, we cluster the data by using several different clustering algorithms. The number of clusters is dynamically decided in order to achieve the best average silhouette width."); //$NON-NLS-1$
+        "We therefore first model the relationships of the different measurement dimensions by fitting different models, by applying several different fitting strategies. Based on these models, we cluster the data by using several different clustering algorithms. The number of clusters is dynamically decided in order to achieve the best average silhouette width."); //$NON-NLS-1$
     return ETextCase.IN_SENTENCE;
   }
 }

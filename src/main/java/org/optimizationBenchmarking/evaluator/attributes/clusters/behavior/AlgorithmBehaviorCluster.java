@@ -1,6 +1,7 @@
 package org.optimizationBenchmarking.evaluator.attributes.clusters.behavior;
 
 import org.optimizationBenchmarking.evaluator.attributes.clusters.ClusterUtils;
+import org.optimizationBenchmarking.evaluator.attributes.clusters.NamedCluster;
 import org.optimizationBenchmarking.evaluator.data.impl.shadow.DataSelection;
 import org.optimizationBenchmarking.utils.text.ETextCase;
 import org.optimizationBenchmarking.utils.text.textOutput.ITextOutput;
@@ -10,7 +11,7 @@ import org.optimizationBenchmarking.utils.text.textOutput.ITextOutput;
  * belonging to one similarity group according to their runtime behavior.
  */
 public class AlgorithmBehaviorCluster
-    extends _BehaviorCluster<AlgorithmBehaviorClustering> {
+    extends NamedCluster<AlgorithmBehaviorClustering> {
 
   /**
    * create the algorithm behavior cluster
