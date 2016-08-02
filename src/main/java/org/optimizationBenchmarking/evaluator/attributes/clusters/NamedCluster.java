@@ -6,6 +6,7 @@ import org.optimizationBenchmarking.utils.document.spec.IMath;
 import org.optimizationBenchmarking.utils.document.spec.IMathName;
 import org.optimizationBenchmarking.utils.document.spec.IParameterRenderer;
 import org.optimizationBenchmarking.utils.text.ETextCase;
+import org.optimizationBenchmarking.utils.text.numbers.AlphabeticNumberAppender;
 import org.optimizationBenchmarking.utils.text.textOutput.ITextOutput;
 
 /**
@@ -34,6 +35,22 @@ public class NamedCluster<OT extends IClustering>
       final DataSelection selection) {
     super(owner, selection);
     this.m_name = name;
+  }
+
+  /**
+   * create behavior cluster
+   *
+   * @param owner
+   *          the owning element set
+   * @param nameIndex
+   *          the 0-based name index to be transformed to a name string
+   * @param selection
+   *          the data selection
+   */
+  protected NamedCluster(final OT owner, final int nameIndex,
+      final DataSelection selection) {
+    this(owner, AlphabeticNumberAppender.UPPER_CASE_INSTANCE
+        .toString(nameIndex, ETextCase.IN_SENTENCE), selection);
   }
 
   /**

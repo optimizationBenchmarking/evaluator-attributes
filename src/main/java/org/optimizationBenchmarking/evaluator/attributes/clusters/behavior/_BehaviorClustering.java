@@ -2,18 +2,18 @@ package org.optimizationBenchmarking.evaluator.attributes.clusters.behavior;
 
 import java.util.ArrayList;
 
-import org.optimizationBenchmarking.evaluator.attributes.clusters.IClustering;
+import org.optimizationBenchmarking.evaluator.attributes.clusters.ClusterUtils;
+import org.optimizationBenchmarking.evaluator.attributes.clusters.ClusteringBase;
 import org.optimizationBenchmarking.evaluator.attributes.clusters.NamedCluster;
 import org.optimizationBenchmarking.evaluator.data.impl.shadow.DataSelection;
-import org.optimizationBenchmarking.evaluator.data.spec.DataElement;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperiment;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperimentSet;
 import org.optimizationBenchmarking.evaluator.data.spec.IInstance;
 import org.optimizationBenchmarking.evaluator.data.spec.INamedElement;
 import org.optimizationBenchmarking.evaluator.data.spec.INamedElementSet;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
+import org.optimizationBenchmarking.utils.document.spec.ISectionBody;
 import org.optimizationBenchmarking.utils.text.ETextCase;
-import org.optimizationBenchmarking.utils.text.numbers.AlphabeticNumberAppender;
 import org.optimizationBenchmarking.utils.text.textOutput.ITextOutput;
 
 /**
@@ -24,10 +24,7 @@ import org.optimizationBenchmarking.utils.text.textOutput.ITextOutput;
  *          the cluster type
  */
 abstract class _BehaviorClustering<CT extends NamedCluster<?>>
-    extends DataElement implements IClustering {
-
-  /** the owning experiment set */
-  private final IExperimentSet m_owner;
+    extends ClusteringBase<IExperimentSet, CT> {
 
   /** the data */
   private final ArrayListView<CT> m_data;
@@ -47,15 +44,13 @@ abstract class _BehaviorClustering<CT extends NamedCluster<?>>
   _BehaviorClustering(final IExperimentSet owner, final int[] clusters,
       final INamedElementSet source,
       final ArrayListView<? extends INamedElement> names) {
-    super();
+    super(owner);
     final ArrayList<CT> list;
     DataSelection selection;
     int clusterIndex, find;
     INamedElement ne;
     String name;
     int total;
-
-    this.m_owner = owner;
 
     list = new ArrayList<>(20);
 
@@ -92,8 +87,7 @@ abstract class _BehaviorClustering<CT extends NamedCluster<?>>
       if (selection == null) {
         break;
       }
-      list.add(this._create(AlphabeticNumberAppender.UPPER_CASE_INSTANCE
-          .toString(clusterIndex, ETextCase.IN_SENTENCE), selection));
+      list.add(this._create(list.size(), selection));
     }
 
     if (total != names.size()) {
@@ -109,19 +103,13 @@ abstract class _BehaviorClustering<CT extends NamedCluster<?>>
   /**
    * create a new cluster
    *
-   * @param name
-   *          the name
+   * @param nameIndex
+   *          the 0-based name index to be transformed to a name string
    * @param selection
    *          the selection
    * @return the cluster
    */
-  abstract CT _create(final String name, final DataSelection selection);
-
-  /** {@inheritDoc} */
-  @Override
-  public final IExperimentSet getOwner() {
-    return this.m_owner;
-  }
+  abstract CT _create(final int nameIndex, final DataSelection selection);
 
   /** {@inheritDoc} */
   @Override
@@ -135,6 +123,14 @@ abstract class _BehaviorClustering<CT extends NamedCluster<?>>
       final ETextCase textCase) {
     textOut.append(
         "We therefore first model the relationships of the different measurement dimensions by fitting different models, by applying several different fitting strategies. Based on these models, we cluster the data by using several different clustering algorithms. The number of clusters is dynamically decided in order to achieve the best average silhouette width."); //$NON-NLS-1$
-    return ETextCase.IN_SENTENCE;
+    return ETextCase.AT_SENTENCE_START;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public void printLongDescription(final ISectionBody body) {
+    super.printLongDescription(body);
+    body.appendLineBreak();
+    ClusterUtils.listClusters(this, body);
   }
 }

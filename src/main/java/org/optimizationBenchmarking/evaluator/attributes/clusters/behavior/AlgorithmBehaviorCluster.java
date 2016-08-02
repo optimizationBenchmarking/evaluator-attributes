@@ -18,14 +18,14 @@ public class AlgorithmBehaviorCluster
    *
    * @param owner
    *          the owning element set
-   * @param name
-   *          the name of the cluster
+   * @param nameIndex
+   *          the 0-based name index to be transformed to a name string
    * @param selection
    *          the data selection
    */
   AlgorithmBehaviorCluster(final AlgorithmBehaviorClustering owner,
-      final String name, final DataSelection selection) {
-    super(owner, name, selection);
+      final int nameIndex, final DataSelection selection) {
+    super(owner, nameIndex, selection);
   }
 
   /** {@inheritDoc} */

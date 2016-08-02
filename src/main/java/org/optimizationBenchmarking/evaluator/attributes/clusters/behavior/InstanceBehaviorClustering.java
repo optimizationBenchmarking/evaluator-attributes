@@ -35,9 +35,9 @@ public final class InstanceBehaviorClustering
 
   /** {@inheritDoc} */
   @Override
-  final InstanceBehaviorCluster _create(final String name,
+  final InstanceBehaviorCluster _create(final int nameIndex,
       final DataSelection selection) {
-    return new InstanceBehaviorCluster(this, name, selection);
+    return new InstanceBehaviorCluster(this, nameIndex, selection);
   }
 
   /** {@inheritDoc} */
@@ -58,14 +58,17 @@ public final class InstanceBehaviorClustering
   @Override
   public ETextCase printDescription(final ITextOutput textOut,
       final ETextCase textCase) {
+    final ETextCase nextCase;
+
+    nextCase = textCase.appendWord("the", textOut); //$NON-NLS-1$
     textOut.append(
-        "The benchmark instances are divided into groups according to the runtime behavior of the algorithm setups applied to them. "); //$NON-NLS-1$
-    return super.printDescription(textOut, textCase);
+        "  benchmark instances are divided into groups according to the runtime behavior of the algorithm setups applied to them. "); //$NON-NLS-1$
+    return super.printDescription(textOut, nextCase);
   }
 
   /** {@inheritDoc} */
   @Override
   public final String getPathComponentSuggestion() {
-    return "instanceBehavior"; //$NON-NLS-1$
+    return "instanceBehavior" + this.getData().size(); //$NON-NLS-1$
   }
 }

@@ -35,9 +35,9 @@ public final class AlgorithmBehaviorClustering
 
   /** {@inheritDoc} */
   @Override
-  final AlgorithmBehaviorCluster _create(final String name,
+  final AlgorithmBehaviorCluster _create(final int nameIndex,
       final DataSelection selection) {
-    return new AlgorithmBehaviorCluster(this, name, selection);
+    return new AlgorithmBehaviorCluster(this, nameIndex, selection);
   }
 
   /** {@inheritDoc} */
@@ -59,14 +59,17 @@ public final class AlgorithmBehaviorClustering
   @Override
   public ETextCase printDescription(final ITextOutput textOut,
       final ETextCase textCase) {
+    final ETextCase nextCase;
+
+    nextCase = textCase.appendWord("the", textOut); //$NON-NLS-1$
     textOut.append(
-        "The experiments, i.e., algorithm setups, are divided into groups according to their runtime behavior. "); //$NON-NLS-1$
-    return super.printDescription(textOut, textCase);
+        " experiments, i.e., algorithm setups, are divided into groups according to their runtime behavior. "); //$NON-NLS-1$
+    return super.printDescription(textOut, nextCase);
   }
 
   /** {@inheritDoc} */
   @Override
   public final String getPathComponentSuggestion() {
-    return "algorithmBehavior"; //$NON-NLS-1$
+    return "algorithmBehavior" + this.getData().size(); //$NON-NLS-1$
   }
 }

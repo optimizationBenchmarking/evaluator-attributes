@@ -5,6 +5,8 @@ import org.optimizationBenchmarking.evaluator.data.impl.shadow.DataSelection;
 import org.optimizationBenchmarking.evaluator.data.spec.DataElement;
 import org.optimizationBenchmarking.evaluator.data.spec.IProperty;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
+import org.optimizationBenchmarking.utils.document.spec.ISectionBody;
+import org.optimizationBenchmarking.utils.text.ETextCase;
 
 /**
  * A set of property value groups.
@@ -136,5 +138,11 @@ public abstract class PropertyValueGroups extends DataElement
   @Override
   public ArrayListView<? extends PropertyValueGroup<?>> getData() {
     return this.m_data;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public void printLongDescription(final ISectionBody body) {
+    this.printDescription(body, ETextCase.AT_SENTENCE_START);
   }
 }
