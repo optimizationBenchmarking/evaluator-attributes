@@ -2,6 +2,8 @@ package org.optimizationBenchmarking.evaluator.attributes.clusters;
 
 import org.optimizationBenchmarking.evaluator.attributes.clusters.behavior.AlgorithmBehaviorClusterer;
 import org.optimizationBenchmarking.evaluator.attributes.clusters.behavior.InstanceBehaviorClusterer;
+import org.optimizationBenchmarking.evaluator.attributes.clusters.behaviorFromProperties.FeatureInstanceBehaviorClusterer;
+import org.optimizationBenchmarking.evaluator.attributes.clusters.behaviorFromProperties.ParameterAlgorithmBehaviorClusterer;
 import org.optimizationBenchmarking.evaluator.attributes.clusters.byInstance.ByInstanceGrouping;
 import org.optimizationBenchmarking.evaluator.attributes.clusters.propertyValueGroups.PropertyValueSelector;
 import org.optimizationBenchmarking.evaluator.data.spec.Attribute;
@@ -55,8 +57,14 @@ public final class ClustererLoader {
       case InstanceBehaviorClusterer.CHOICE_INSTANCES_BY_ALGORITHM_BEHAVIOR: {
         return new InstanceBehaviorClusterer(config);
       }
+      case FeatureInstanceBehaviorClusterer.CHOICE_INSTANCES_BY_ALGORITHM_BEHAVIOR_AND_FEATURES: {
+        return new FeatureInstanceBehaviorClusterer(config);
+      }
       case AlgorithmBehaviorClusterer.CHOICE_ALGORITHMS_BY_ALGORITHM_BEHAVIOR: {
         return new AlgorithmBehaviorClusterer(config);
+      }
+      case ParameterAlgorithmBehaviorClusterer.CHOICE_ALGORITHMS_BY_ALGORITHM_BEHAVIOR_AND_PARAMETERS: {
+        return new ParameterAlgorithmBehaviorClusterer(config);
       }
       default: {
         throw new IllegalArgumentException(((//

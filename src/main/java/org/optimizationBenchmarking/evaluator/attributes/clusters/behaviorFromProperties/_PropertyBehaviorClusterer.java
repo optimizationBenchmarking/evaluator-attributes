@@ -1,6 +1,7 @@
 package org.optimizationBenchmarking.evaluator.attributes.clusters.behaviorFromProperties;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,7 +21,6 @@ import org.optimizationBenchmarking.evaluator.data.spec.IPropertyValue;
 import org.optimizationBenchmarking.utils.MemoryUtils;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
 import org.optimizationBenchmarking.utils.comparison.Compare;
-import org.optimizationBenchmarking.utils.hash.HashUtils;
 import org.optimizationBenchmarking.utils.ml.classification.impl.multi.MultiClassifierTrainer;
 import org.optimizationBenchmarking.utils.ml.classification.impl.quality.MCC;
 import org.optimizationBenchmarking.utils.ml.classification.spec.ClassifiedSample;
@@ -43,7 +43,7 @@ abstract class _PropertyBehaviorClusterer<ET extends INamedElement>
   static final IClassifierQualityMeasure<?> CLASSIFIER_QUALITY_MEASURE = MCC.INSTANCE;
 
   /** the behavior clusterer */
-  private final Attribute<IExperimentSet, IClustering> m_behaviorClusterer;
+  final Attribute<IExperimentSet, ? extends IClustering> m_behaviorClusterer;
 
   /**
    * create the clusterer
@@ -52,7 +52,7 @@ abstract class _PropertyBehaviorClusterer<ET extends INamedElement>
    *          the behavior clusterer
    */
   _PropertyBehaviorClusterer(
-      final Attribute<IExperimentSet, IClustering> behaviorClusterer) {
+      final Attribute<IExperimentSet, ? extends IClustering> behaviorClusterer) {
     super(EAttributeType.PERMANENTLY_STORED);
     if (behaviorClusterer == null) {
       throw new IllegalArgumentException(
@@ -72,7 +72,7 @@ abstract class _PropertyBehaviorClusterer<ET extends INamedElement>
    *          the elements to classify
    */
   abstract void _getElementsToClassify(final ICluster cluster,
-      IExperimentSet data, final ArrayList<ET> elements);
+      IExperimentSet data, final LinkedHashSet<ET> elements);
 
   /**
    * Get the property set of the given data
@@ -103,7 +103,8 @@ abstract class _PropertyBehaviorClusterer<ET extends INamedElement>
     final ArrayListView<? extends IProperty> properties;
     final EFeatureType[] featureTypes;
     final int propertySize, clusterSize;
-    ArrayList<ET> elements, allElements;
+    LinkedHashSet<ET> elements;
+    ArrayList<ET> allElements;
     final IClassifier classifier;
     ClassifiedSample[] sampleArray;
     ArrayList<ClassifiedSample> samples;
@@ -159,7 +160,7 @@ abstract class _PropertyBehaviorClusterer<ET extends INamedElement>
     // element (i.e., experiment or instance) has a set of features and
     // belongs to a cluster. The cluster index becomes the class id.
     samples = new ArrayList<>();
-    elements = new ArrayList<>();
+    elements = new LinkedHashSet<>();
     allElements = new ArrayList<>();
     index = (-1);
     for (final ICluster cluster : clusters) {
@@ -317,12 +318,5 @@ abstract class _PropertyBehaviorClusterer<ET extends INamedElement>
           ((_PropertyBehaviorClusterer) o).m_behaviorClusterer);
     }
     return true;
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  protected final int calcHashCode() {
-    return HashUtils.combineHashes(
-        HashUtils.hashCode(this.m_behaviorClusterer), 45675661);
   }
 }
