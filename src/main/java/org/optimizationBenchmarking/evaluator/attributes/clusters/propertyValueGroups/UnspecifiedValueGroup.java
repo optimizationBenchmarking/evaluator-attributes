@@ -77,7 +77,7 @@ public final class UnspecifiedValueGroup
   public final void mathRender(final IMath out,
       final IParameterRenderer renderer) {
     try (final IMath compare = out.compare(EMathComparison.EQUAL)) {
-      this.getOwner().m_property.mathRender(compare, renderer);
+      this.getOwner().getOwner().mathRender(compare, renderer);
       try (final IComplexText text = compare.text()) {
         text.append(UnspecifiedValueGroup.UNSPECIFIED_CHAR);
       }
@@ -88,7 +88,7 @@ public final class UnspecifiedValueGroup
   @Override
   public final void mathRender(final ITextOutput out,
       final IParameterRenderer renderer) {
-    this.getOwner().m_property.mathRender(out, renderer);
+    this.getOwner().getOwner().mathRender(out, renderer);
     out.append('=');
     out.append(UnspecifiedValueGroup.UNSPECIFIED_CHAR);
   }
@@ -98,7 +98,7 @@ public final class UnspecifiedValueGroup
   public final ETextCase printShortName(final ITextOutput textOut,
       final ETextCase textCase) {
     final ETextCase use;
-    use = this.getOwner().m_property.printShortName(textOut, textCase);
+    use = this.getOwner().getOwner().printShortName(textOut, textCase);
     textOut.append(' ');
     return use.appendWords("is unspecified", textOut); //$NON-NLS-1$
   }
@@ -108,7 +108,7 @@ public final class UnspecifiedValueGroup
   public final ETextCase printLongName(final ITextOutput textOut,
       final ETextCase textCase) {
     final ETextCase use;
-    use = this.getOwner().m_property.printLongName(textOut, textCase);
+    use = this.getOwner().getOwner().printLongName(textOut, textCase);
     textOut.append(' ');
     return use.appendWords("is unspecified", textOut); //$NON-NLS-1$
   }
@@ -122,7 +122,7 @@ public final class UnspecifiedValueGroup
         "the set of experiments whose parameter", //$NON-NLS-1$
         textOut);
     textOut.append(' ');
-    use = this.getOwner().m_property.printLongName(textOut, use);
+    use = this.getOwner().getOwner().printLongName(textOut, use);
     textOut.append(' ');
     return use.appendWords("is unspecified", textOut); //$NON-NLS-1$
   }

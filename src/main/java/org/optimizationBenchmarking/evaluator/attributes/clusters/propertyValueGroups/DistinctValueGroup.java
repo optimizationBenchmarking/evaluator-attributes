@@ -74,7 +74,7 @@ public final class DistinctValueGroup
   public final void mathRender(final IMath out,
       final IParameterRenderer renderer) {
     try (final IMath compare = out.compare(EMathComparison.EQUAL)) {
-      this.getOwner().m_property.mathRender(compare, renderer);
+      this.getOwner().getOwner().mathRender(compare, renderer);
       if (this.m_value instanceof Number) {
         try (final IText number = compare.number()) {
           PropertyValueGroup._appendNumber(((Number) (this.m_value)),
@@ -92,7 +92,7 @@ public final class DistinctValueGroup
   @Override
   public final void mathRender(final ITextOutput out,
       final IParameterRenderer renderer) {
-    this.getOwner().m_property.mathRender(out, renderer);
+    this.getOwner().getOwner().mathRender(out, renderer);
     out.append('=');
     if (this.m_value instanceof Number) {
       PropertyValueGroup._appendNumber(((Number) (this.m_value)), out);

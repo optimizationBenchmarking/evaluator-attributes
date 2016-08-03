@@ -67,7 +67,7 @@ public class ValueRangeGroups extends PropertyValueGroups {
   /** {@inheritDoc} */
   @Override
   public final String getPathComponentSuggestion() {
-    return (this.m_property.getName() + //
+    return (this.getOwner().getName() + //
         "_grouped_by_" + //$NON-NLS-1$
         TextUtils.toLowerCase(this.getGroupingMode().toString()) + //
         "_of_" + //$NON-NLS-1$
@@ -103,7 +103,7 @@ public class ValueRangeGroups extends PropertyValueGroups {
   public final ETextCase printLongName(final ITextOutput textOut,
       final ETextCase textCase) {
     return this.__printNameRest(textOut,
-        this.m_property.printLongName(textOut, textCase));
+        this.getOwner().printLongName(textOut, textCase));
   }
 
   /** {@inheritDoc} */
@@ -111,24 +111,26 @@ public class ValueRangeGroups extends PropertyValueGroups {
   public final ETextCase printShortName(final ITextOutput textOut,
       final ETextCase textCase) {
     return this.__printNameRest(textOut,
-        this.m_property.printShortName(textOut, textCase));
+        this.getOwner().printShortName(textOut, textCase));
   }
 
   /** {@inheritDoc} */
   @Override
   public ETextCase printDescription(final ITextOutput textOut,
       final ETextCase textCase) {
+    final IProperty property;
     ETextCase next;
 
     next = textCase;
+    property = this.getOwner();
 
-    if (this.m_property instanceof IParameter) {
+    if (property instanceof IParameter) {
       textOut.append(' ');
       next = next.appendWords(//
           "all experiments whose value of parameter", //$NON-NLS-1$
           textOut);
     } else {
-      if (this.m_property instanceof IFeature) {
+      if (property instanceof IFeature) {
         textOut.append(' ');
         next = next.appendWords(//
             "all instance run sets belonging to an instance whose value of feature", //$NON-NLS-1$
@@ -140,7 +142,7 @@ public class ValueRangeGroups extends PropertyValueGroups {
     }
     textOut.append(' ');
     next = SemanticComponentUtils
-        .printLongAndShortNameIfDifferent(this.m_property, textOut, next);
+        .printLongAndShortNameIfDifferent(property, textOut, next);
     textOut.append(' ');
     if (next == null) {
       next = ETextCase.IN_SENTENCE;

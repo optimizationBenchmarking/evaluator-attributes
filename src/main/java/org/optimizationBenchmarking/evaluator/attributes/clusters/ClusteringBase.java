@@ -52,7 +52,7 @@ public abstract class ClusteringBase<OT extends IDataElement, CT extends ICluste
 
   /** {@inheritDoc} */
   @Override
-  public abstract ArrayListView<CT> getData();
+  public abstract ArrayListView<? extends CT> getData();
 
   /** {@inheritDoc} */
   @Override

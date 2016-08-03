@@ -182,7 +182,7 @@ public class ValueRangeGroup extends PropertyValueGroup<ValueRangeGroups> {
       try (final IMath compare2 = compare.compare(//
           this.m_isUpperExclusive ? EMathComparison.LESS
               : EMathComparison.LESS_OR_EQUAL)) {
-        this.getOwner().m_property.mathRender(compare2, renderer);
+        this.getOwner().getOwner().mathRender(compare2, renderer);
 
         try (final IText number = compare2.number()) {
           PropertyValueGroup._appendNumber(this.m_upper, number);
@@ -197,7 +197,7 @@ public class ValueRangeGroup extends PropertyValueGroup<ValueRangeGroups> {
       final IParameterRenderer renderer) {
     PropertyValueGroup._appendNumber(this.m_lower, out);
     out.append(EMathComparison.LESS_OR_EQUAL.getOperatorChar());
-    this.getOwner().m_property.mathRender(out, renderer);
+    this.getOwner().getOwner().mathRender(out, renderer);
     out.append((this.m_isUpperExclusive ? EMathComparison.LESS
         : EMathComparison.LESS_OR_EQUAL).getOperatorChar());
   }

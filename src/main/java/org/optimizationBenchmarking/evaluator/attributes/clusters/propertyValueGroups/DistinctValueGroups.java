@@ -48,7 +48,7 @@ public final class DistinctValueGroups extends PropertyValueGroups {
   /** {@inheritDoc} */
   @Override
   public final String getPathComponentSuggestion() {
-    return ("distinct_" + this.m_property.getName()); //$NON-NLS-1$
+    return ("distinct_" + this.getOwner().getName()); //$NON-NLS-1$
   }
 
   /**
@@ -75,7 +75,7 @@ public final class DistinctValueGroups extends PropertyValueGroups {
   public final ETextCase printLongName(final ITextOutput textOut,
       final ETextCase textCase) {
     return this.__printNameRest(textOut,
-        this.m_property.printLongName(textOut, textCase));
+        this.getOwner().printLongName(textOut, textCase));
   }
 
   /** {@inheritDoc} */
@@ -83,24 +83,25 @@ public final class DistinctValueGroups extends PropertyValueGroups {
   public final ETextCase printShortName(final ITextOutput textOut,
       final ETextCase textCase) {
     return this.__printNameRest(textOut,
-        this.m_property.printShortName(textOut, textCase));
+        this.getOwner().printShortName(textOut, textCase));
   }
 
   /** {@inheritDoc} */
   @Override
   public ETextCase printDescription(final ITextOutput textOut,
       final ETextCase textCase) {
+    final IProperty property;
     ETextCase next;
 
     next = textCase;
-
-    if (this.m_property instanceof IParameter) {
+    property = this.getOwner();
+    if (property instanceof IParameter) {
       textOut.append(' ');
       next = next.appendWords(//
           "the experiments with the sane value of the algorithm parameter are", //$NON-NLS-1$
           textOut);
     } else {
-      if (this.m_property instanceof IFeature) {
+      if (property instanceof IFeature) {
         textOut.append(' ');
         next = next.appendWords(//
             "the instance run sets belonging to instances with the same value of the feature", //$NON-NLS-1$
@@ -112,7 +113,7 @@ public final class DistinctValueGroups extends PropertyValueGroups {
     }
     textOut.append(' ');
     next = SemanticComponentUtils
-        .printLongAndShortNameIfDifferent(this.m_property, textOut, next);
+        .printLongAndShortNameIfDifferent(property, textOut, next);
 
     textOut.append(' ');
     return next.appendWords("grouped together.", //$NON-NLS-1$

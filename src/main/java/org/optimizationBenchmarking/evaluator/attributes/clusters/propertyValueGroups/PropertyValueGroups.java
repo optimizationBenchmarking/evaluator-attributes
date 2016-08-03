@@ -1,21 +1,15 @@
 package org.optimizationBenchmarking.evaluator.attributes.clusters.propertyValueGroups;
 
-import org.optimizationBenchmarking.evaluator.attributes.clusters.IClustering;
+import org.optimizationBenchmarking.evaluator.attributes.clusters.ClusteringBase;
 import org.optimizationBenchmarking.evaluator.data.impl.shadow.DataSelection;
-import org.optimizationBenchmarking.evaluator.data.spec.DataElement;
 import org.optimizationBenchmarking.evaluator.data.spec.IProperty;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
-import org.optimizationBenchmarking.utils.document.spec.ISectionBody;
-import org.optimizationBenchmarking.utils.text.ETextCase;
 
 /**
  * A set of property value groups.
  */
-public abstract class PropertyValueGroups extends DataElement
-    implements IClustering {
-
-  /** the property */
-  final IProperty m_property;
+public abstract class PropertyValueGroups
+    extends ClusteringBase<IProperty, PropertyValueGroup<?>> {
 
   /** the data */
   final ArrayListView<PropertyValueGroup<?>> m_data;
@@ -45,16 +39,12 @@ public abstract class PropertyValueGroups extends DataElement
   @SuppressWarnings({ "unchecked", "rawtypes" })
   PropertyValueGroups(final IProperty property, final _Groups groups,
       final DataSelection unspecified, final Object unspecifiedValue) {
-    super();
+    super(property);
 
     final PropertyValueGroup[] list;
     final int size;
     int index;
 
-    if (property == null) {
-      throw new IllegalArgumentException(//
-          "Property must not be null."); //$NON-NLS-1$
-    }
     if (groups == null) {
       throw new IllegalArgumentException(((//
       "Property groups must not be null, but are for property '" //$NON-NLS-1$
@@ -78,7 +68,6 @@ public abstract class PropertyValueGroups extends DataElement
     }
 
     this.m_data = new ArrayListView(list, false);
-    this.m_property = property;
     this.m_groupingMode = groups.m_groupingMode;
 
     if (unspecified == null) {
@@ -97,12 +86,6 @@ public abstract class PropertyValueGroups extends DataElement
    * @return the group
    */
   abstract PropertyValueGroup<?> _group(final _Group group);
-
-  /** {@inheritDoc} */
-  @Override
-  public final IProperty getOwner() {
-    return this.m_property;
-  }
 
   /**
    * Get the group for which the property value is unspecified. For
@@ -138,11 +121,5 @@ public abstract class PropertyValueGroups extends DataElement
   @Override
   public ArrayListView<? extends PropertyValueGroup<?>> getData() {
     return this.m_data;
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public void printLongDescription(final ISectionBody body) {
-    this.printDescription(body, ETextCase.AT_SENTENCE_START);
   }
 }

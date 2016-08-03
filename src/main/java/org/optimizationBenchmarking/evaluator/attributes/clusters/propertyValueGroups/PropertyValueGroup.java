@@ -98,7 +98,7 @@ public abstract class PropertyValueGroup<OT extends PropertyValueGroups>
     ETextCase useCase;
 
     useCase = textCase;
-    prop = this.getOwner().m_property;
+    prop = this.getOwner().getOwner();
 
     if (prop instanceof IFeature) {
       instanceList = this.getInstances().getData();
