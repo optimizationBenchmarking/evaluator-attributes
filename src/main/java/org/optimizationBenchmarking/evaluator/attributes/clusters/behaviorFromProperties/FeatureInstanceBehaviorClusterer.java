@@ -3,7 +3,9 @@ package org.optimizationBenchmarking.evaluator.attributes.clusters.behaviorFromP
 import java.util.LinkedHashSet;
 
 import org.optimizationBenchmarking.evaluator.attributes.clusters.ICluster;
+import org.optimizationBenchmarking.evaluator.attributes.clusters.IClustering;
 import org.optimizationBenchmarking.evaluator.attributes.clusters.behavior.InstanceBehaviorClusterer;
+import org.optimizationBenchmarking.evaluator.data.impl.shadow.DataSelection;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperimentSet;
 import org.optimizationBenchmarking.evaluator.data.spec.IInstance;
 import org.optimizationBenchmarking.evaluator.data.spec.IProperty;
@@ -11,6 +13,7 @@ import org.optimizationBenchmarking.evaluator.data.spec.IPropertySetting;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
 import org.optimizationBenchmarking.utils.config.Configuration;
 import org.optimizationBenchmarking.utils.hash.HashUtils;
+import org.optimizationBenchmarking.utils.ml.classification.spec.IClassifier;
 
 /**
  * A clusterer for clustering via instance behavior and instance features.
@@ -61,5 +64,14 @@ public final class FeatureInstanceBehaviorClusterer
   @Override
   final IPropertySetting _getPropertySetting(final IInstance element) {
     return element.getFeatureSetting();
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  final IClustering _createClustering(final IExperimentSet owner,
+      final IClustering behavior, final IClassifier classifier,
+      final DataSelection[] selections) {
+    return new FeatureInstanceBehaviorClustering(owner, behavior,
+        classifier, selections);
   }
 }

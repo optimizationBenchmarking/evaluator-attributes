@@ -18,7 +18,6 @@ import org.optimizationBenchmarking.evaluator.data.spec.IParameterValue;
 import org.optimizationBenchmarking.evaluator.data.spec.IProperty;
 import org.optimizationBenchmarking.evaluator.data.spec.IPropertySetting;
 import org.optimizationBenchmarking.evaluator.data.spec.IPropertyValue;
-import org.optimizationBenchmarking.utils.MemoryUtils;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
 import org.optimizationBenchmarking.utils.comparison.Compare;
 import org.optimizationBenchmarking.utils.ml.classification.impl.multi.MultiClassifierTrainer;
@@ -99,7 +98,6 @@ abstract class _PropertyBehaviorClusterer<ET extends INamedElement>
       final Logger logger) {
     final IClustering clustering;
     final ArrayListView<? extends ICluster> clusters;
-    final IClustering result;
     final ArrayListView<? extends IProperty> properties;
     final EFeatureType[] featureTypes;
     final int propertySize, clusterSize;
@@ -177,8 +175,6 @@ abstract class _PropertyBehaviorClusterer<ET extends INamedElement>
       }
     }
 
-    result = null;
-
     // Now we can learn the relationship between element features and
     // clusters.
     sampleArray = samples.toArray(new ClassifiedSample[samples.size()]);
@@ -215,9 +211,26 @@ abstract class _PropertyBehaviorClusterer<ET extends INamedElement>
     }
     allElements = null;
 
-    MemoryUtils.fullGC();
-    return result;
+    return this._createClustering(data, clustering, classifier,
+        selections);
   }
+
+  /**
+   * Create the clustering
+   *
+   * @param owner
+   *          the owner
+   * @param behavior
+   *          the behavior-based clustering underlying this clustering
+   * @param classifier
+   *          the classifier
+   * @param selections
+   *          the section
+   * @return the clustering
+   */
+  abstract IClustering _createClustering(final IExperimentSet owner,
+      final IClustering behavior, final IClassifier classifier,
+      final DataSelection[] selections);
 
   /**
    * transform a property setting into a feature vector, i.e., feature
