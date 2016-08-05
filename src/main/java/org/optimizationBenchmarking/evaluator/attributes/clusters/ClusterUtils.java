@@ -1,7 +1,5 @@
 package org.optimizationBenchmarking.evaluator.attributes.clusters;
 
-import org.optimizationBenchmarking.evaluator.data.spec.IExperiment;
-import org.optimizationBenchmarking.evaluator.data.spec.IInstance;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
 import org.optimizationBenchmarking.utils.document.spec.IList;
 import org.optimizationBenchmarking.utils.document.spec.ISectionBody;
@@ -9,6 +7,7 @@ import org.optimizationBenchmarking.utils.document.spec.IText;
 import org.optimizationBenchmarking.utils.error.ErrorUtils;
 import org.optimizationBenchmarking.utils.text.ESequenceMode;
 import org.optimizationBenchmarking.utils.text.ETextCase;
+import org.optimizationBenchmarking.utils.text.TextUtils;
 import org.optimizationBenchmarking.utils.text.numbers.InTextNumberAppender;
 import org.optimizationBenchmarking.utils.text.textOutput.ITextOutput;
 
@@ -28,39 +27,17 @@ public final class ClusterUtils {
    */
   public static final ETextCase listInstances(final ICluster cluster,
       final ETextCase textCase, final ITextOutput textOut) {
-    final ArrayListView<? extends IInstance> instances;
-    final int size;
     ETextCase next;
 
     next = textCase.appendWord("cluster", textOut);//$NON-NLS-1$
     textOut.append(' ');
     next = cluster.printShortName(textOut, next);
-
     textOut.append(' ');
-
-    instances = cluster.getInstances().getData();
-    size = instances.size();
-
-    if (size <= 0) {
-      next = next.appendWords("contains no data", textOut);//$NON-NLS-1$
-      textOut.append('.');
-      return next;
-    }
-
-    next = next.appendWords("contains the runs collected on", textOut);//$NON-NLS-1$
+    next = next.appendWord("contains", textOut);//$NON-NLS-1$
     textOut.append(' ');
-
-    next = InTextNumberAppender.INSTANCE.appendTo(instances.size(), next,
-        textOut);
-
-    textOut.append(' ');
-    next = next.appendWord("benchmark", textOut);//$NON-NLS-1$
-    textOut.append(' ');
-    next = next.appendWord((size > 1) ? "instances" : "instance", textOut);//$NON-NLS-1$//$NON-NLS-2$
-    textOut.append(' ');
-    next = next.appendWord(", namely", textOut);//$NON-NLS-1$
-    textOut.append(' ');
-    ESequenceMode.AND.appendSequence(next, instances, true, textOut);
+    next = TextUtils.appendElements(cluster.getInstances().getData(),
+        "benchmark instance", "benchmark instances", //$NON-NLS-1$//$NON-NLS-2$
+        next, ESequenceMode.AND, textOut);
     textOut.append('.');
     return next.nextAfterSentenceEnd();
   }
@@ -78,41 +55,18 @@ public final class ClusterUtils {
    */
   public static final ETextCase listExperiments(final ICluster cluster,
       final ETextCase textCase, final ITextOutput textOut) {
-    final ArrayListView<? extends IExperiment> experiments;
-    final int size;
     ETextCase next;
 
     next = textCase.appendWord("cluster", textOut);//$NON-NLS-1$
     textOut.append(' ');
     next = cluster.printShortName(textOut, next);
-
     textOut.append(' ');
-
-    experiments = cluster.getData();
-    size = experiments.size();
-
-    if (size <= 0) {
-      next = next.appendWords("contains no data", textOut);//$NON-NLS-1$
-      textOut.append('.');
-      return next;
-    }
-
-    next = next.appendWords("contains the runs collected on", textOut);//$NON-NLS-1$
+    next = next.appendWord("contains", textOut);//$NON-NLS-1$
     textOut.append(' ');
-
-    next = InTextNumberAppender.INSTANCE.appendTo(experiments.size(), next,
-        textOut);
-
-    textOut.append(' ');
-    next = next.appendWord("algorithm", textOut);//$NON-NLS-1$
-    textOut.append(' ');
-    next = next.appendWord((size > 1) ? "setups" : "setup", textOut);//$NON-NLS-1$//$NON-NLS-2$
-    textOut.append(' ');
-    next = next.appendWord(", namely", textOut);//$NON-NLS-1$
-    textOut.append(' ');
-    ESequenceMode.AND.appendSequence(next, experiments, true, textOut);
+    next = TextUtils.appendElements(cluster.getInstances().getData(),
+        "algorithm setup", "algorithm setups", //$NON-NLS-1$//$NON-NLS-2$
+        next, ESequenceMode.AND, textOut);
     textOut.append('.');
-
     return next.nextAfterSentenceEnd();
   }
 
@@ -128,6 +82,8 @@ public final class ClusterUtils {
       final ISectionBody body) {
     final ArrayListView<? extends ICluster> list;
     final int size;
+
+    body.append("Not a single cluster was formed. Odd."); //$NON-NLS-1$
 
     list = clustering.getData();
     size = list.size();
