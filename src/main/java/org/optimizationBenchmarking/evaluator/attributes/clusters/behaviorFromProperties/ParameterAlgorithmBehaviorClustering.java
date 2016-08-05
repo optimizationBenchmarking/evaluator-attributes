@@ -97,7 +97,7 @@ public final class ParameterAlgorithmBehaviorClustering extends
             ". In other words, we use the single experiment setups as vectors to be classified. Their features are the algorithm parameters, namely "); //$NON-NLS-1$
         this._printClassification(subBody);
         subBody.append(
-            "The classifier is then applied classify all algorithm setups into clusters (again): "); //$NON-NLS-1$
+            "The classifier is then applied to again classify all algorithm setups into clusters: "); //$NON-NLS-1$
         ClusterUtils.listClusters(this, subBody);
       }
     }

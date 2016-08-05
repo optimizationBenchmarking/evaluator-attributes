@@ -95,12 +95,12 @@ public final class FeatureInstanceBehaviorClustering
         subBody.reference(ETextCase.IN_SENTENCE, ESequenceMode.COMMA,
             behavior);
         subBody.append(
-            ". In other words, we use the single benchmark instance as vectors to be classified. Their features are, well the benchmark instance features, namely "); //$NON-NLS-1$
+            ". In other words, we use the single benchmark instance as vectors to be classified. Their features are, well, the benchmark instance features, namely "); //$NON-NLS-1$
         ESequenceMode.AND.appendSequence(ETextCase.IN_SENTENCE,
             this.getOwner().getFeatures().getData(), true, subBody);
         this._printClassification(subBody);
         subBody.append(
-            "The classifier is then applied classify all benchmark instances into clusters (again): "); //$NON-NLS-1$
+            "The classifier is then applied to again classify all benchmark instances into clusters: "); //$NON-NLS-1$
         ClusterUtils.listClusters(this, subBody);
       }
     }

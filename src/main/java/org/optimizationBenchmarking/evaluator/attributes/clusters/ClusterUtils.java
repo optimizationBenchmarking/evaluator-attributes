@@ -63,8 +63,8 @@ public final class ClusterUtils {
     textOut.append(' ');
     next = next.appendWord("contains", textOut);//$NON-NLS-1$
     textOut.append(' ');
-    next = TextUtils.appendElements(cluster.getInstances().getData(),
-        "algorithm setup", "algorithm setups", //$NON-NLS-1$//$NON-NLS-2$
+    next = TextUtils.appendElements(cluster.getData(), "algorithm setup", //$NON-NLS-1$
+        "algorithm setups", //$NON-NLS-1$
         next, ESequenceMode.AND, textOut);
     textOut.append('.');
     return next.nextAfterSentenceEnd();

@@ -4,7 +4,7 @@ import java.util.LinkedHashSet;
 
 import org.optimizationBenchmarking.evaluator.attributes.clusters.ICluster;
 import org.optimizationBenchmarking.evaluator.attributes.clusters.IClustering;
-import org.optimizationBenchmarking.evaluator.attributes.clusters.behavior.InstanceBehaviorClusterer;
+import org.optimizationBenchmarking.evaluator.attributes.clusters.behavior.AlgorithmBehaviorClusterer;
 import org.optimizationBenchmarking.evaluator.data.impl.shadow.DataSelection;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperiment;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperimentSet;
@@ -35,7 +35,7 @@ public final class ParameterAlgorithmBehaviorClusterer
    *          the configuration
    */
   public ParameterAlgorithmBehaviorClusterer(final Configuration config) {
-    super(new InstanceBehaviorClusterer(config));
+    super(new AlgorithmBehaviorClusterer(config));
   }
 
   /** {@inheritDoc} */
