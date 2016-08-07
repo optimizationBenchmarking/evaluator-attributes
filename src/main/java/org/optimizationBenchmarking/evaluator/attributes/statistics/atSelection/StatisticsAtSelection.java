@@ -17,6 +17,7 @@ import org.optimizationBenchmarking.utils.hash.HashUtils;
 import org.optimizationBenchmarking.utils.math.statistics.aggregate.ScalarAggregate;
 import org.optimizationBenchmarking.utils.math.statistics.parameters.Median;
 import org.optimizationBenchmarking.utils.math.statistics.parameters.StatisticalParameter;
+import org.optimizationBenchmarking.utils.text.TextUtils;
 
 /**
  * A statistic parameter is computed at a specified selection of an
@@ -154,9 +155,9 @@ public class StatisticsAtSelection
     }
 
     throw new IllegalArgumentException("Class " + //$NON-NLS-1$
-        data.getClass().getSimpleName() + //
+        TextUtils.className(data) + //
         " not supported by attribute " + //$NON-NLS-1$
-        this.getClass().getSimpleName());
+        TextUtils.className(this));
   }
 
   /** {@inheritDoc} */

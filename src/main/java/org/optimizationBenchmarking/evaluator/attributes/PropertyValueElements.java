@@ -15,6 +15,7 @@ import org.optimizationBenchmarking.evaluator.data.spec.IParameterValue;
 import org.optimizationBenchmarking.evaluator.data.spec.IProperty;
 import org.optimizationBenchmarking.evaluator.data.spec.IPropertyValue;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
+import org.optimizationBenchmarking.utils.text.TextUtils;
 
 /**
  * This attribute will obtain the instances belonging to a given feature
@@ -96,7 +97,7 @@ public final class PropertyValueElements<PT extends IPropertyValue, ET extends I
       }
 
       throw new IllegalArgumentException("Property type " + //$NON-NLS-1$
-          owner.getClass().getSimpleName() + " not supported.");//$NON-NLS-1$
+          TextUtils.className(owner) + " not supported.");//$NON-NLS-1$
     }
 
     if (adder.size() >= elements.size()) {

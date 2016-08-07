@@ -116,19 +116,19 @@ public abstract class FunctionAttribute<DT extends IElementSet>
     if (xAxisTransformation == null) {
       throw new IllegalArgumentException(//
           "The transformation to be applied to the x-axis cannot be null when creating an instance of " //$NON-NLS-1$
-              + this.getClass().getSimpleName());
+              + TextUtils.className(this));
     }
 
     if (yAxisInputTransformation == null) {
       throw new IllegalArgumentException(//
           "The transformation to be applied to the data of the y-axis before being fed to the actual computation cannot be null when creating an instance of " //$NON-NLS-1$
-              + this.getClass().getSimpleName());
+              + TextUtils.className(this));
     }
 
     if (yAxisOutputTransformation == null) {
       throw new IllegalArgumentException(//
           "The transformation of the result of the function applied to the data on the y-axis cannot be null when creating an instance of " //$NON-NLS-1$
-              + this.getClass().getSimpleName());
+              + TextUtils.className(this));
     }
 
     this.m_xAxisTransformation = xAxisTransformation;

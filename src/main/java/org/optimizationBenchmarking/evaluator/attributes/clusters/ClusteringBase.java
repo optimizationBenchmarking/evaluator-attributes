@@ -5,6 +5,7 @@ import org.optimizationBenchmarking.evaluator.data.spec.IDataElement;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
 import org.optimizationBenchmarking.utils.document.spec.ISectionBody;
 import org.optimizationBenchmarking.utils.text.ETextCase;
+import org.optimizationBenchmarking.utils.text.TextUtils;
 import org.optimizationBenchmarking.utils.text.textOutput.ITextOutput;
 
 /**
@@ -32,7 +33,7 @@ public abstract class ClusteringBase<OT extends IDataElement, CT extends ICluste
 
     if (owner == null) {
       throw new IllegalArgumentException("Owner of cluster type " //$NON-NLS-1$
-          + this.getClass().getSimpleName() + " cannot be null.");//$NON-NLS-1$
+          + TextUtils.className(this) + " cannot be null.");//$NON-NLS-1$
     }
     this.m_owner = owner;
   }
