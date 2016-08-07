@@ -20,12 +20,14 @@ import org.optimizationBenchmarking.evaluator.data.spec.IPropertySetting;
 import org.optimizationBenchmarking.evaluator.data.spec.IPropertyValue;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
 import org.optimizationBenchmarking.utils.comparison.Compare;
+import org.optimizationBenchmarking.utils.ml.classification.impl.DefaultClassifierTrainer;
 import org.optimizationBenchmarking.utils.ml.classification.impl.multi.MultiClassifierTrainer;
 import org.optimizationBenchmarking.utils.ml.classification.impl.quality.MCC;
 import org.optimizationBenchmarking.utils.ml.classification.spec.ClassifiedSample;
 import org.optimizationBenchmarking.utils.ml.classification.spec.EFeatureType;
 import org.optimizationBenchmarking.utils.ml.classification.spec.IClassifier;
 import org.optimizationBenchmarking.utils.ml.classification.spec.IClassifierQualityMeasure;
+import org.optimizationBenchmarking.utils.ml.classification.spec.IClassifierTrainer;
 import org.optimizationBenchmarking.utils.ml.classification.spec.IClassifierTrainingJob;
 import org.optimizationBenchmarking.utils.reflection.EPrimitiveType;
 
@@ -40,6 +42,10 @@ abstract class _PropertyBehaviorClusterer<ET extends INamedElement>
 
   /** the MCC classifier measure */
   static final IClassifierQualityMeasure<?> CLASSIFIER_QUALITY_MEASURE = MCC.INSTANCE;
+
+  /** the used trainers */
+  static final ArrayListView<IClassifierTrainer> TRAINERS = DefaultClassifierTrainer
+      .getAllInstance();
 
   /** the behavior clusterer */
   final Attribute<IExperimentSet, ? extends IClustering> m_behaviorClusterer;
@@ -180,6 +186,7 @@ abstract class _PropertyBehaviorClusterer<ET extends INamedElement>
     sampleArray = samples.toArray(new ClassifiedSample[samples.size()]);
     samples = null;
     job = MultiClassifierTrainer.getInstance().use()//
+        .setTrainers(_PropertyBehaviorClusterer.TRAINERS)//
         .setLogger(logger)//
         .setFeatureTypes(featureTypes)//
         .setQualityMeasure(

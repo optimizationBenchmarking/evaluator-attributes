@@ -8,11 +8,13 @@ import org.optimizationBenchmarking.evaluator.attributes.clusters.NamedCluster;
 import org.optimizationBenchmarking.evaluator.data.impl.shadow.DataSelection;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperimentSet;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
+import org.optimizationBenchmarking.utils.document.impl.SemanticComponentSequenceable;
 import org.optimizationBenchmarking.utils.document.spec.IComplexText;
 import org.optimizationBenchmarking.utils.document.spec.ILabel;
 import org.optimizationBenchmarking.utils.document.spec.ISection;
 import org.optimizationBenchmarking.utils.document.spec.ISectionBody;
 import org.optimizationBenchmarking.utils.ml.classification.spec.IClassifier;
+import org.optimizationBenchmarking.utils.text.ESequenceMode;
 import org.optimizationBenchmarking.utils.text.ETextCase;
 import org.optimizationBenchmarking.utils.text.numbers.InTextNumberAppender;
 import org.optimizationBenchmarking.utils.text.textOutput.ITextOutput;
@@ -139,25 +141,56 @@ abstract class _PropertyBehaviorClustering<CT extends NamedCluster<?>>
    *          the body
    */
   final void _printClassification(final ISectionBody body) {
+    final int trainerSize;
+
     body.append(" and the known classes are the IDs of the "); //$NON-NLS-1$
     InTextNumberAppender.INSTANCE.appendTo(
         this.m_behavior.getData().size(), ETextCase.IN_SENTENCE, body);
     body.append(" behavior clusters."); //$NON-NLS-1$
     body.appendLineBreak();
-    body.append(
-        "We tested several different classification methods and compared their result based on the "); //$NON-NLS-1$
-    _PropertyBehaviorClusterer.CLASSIFIER_QUALITY_MEASURE
-        .printDescription(body, ETextCase.IN_SENTENCE);
-    body.append(
-        ". The classifier that performed best on the whole data set in terms of the "); //$NON-NLS-1$
-    _PropertyBehaviorClusterer.CLASSIFIER_QUALITY_MEASURE
-        .printShortName(body, ETextCase.IN_SENTENCE);
-    body.append(" was a ");//$NON-NLS-1$
-    this.m_classifier.printDescription(body, ETextCase.IN_SENTENCE);
-    body.append('.');
+
+    switch (trainerSize = _PropertyBehaviorClusterer.TRAINERS.size()) {
+      case 0: {
+        body.append("No classifier trainer was available.");//$NON-NLS-1$
+        break;
+      }
+      case 1: {
+        body.append(
+            "Only one classifier training engine could be used, namely ");//$NON-NLS-1$
+        _PropertyBehaviorClusterer.TRAINERS.get(0).printDescription(body,
+            ETextCase.IN_SENTENCE);
+        body.append(" and it constructed a ");//$NON-NLS-1$
+        this.m_classifier.printDescription(body, ETextCase.IN_SENTENCE);
+        body.append('.');
+        break;
+      }
+      default: {
+        body.append("We tested ");//$NON-NLS-1$
+        InTextNumberAppender.INSTANCE.appendTo(trainerSize,
+            ETextCase.IN_SENTENCE, body);
+        body.append(" different classification methods, namely "); //$NON-NLS-1$
+        ESequenceMode.AND.appendSequence(ETextCase.IN_SENTENCE,
+            SemanticComponentSequenceable.wrap(
+                _PropertyBehaviorClusterer.TRAINERS, false, false, true),
+            body);
+        body.append(
+            " by using cross-validation (if sufficient samples were there). We compared their result based on the "); //$NON-NLS-1$
+        _PropertyBehaviorClusterer.CLASSIFIER_QUALITY_MEASURE
+            .printDescription(body, ETextCase.IN_SENTENCE);
+        body.append(
+            ". The classifier that performed best on the whole data set in terms of the "); //$NON-NLS-1$
+        _PropertyBehaviorClusterer.CLASSIFIER_QUALITY_MEASURE
+            .printShortName(body, ETextCase.IN_SENTENCE);
+        body.append(" was a ");//$NON-NLS-1$
+        this.m_classifier.printDescription(body, ETextCase.IN_SENTENCE);
+        body.append('.');
+      }
+    }
+
     body.append(' ');
     this.m_classifier.render(this._getClassifierRenderer(), body);
     body.appendLineBreak();
+
   }
 
   /**
