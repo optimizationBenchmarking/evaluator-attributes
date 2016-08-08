@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.optimizationBenchmarking.evaluator.attributes.clusters.ClusterUtils;
 import org.optimizationBenchmarking.evaluator.attributes.clusters.ClusteringBase;
 import org.optimizationBenchmarking.evaluator.attributes.clusters.NamedCluster;
+import org.optimizationBenchmarking.evaluator.attributes.modeling.DimensionRelationshipModels;
 import org.optimizationBenchmarking.evaluator.data.impl.shadow.DataSelection;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperiment;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperimentSet;
@@ -122,7 +123,11 @@ abstract class _BehaviorClustering<CT extends NamedCluster<?>>
   public ETextCase printDescription(final ITextOutput textOut,
       final ETextCase textCase) {
     textOut.append(
-        "We therefore first model the relationships of the different measurement dimensions by fitting different models, by applying several different fitting strategies. Based on these models, we cluster the data by using several different clustering algorithms. The number of clusters is dynamically decided in order to achieve the best average silhouette width."); //$NON-NLS-1$
+        "We therefore first model the relationships of all time dimensions to all objective dimensions. Therefore "); //$NON-NLS-1$
+    DimensionRelationshipModels.printModelingDescription(textOut,
+        ETextCase.IN_SENTENCE, true, false);
+    textOut.append(
+        " Based on the obtained models, we cluster the data by appying distance-based clustering. The quality that a fitted model for algorithm setup would have if it would represents the measured points from other setup is used as distance metric. By using several different clustering algorithms. The number of clusters is dynamically decided in order to achieve the best average silhouette width."); //$NON-NLS-1$
     return ETextCase.AT_SENTENCE_START;
   }
 
