@@ -83,8 +83,6 @@ public final class ClusterUtils {
     final ArrayListView<? extends ICluster> list;
     final int size;
 
-    body.append("Not a single cluster was formed. Odd."); //$NON-NLS-1$
-
     list = clustering.getData();
     size = list.size();
 

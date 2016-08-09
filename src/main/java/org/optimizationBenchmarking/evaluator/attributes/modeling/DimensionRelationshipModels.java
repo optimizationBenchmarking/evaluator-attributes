@@ -8,6 +8,7 @@ import org.optimizationBenchmarking.utils.ml.fitting.impl.DefaultFunctionFitter;
 import org.optimizationBenchmarking.utils.ml.fitting.models.CubicModel;
 import org.optimizationBenchmarking.utils.ml.fitting.models.ExpLinearModelOverLogX;
 import org.optimizationBenchmarking.utils.ml.fitting.models.ExponentialDecayModel;
+import org.optimizationBenchmarking.utils.ml.fitting.models.GompertzModel;
 import org.optimizationBenchmarking.utils.ml.fitting.models.LogisticModelWithOffsetOverLogX;
 import org.optimizationBenchmarking.utils.ml.fitting.quality.WeightedRootMeanSquareError;
 import org.optimizationBenchmarking.utils.ml.fitting.spec.IFunctionFitter;
@@ -192,6 +193,7 @@ public final class DimensionRelationshipModels {
         new LogisticModelWithOffsetOverLogX(), //
         new ExponentialDecayModel(), //
         new ExpLinearModelOverLogX(), //
+        new GompertzModel(), //
         new CubicModel(), //
     }, false);
   }
