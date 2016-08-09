@@ -2,6 +2,9 @@ package org.optimizationBenchmarking.evaluator.attributes.clusters;
 
 import org.optimizationBenchmarking.evaluator.data.impl.shadow.DataSelection;
 import org.optimizationBenchmarking.evaluator.data.impl.shadow.ShadowExperimentSet;
+import org.optimizationBenchmarking.evaluator.data.spec.IDataElement;
+import org.optimizationBenchmarking.evaluator.data.spec.INamedElement;
+import org.optimizationBenchmarking.utils.comparison.Compare;
 import org.optimizationBenchmarking.utils.document.spec.IMath;
 import org.optimizationBenchmarking.utils.document.spec.IMathName;
 import org.optimizationBenchmarking.utils.document.spec.IParameterRenderer;
@@ -104,4 +107,17 @@ public class NamedCluster<OT extends IClustering>
       name.append(this.getName());
     }
   }
+
+  /** {@inheritDoc} */
+  @Override
+  public int compareTo(final IDataElement o) {
+    int result;
+
+    result = super.compareTo(o);
+    if ((result == 0) && (o instanceof INamedElement)) {
+      return Compare.compare(this.m_name, ((INamedElement) o).getName());
+    }
+    return result;
+  }
+
 }

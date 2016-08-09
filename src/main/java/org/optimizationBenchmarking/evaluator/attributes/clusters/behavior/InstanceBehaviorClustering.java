@@ -42,6 +42,13 @@ public final class InstanceBehaviorClustering
 
   /** {@inheritDoc} */
   @Override
+  final void _distanceAggregationText(final ITextOutput textOut) {
+    textOut.append(
+        "The distance between two benchmark instances is then the sum of the distances of their fitted models for the same algorithm setups and dimensions, over all algorithm setups."); //$NON-NLS-1$
+  }
+
+  /** {@inheritDoc} */
+  @Override
   public ETextCase printShortName(final ITextOutput textOut,
       final ETextCase textCase) {
     return textCase.appendWord("instance behavior clustering", textOut); //$NON-NLS-1$

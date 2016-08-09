@@ -7,14 +7,21 @@ import org.optimizationBenchmarking.evaluator.attributes.clusters.ClusteringBase
 import org.optimizationBenchmarking.evaluator.attributes.clusters.NamedCluster;
 import org.optimizationBenchmarking.evaluator.attributes.modeling.DimensionRelationshipModels;
 import org.optimizationBenchmarking.evaluator.data.impl.shadow.DataSelection;
+import org.optimizationBenchmarking.evaluator.data.spec.IDimension;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperiment;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperimentSet;
 import org.optimizationBenchmarking.evaluator.data.spec.IInstance;
 import org.optimizationBenchmarking.evaluator.data.spec.INamedElement;
 import org.optimizationBenchmarking.evaluator.data.spec.INamedElementSet;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
+import org.optimizationBenchmarking.utils.document.spec.IComplexText;
+import org.optimizationBenchmarking.utils.document.spec.IMath;
 import org.optimizationBenchmarking.utils.document.spec.ISectionBody;
+import org.optimizationBenchmarking.utils.document.spec.IText;
+import org.optimizationBenchmarking.utils.ml.clustering.impl.DefaultClusterer;
+import org.optimizationBenchmarking.utils.text.ESequenceMode;
 import org.optimizationBenchmarking.utils.text.ETextCase;
+import org.optimizationBenchmarking.utils.text.numbers.InTextNumberAppender;
 import org.optimizationBenchmarking.utils.text.textOutput.ITextOutput;
 
 /**
@@ -118,16 +125,123 @@ abstract class _BehaviorClustering<CT extends NamedCluster<?>>
     return this.m_data;
   }
 
+  /**
+   * The text describing how distances are aggregated
+   *
+   * @param textOut
+   *          the text output
+   */
+  abstract void _distanceAggregationText(final ITextOutput textOut);
+
   /** {@inheritDoc} */
   @Override
   public ETextCase printDescription(final ITextOutput textOut,
       final ETextCase textCase) {
+    final ArrayList<IDimension> time, objective;
+    final int timeSize, objectiveSize;
+    IComplexText complex;
+
+    time = new ArrayList<>();
+    objective = new ArrayList<>();
+    _BehaviorClusterer._findDimensions(this.getOwner(), time, objective);
+
+    timeSize = time.size();
+    textOut.append("We therefore first model the relationships of the "); //$NON-NLS-1$
+    if (timeSize > 1) {
+      InTextNumberAppender.INSTANCE.appendTo(timeSize,
+          ETextCase.IN_SENTENCE, textOut);
+      textOut.append(" time dimensions "); //$NON-NLS-1$
+      ESequenceMode.AND.appendSequence(ETextCase.IN_SENTENCE, time,
+          textOut);
+    } else {
+      textOut.append(" time dimension "); //$NON-NLS-1$
+      time.get(0).printShortName(textOut, ETextCase.IN_SENTENCE);
+    }
+
+    objectiveSize = objective.size();
+    textOut.append(" to the "); //$NON-NLS-1$
+    if (objectiveSize > 1) {
+      InTextNumberAppender.INSTANCE.appendTo(objectiveSize,
+          ETextCase.IN_SENTENCE, textOut);
+      textOut.append(" solution quality dimensions "); //$NON-NLS-1$
+      ESequenceMode.AND.appendSequence(ETextCase.IN_SENTENCE, objective,
+          textOut);
+    } else {
+      textOut.append(" solution quality dimension "); //$NON-NLS-1$
+      objective.get(0).printShortName(textOut, ETextCase.IN_SENTENCE);
+    }
+
     textOut.append(
-        "We therefore first model the relationships of all time dimensions to all objective dimensions. Therefore "); //$NON-NLS-1$
+        " as simple mathematical functions. This is done for each algorithm setup on each benchmark instance based on all data (runs) available for a given setup on a specific instance."); //$NON-NLS-1$
+    textOut.appendLineBreak();
+    textOut.append("For this purpose, "); //$NON-NLS-1$
     DimensionRelationshipModels.printModelingDescription(textOut,
         ETextCase.IN_SENTENCE, true, false);
+    textOut.appendLineBreak();
     textOut.append(
-        " Based on the obtained models, we cluster the data by appying distance-based clustering. The quality that a fitted model for algorithm setup would have if it would represents the measured points from other setup is used as distance metric. By using several different clustering algorithms. The number of clusters is dynamically decided in order to achieve the best average silhouette width."); //$NON-NLS-1$
+        "We now cluster the data by using the obtained models and by appying "); //$NON-NLS-1$
+    DefaultClusterer.getDistanceInstance().printDescription(textOut,
+        ETextCase.IN_SENTENCE);
+    textOut.append(
+        " Since we apply the clustering for different target cluster numbers, we this way can also automatically detect into how many groups the data should be split."); //$NON-NLS-1$
+
+    textOut.appendLineBreak();
+
+    textOut.append(" The distance measure between two models "); //$NON-NLS-1$
+    if (textOut instanceof IComplexText) {
+      complex = ((IComplexText) textOut);
+      try (final IMath math = complex.inlineMath()) {
+        try (final IText text = math.name()) {
+          text.append('X');
+        }
+      }
+      textOut.append(" and "); //$NON-NLS-1$
+      try (final IMath math = complex.inlineMath()) {
+        try (final IText text = math.name()) {
+          text.append('Y');
+        }
+      }
+      textOut.append(
+          " is the quality that a fitted model for an algorithm setup would have if it would represents the measured points used to build the model for the other setup, i.e., "); //$NON-NLS-1$
+
+      try (final IMath math = complex.inlineMath()) {
+        try (final IMath min = math.min()) {
+
+          try (final IMath quality = min.nAryFunction("quality", 2, 2)) { //$NON-NLS-1$
+            try (final IText text = quality.name()) {
+              text.append('X');
+            }
+            try (final IMath dataUsedToBuild = min
+                .nAryFunction("dataUsedToBuild", 1, 1)) { //$NON-NLS-1$
+              try (final IText text = dataUsedToBuild.name()) {
+                text.append('Y');
+              }
+            }
+          }
+
+          try (final IMath quality = min.nAryFunction("quality", 2, 2)) { //$NON-NLS-1$
+            try (final IText text = quality.name()) {
+              text.append('Y');
+            }
+            try (final IMath dataUsedToBuild = min
+                .nAryFunction("dataUsedToBuild", 1, 1)) { //$NON-NLS-1$
+              try (final IText text = dataUsedToBuild.name()) {
+                text.append('X');
+              }
+            }
+          }
+
+        }
+      }
+    } else {
+      textOut.append(
+          " X and Y is the quality that a fitted model for an algorithm setup would have if it would represents the measured points from the other setup, i.e., min(quality(X, pointsUsedToBuild(Y)), quality(Y, pointsUsedToBuild(X))"); //$NON-NLS-1$
+    }
+
+    textOut.append(
+        ". If one model can better represent the points of a different data set than the model originally trained on that set, their distance is considered to be zero. ");//$NON-NLS-1$
+    this._distanceAggregationText(textOut);
+
     return ETextCase.AT_SENTENCE_START;
   }
 

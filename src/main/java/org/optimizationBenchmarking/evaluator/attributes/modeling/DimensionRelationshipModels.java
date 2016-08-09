@@ -175,7 +175,7 @@ public final class DimensionRelationshipModels {
     }
 
     textOut.append(
-        "and the best fitting among all models, i.e., the parameterization with the smallest ");//$NON-NLS-1$
+        " and the best fitting among all models, i.e., the parameterization with the smallest ");//$NON-NLS-1$
     WeightedRootMeanSquareError.printName(textOut, next);
     textOut.append(
         ", is chosen for a given algorithm setup/benchmark instance combination.");//$NON-NLS-1$

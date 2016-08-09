@@ -13,6 +13,7 @@ import org.optimizationBenchmarking.evaluator.attributes.modeling.DimensionRelat
 import org.optimizationBenchmarking.evaluator.attributes.modeling.DimensionRelationshipData;
 import org.optimizationBenchmarking.evaluator.data.spec.Attribute;
 import org.optimizationBenchmarking.evaluator.data.spec.EAttributeType;
+import org.optimizationBenchmarking.evaluator.data.spec.EDimensionType;
 import org.optimizationBenchmarking.evaluator.data.spec.IDimension;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperimentSet;
 import org.optimizationBenchmarking.evaluator.data.spec.IInstanceRuns;
@@ -124,6 +125,46 @@ abstract class _BehaviorClusterer<CCT extends IClustering>
       final INamedElement element, final String[] categories);
 
   /**
+   * Find the sets of dimensions
+   *
+   * @param data
+   *          the data
+   * @param time
+   *          the collection to receive the time dimensions
+   * @param objective
+   *          the collection to receive the objective dimensions
+   */
+  static final void _findDimensions(final IExperimentSet data,
+      final ArrayList<IDimension> time,
+      final ArrayList<IDimension> objective) {
+    final int origTimeSize, origObjectiveSize;
+    EDimensionType type;
+
+    origTimeSize = time.size();
+    origObjectiveSize = objective.size();
+
+    for (final IDimension dimension : data.getDimensions().getData()) {
+      type = dimension.getDimensionType();
+      if (type.isTimeMeasure()) {
+        time.add(dimension);
+        continue;
+      }
+      if (type.isSolutionQualityMeasure()) {
+        objective.add(dimension);
+        continue;
+      }
+    }
+    if (time.size() <= origTimeSize) {
+      throw new IllegalArgumentException(
+          "There must be at least one time dimension."); //$NON-NLS-1$
+    }
+    if (objective.size() <= origObjectiveSize) {
+      throw new IllegalArgumentException(
+          "There must be at least one solution quality dimension."); //$NON-NLS-1$
+    }
+  }
+
+  /**
    * Get the attributes for the fitting.
    *
    * @param data
@@ -132,33 +173,17 @@ abstract class _BehaviorClusterer<CCT extends IClustering>
    */
   private static final DimensionRelationshipAndData[] __getFittingAttributes(
       final IExperimentSet data) {
-    final ArrayListView<? extends IDimension> dims;
-    int index, index2;
-    ArrayList<DimensionRelationshipAndData> list;
-    IDimension dimA, dimB, useDimA;
-    boolean dimAIsTime, dimBIsTime;
+    final ArrayList<IDimension> time, objective;
+    final ArrayList<DimensionRelationshipAndData> list;
 
-    dims = data.getDimensions().getData();
-    index = dims.size();
-    list = new ArrayList<>((index * (index - 1)) >>> 1);
-    for (; (--index) > 0;) {
-      dimA = dims.get(index);
-      dimAIsTime = dimA.getDimensionType().isTimeMeasure();
-      for (index2 = index; (--index2) >= 0;) {
-        dimB = dims.get(index2);
-        dimBIsTime = dimB.getDimensionType().isTimeMeasure();
+    time = new ArrayList<>();
+    objective = new ArrayList<>();
+    _BehaviorClusterer._findDimensions(data, time, objective);
+    list = new ArrayList<>();
 
-        if (dimBIsTime != dimAIsTime) {
-
-          if (dimBIsTime) {
-            useDimA = dimB;
-            dimB = dimA;
-          } else {
-            useDimA = dimA;
-          }
-
-          list.add(new DimensionRelationshipAndData(useDimA, dimB));
-        }
+    for (final IDimension timeDim : time) {
+      for (final IDimension objDim : objective) {
+        list.add(new DimensionRelationshipAndData(timeDim, objDim));
       }
     }
 
