@@ -211,7 +211,7 @@ abstract class _BehaviorClustering<CT extends NamedCluster<?>>
             try (final IText text = quality.name()) {
               text.append('X');
             }
-            try (final IMath dataUsedToBuild = min
+            try (final IMath dataUsedToBuild = quality
                 .nAryFunction("dataUsedToBuild", 1, 1)) { //$NON-NLS-1$
               try (final IText text = dataUsedToBuild.name()) {
                 text.append('Y');
@@ -223,7 +223,7 @@ abstract class _BehaviorClustering<CT extends NamedCluster<?>>
             try (final IText text = quality.name()) {
               text.append('Y');
             }
-            try (final IMath dataUsedToBuild = min
+            try (final IMath dataUsedToBuild = quality
                 .nAryFunction("dataUsedToBuild", 1, 1)) { //$NON-NLS-1$
               try (final IText text = dataUsedToBuild.name()) {
                 text.append('X');
