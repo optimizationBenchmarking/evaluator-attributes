@@ -14,6 +14,7 @@ import org.optimizationBenchmarking.evaluator.data.spec.IInstance;
 import org.optimizationBenchmarking.evaluator.data.spec.INamedElement;
 import org.optimizationBenchmarking.evaluator.data.spec.INamedElementSet;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
+import org.optimizationBenchmarking.utils.document.spec.EMathComparison;
 import org.optimizationBenchmarking.utils.document.spec.IComplexText;
 import org.optimizationBenchmarking.utils.document.spec.IMath;
 import org.optimizationBenchmarking.utils.document.spec.ISectionBody;
@@ -187,62 +188,156 @@ abstract class _BehaviorClustering<CT extends NamedCluster<?>>
 
     textOut.appendLineBreak();
 
-    textOut.append(" The distance measure between two models "); //$NON-NLS-1$
+    textOut.append(
+        "For clustering, we need a distance measure (also called dissimilarity measure), i.e., we need to know how different the fitted models are. The distance measure between two fitted models "); //$NON-NLS-1$
     if (textOut instanceof IComplexText) {
       complex = ((IComplexText) textOut);
       try (final IMath math = complex.inlineMath()) {
-        try (final IText text = math.name()) {
-          text.append('X');
-        }
+        _BehaviorClustering.__printModel(math, 0);
       }
       textOut.append(" and "); //$NON-NLS-1$
       try (final IMath math = complex.inlineMath()) {
-        try (final IText text = math.name()) {
-          text.append('Y');
-        }
+        _BehaviorClustering.__printModel(math, 1);
       }
       textOut.append(
-          " is the quality that a fitted model for an algorithm setup would have if it would represents the measured points used to build the model for the other setup, i.e., "); //$NON-NLS-1$
+          " is the quality that a fitted model for an algorithm setup would have if it would represents the measured points used to build the model for the other setup, i.e.,"); //$NON-NLS-1$
 
+      if (complex instanceof ISectionBody) {
+        try (final IMath math = ((ISectionBody) complex).equation(null)) {
+          _BehaviorClustering.__printDistance(math);
+        }
+      } else {
+        complex.append(' ');
+        try (final IMath math = complex.inlineMath()) {
+          _BehaviorClustering.__printDistance(math);
+        }
+        complex.append('.');
+        complex.append(' ');
+      }
+    } else {
+      complex = null;
+      textOut.append(
+          " f and g is the quality that a fitted model for an algorithm setup would have if it would represents the measured points from the other setup, i.e., min(quality(f, pointsUsedToBuild(g)), quality(g, pointsUsedToBuild(f)). "); //$NON-NLS-1$
+    }
+
+    if (complex != null) {
+      textOut.append("If one model ");//$NON-NLS-1$
       try (final IMath math = complex.inlineMath()) {
-        try (final IMath min = math.min()) {
-
-          try (final IMath quality = min.nAryFunction("quality", 2, 2)) { //$NON-NLS-1$
-            try (final IText text = quality.name()) {
-              text.append('X');
-            }
-            try (final IMath dataUsedToBuild = quality
-                .nAryFunction("dataUsedToBuild", 1, 1)) { //$NON-NLS-1$
-              try (final IText text = dataUsedToBuild.name()) {
-                text.append('Y');
-              }
-            }
-          }
-
-          try (final IMath quality = min.nAryFunction("quality", 2, 2)) { //$NON-NLS-1$
-            try (final IText text = quality.name()) {
-              text.append('Y');
-            }
-            try (final IMath dataUsedToBuild = quality
-                .nAryFunction("dataUsedToBuild", 1, 1)) { //$NON-NLS-1$
-              try (final IText text = dataUsedToBuild.name()) {
-                text.append('X');
-              }
-            }
-          }
-
+        _BehaviorClustering.__printModel(math, 0);
+      }
+      textOut.append(
+          " can better represent the points (data from the runs) ");//$NON-NLS-1$
+      try (final IMath math = complex.inlineMath()) {
+        _BehaviorClustering.__printDataUsedForModel(math, 1);
+      }
+      textOut.append(" used to fit another model ");//$NON-NLS-1$
+      try (final IMath math = complex.inlineMath()) {
+        _BehaviorClustering.__printModel(math, 1);
+      }
+      textOut.append(" than that other model, i.e., if ");//$NON-NLS-1$
+      try (final IMath math = complex.inlineMath()) {
+        try (final IMath compare = math
+            .compare(EMathComparison.LESS_OR_EQUAL)) {
+          _BehaviorClustering.__printQuality(compare, 0, 1);
+          _BehaviorClustering.__printQuality(compare, 1, 1);
         }
       }
     } else {
       textOut.append(
-          " X and Y is the quality that a fitted model for an algorithm setup would have if it would represents the measured points from the other setup, i.e., min(quality(X, pointsUsedToBuild(Y)), quality(Y, pointsUsedToBuild(X))"); //$NON-NLS-1$
+          "If one model can better represent the points of a different data set than the model originally trained on that set");//$NON-NLS-1$
     }
-
     textOut.append(
-        ". If one model can better represent the points of a different data set than the model originally trained on that set, their distance is considered to be zero. ");//$NON-NLS-1$
+        " (which is unlikely to occur), then the distance of the models is considered to be zero, i.e., we assume that the two algorithms have the same behavior.");//$NON-NLS-1$
     this._distanceAggregationText(textOut);
 
     return ETextCase.AT_SENTENCE_START;
+  }
+
+  /**
+   * print a given model
+   *
+   * @param math
+   *          the destination math component
+   * @param model
+   *          the zero-based model index
+   */
+  private static final void __printModel(final IMath math,
+      final int model) {
+    try (final IText text = math.name()) {
+      text.append((char) ('f' + model));
+    }
+  }
+
+  /**
+   * print the data used to build a given model
+   *
+   * @param math
+   *          the destination math component
+   * @param model
+   *          the zero-based model index
+   */
+  private static final void __printDataUsedForModel(final IMath math,
+      final int model) {
+    try (
+        final IMath dataUsedToBuild = math.nAryFunction("dataUsedToFit", 1, //$NON-NLS-1$
+            1)) {
+      try (final IMath braces = dataUsedToBuild.inBraces()) {
+        _BehaviorClustering.__printModel(braces, model);
+      }
+    }
+  }
+
+  /**
+   * print the quality of a given model
+   *
+   * @param math
+   *          the destination math component
+   * @param qualityModel
+   *          the model for which we obtain the quality
+   * @param dataModel
+   *          the model whose data we use
+   */
+  private static final void __printQuality(final IMath math,
+      final int qualityModel, final int dataModel) {
+    try (final IMath quality = math.nAryFunction("quality", 2, 2)) { //$NON-NLS-1$
+      _BehaviorClustering.__printModel(quality, qualityModel);
+      _BehaviorClustering.__printDataUsedForModel(quality, dataModel);
+    }
+  }
+
+  /**
+   * print the real normalized quality of a given model on a given data set
+   *
+   * @param math
+   *          the destination math component
+   * @param qualityModel
+   *          the model for which we obtain the quality
+   * @param dataModel
+   *          the model whose data we use
+   */
+  private static final void __printRealQuality(final IMath math,
+      final int qualityModel, final int dataModel) {
+
+    try (final IMath div = math.div()) {
+      try (final IMath sub = math.sub()) {
+        _BehaviorClustering.__printQuality(sub, qualityModel, dataModel);
+        _BehaviorClustering.__printQuality(sub, dataModel, dataModel);
+      }
+      _BehaviorClustering.__printQuality(div, dataModel, dataModel);
+    }
+  }
+
+  /**
+   * print the distance
+   *
+   * @param math
+   *          the math context
+   */
+  private static final void __printDistance(final IMath math) {
+    try (final IMath min = math.min()) {
+      _BehaviorClustering.__printRealQuality(min, 0, 1);
+      _BehaviorClustering.__printRealQuality(min, 1, 0);
+    }
   }
 
   /** {@inheritDoc} */

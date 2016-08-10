@@ -133,7 +133,7 @@ public final class DimensionRelationshipModels {
         next = textCase.appendWords("different algorithms", textOut);//$NON-NLS-1$
         textOut.append(',');
         textOut.append(' ');
-        next = textCase.appendWord("namely,", textOut);//$NON-NLS-1$
+        next = textCase.appendWord("namely", textOut);//$NON-NLS-1$
         textOut.append(' ');
         next = ESequenceMode.AND.appendSequence(next,
             SemanticComponentSequenceable.wrap(fitters, false, true,
@@ -144,7 +144,7 @@ public final class DimensionRelationshipModels {
         next = textCase.appendWord("are", textOut);//$NON-NLS-1$
       }
     }
-    next = next.appendWord("applied to fit", textOut);//$NON-NLS-1$
+    next = next.appendWord(" applied to fit", textOut);//$NON-NLS-1$
     textOut.append(' ');
 
     models = DimensionRelationshipModels.getModels(isXTime, isYTime);
@@ -166,7 +166,7 @@ public final class DimensionRelationshipModels {
         next = textCase.appendWords("different models", textOut);//$NON-NLS-1$
         textOut.append(',');
         textOut.append(' ');
-        next = textCase.appendWord("namely,", textOut);//$NON-NLS-1$
+        next = textCase.appendWord("namely", textOut);//$NON-NLS-1$
         textOut.append(' ');
         next = ESequenceMode.AND.appendSequence(next,
             SemanticComponentSequenceable.wrap(models, false, true, false),
