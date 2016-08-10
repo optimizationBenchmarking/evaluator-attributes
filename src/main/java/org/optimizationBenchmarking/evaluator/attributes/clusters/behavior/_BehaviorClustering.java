@@ -319,7 +319,7 @@ abstract class _BehaviorClustering<CT extends NamedCluster<?>>
       final int qualityModel, final int dataModel) {
 
     try (final IMath div = math.div()) {
-      try (final IMath sub = math.sub()) {
+      try (final IMath sub = div.sub()) {
         _BehaviorClustering.__printQuality(sub, qualityModel, dataModel);
         _BehaviorClustering.__printQuality(sub, dataModel, dataModel);
       }
