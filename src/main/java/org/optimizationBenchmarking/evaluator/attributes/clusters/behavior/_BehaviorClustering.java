@@ -247,7 +247,7 @@ abstract class _BehaviorClustering<CT extends NamedCluster<?>>
           "If one model can better represent the points of a different data set than the model originally trained on that set");//$NON-NLS-1$
     }
     textOut.append(
-        " (which is unlikely to occur), then the distance of the models is considered to be zero, i.e., we assume that the two algorithms have the same behavior.");//$NON-NLS-1$
+        " (which is unlikely to occur), then the distance of the models is considered to be zero, i.e., we assume that the two algorithms have the same behavior. ");//$NON-NLS-1$
     this._distanceAggregationText(textOut);
 
     return ETextCase.AT_SENTENCE_START;

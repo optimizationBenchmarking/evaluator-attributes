@@ -21,6 +21,7 @@ import org.optimizationBenchmarking.evaluator.data.spec.IPropertyValue;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
 import org.optimizationBenchmarking.utils.comparison.Compare;
 import org.optimizationBenchmarking.utils.ml.classification.impl.DefaultClassifierTrainer;
+import org.optimizationBenchmarking.utils.ml.classification.impl.abstr.ClassificationTools;
 import org.optimizationBenchmarking.utils.ml.classification.impl.multi.MultiClassifierTrainer;
 import org.optimizationBenchmarking.utils.ml.classification.impl.quality.MCC;
 import org.optimizationBenchmarking.utils.ml.classification.spec.ClassifiedSample;
@@ -277,7 +278,8 @@ abstract class _PropertyBehaviorClusterer<ET extends INamedElement>
         }
         case BOOLEAN: {
           if (value instanceof Boolean) {
-            dest[index] = (((Boolean) value).booleanValue() ? 1d : 0d);
+            dest[index] = ClassificationTools
+                .featureBooleanToDouble(((Boolean) value).booleanValue());
             continue main;
           }
           throw new IllegalStateException(//
@@ -296,12 +298,14 @@ abstract class _PropertyBehaviorClusterer<ET extends INamedElement>
           }
           if ((propertyValue instanceof IParameterValue) && //
               (((IParameterValue) propertyValue).isUnspecified())) {
-            dest[index] = property.getData().size();
+            dest[index] = dest[index] = ClassificationTools
+                .featureNominalToDouble(property.getData().size());
             continue main;
           }
           valueIndex = property.getData().indexOf(propertyValue);
           if (valueIndex >= 0) {
-            dest[index] = valueIndex;
+            dest[index] = ClassificationTools
+                .featureNominalToDouble(valueIndex);
             continue main;
           }
 

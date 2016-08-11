@@ -4,6 +4,7 @@ import org.optimizationBenchmarking.evaluator.data.spec.IParameter;
 import org.optimizationBenchmarking.evaluator.data.spec.IProperty;
 import org.optimizationBenchmarking.evaluator.data.spec.IPropertyValue;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
+import org.optimizationBenchmarking.utils.ml.classification.impl.abstr.ClassificationTools;
 import org.optimizationBenchmarking.utils.ml.classification.spec.IClassifierParameterRenderer;
 import org.optimizationBenchmarking.utils.reflection.EPrimitiveType;
 import org.optimizationBenchmarking.utils.text.ETextCase;
@@ -91,7 +92,8 @@ abstract class _ClassifierRenderer
     if (type != null) {
       switch (type) {
         case BOOLEAN: {
-          textOut.append(featureValue != 0d);
+          textOut.append(
+              ClassificationTools.featureDoubleToBoolean(featureValue));
           return;
         }
 
@@ -139,7 +141,7 @@ abstract class _ClassifierRenderer
       }
     }
 
-    _int = ((int) (0.5d + featureValue));
+    _int = ClassificationTools.featureDoubleToNominal(featureValue);
     data = property.getData();
     if ((_int >= 0) && (_int < property.getData().size())) {
       textOut.append(data.get(_int).getValue());

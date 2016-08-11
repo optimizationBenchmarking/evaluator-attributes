@@ -2,6 +2,7 @@ package org.optimizationBenchmarking.evaluator.attributes.modeling;
 
 import org.optimizationBenchmarking.evaluator.data.spec.IDimension;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
+import org.optimizationBenchmarking.utils.document.impl.EListSequenceMode;
 import org.optimizationBenchmarking.utils.document.impl.SemanticComponentSequenceable;
 import org.optimizationBenchmarking.utils.error.ErrorUtils;
 import org.optimizationBenchmarking.utils.ml.fitting.impl.DefaultFunctionFitter;
@@ -134,11 +135,10 @@ public final class DimensionRelationshipModels {
         textOut.append(',');
         textOut.append(' ');
         next = textCase.appendWord("namely", textOut);//$NON-NLS-1$
-        textOut.append(' ');
-        next = ESequenceMode.AND.appendSequence(next,
+        next = EListSequenceMode.ENUMERATION.appendSequence(next,
             SemanticComponentSequenceable.wrap(fitters, false, true,
                 false),
-            textOut);
+            textOut, ESequenceMode.AND);
         textOut.append(',');
         textOut.append(' ');
         next = textCase.appendWord("are", textOut);//$NON-NLS-1$
@@ -167,10 +167,9 @@ public final class DimensionRelationshipModels {
         textOut.append(',');
         textOut.append(' ');
         next = textCase.appendWord("namely", textOut);//$NON-NLS-1$
-        textOut.append(' ');
-        next = ESequenceMode.AND.appendSequence(next,
+        next = EListSequenceMode.ENUMERATION.appendSequence(next,
             SemanticComponentSequenceable.wrap(models, false, true, false),
-            textOut);
+            textOut, ESequenceMode.AND);
         textOut.append(',');
       }
     }
