@@ -8,6 +8,7 @@ import org.optimizationBenchmarking.evaluator.attributes.clusters.NamedCluster;
 import org.optimizationBenchmarking.evaluator.data.impl.shadow.DataSelection;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperimentSet;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
+import org.optimizationBenchmarking.utils.document.impl.EListSequenceMode;
 import org.optimizationBenchmarking.utils.document.impl.SemanticComponentSequenceable;
 import org.optimizationBenchmarking.utils.document.spec.IComplexText;
 import org.optimizationBenchmarking.utils.document.spec.ILabel;
@@ -168,13 +169,13 @@ abstract class _PropertyBehaviorClustering<CT extends NamedCluster<?>>
         body.append("We tested ");//$NON-NLS-1$
         InTextNumberAppender.INSTANCE.appendTo(trainerSize,
             ETextCase.IN_SENTENCE, body);
-        body.append(" different classification methods, namely "); //$NON-NLS-1$
-        ESequenceMode.AND.appendSequence(ETextCase.IN_SENTENCE,
+        body.append(" different classification methods, namely"); //$NON-NLS-1$
+        EListSequenceMode.ENUMERATION.appendSequence(ETextCase.IN_SENTENCE,
             SemanticComponentSequenceable.wrap(
                 _PropertyBehaviorClusterer.TRAINERS, false, false, true),
-            body);
+            body, ESequenceMode.AND);
         body.append(
-            " by using cross-validation (if sufficient samples were there). We compared their result based on the "); //$NON-NLS-1$
+            "If sufficient samples were avaible, cross-validation was used to choose classifiers with good generalization ability first. We compared their result based on the "); //$NON-NLS-1$
         _PropertyBehaviorClusterer.CLASSIFIER_QUALITY_MEASURE
             .printDescription(body, ETextCase.IN_SENTENCE);
         body.append(
