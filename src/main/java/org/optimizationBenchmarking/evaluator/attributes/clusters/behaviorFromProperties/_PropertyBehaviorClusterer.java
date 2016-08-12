@@ -115,7 +115,6 @@ abstract class _PropertyBehaviorClusterer<ET extends INamedElement>
     ArrayList<ClassifiedSample> samples;
     int index, clazz;
     EPrimitiveType primitiveType;
-    IPropertySetting propertySetting;
     double[] values;
     IClassifierTrainingJob job;
     DataSelection[] selections;
@@ -174,10 +173,9 @@ abstract class _PropertyBehaviorClusterer<ET extends INamedElement>
       this._getElementsToClassify(cluster, data, elements);
       allElements.addAll(elements);
       for (final ET element : elements) {
-        propertySetting = this._getPropertySetting(element);
         values = new double[propertySize];
-        _PropertyBehaviorClusterer.__fillIn(properties, propertySetting,
-            featureTypes, values);
+        _PropertyBehaviorClusterer.__fillIn(properties,
+            this._getPropertySetting(element), featureTypes, values);
         samples.add(new ClassifiedSample(index, values));
       }
     }
