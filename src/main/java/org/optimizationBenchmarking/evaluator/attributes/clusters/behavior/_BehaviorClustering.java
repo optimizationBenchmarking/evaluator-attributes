@@ -134,10 +134,19 @@ abstract class _BehaviorClustering<CT extends NamedCluster<?>>
    */
   abstract void _distanceAggregationText(final ITextOutput textOut);
 
-  /** {@inheritDoc} */
-  @Override
-  public ETextCase printDescription(final ITextOutput textOut,
-      final ETextCase textCase) {
+  /**
+   * Print the description.
+   *
+   * @param textOut
+   *          the text output destination
+   * @param textCase
+   *          the text case to use
+   * @param isLong
+   *          should we print the long description?
+   * @return the next text case
+   */
+  private final ETextCase __printDescription(final ITextOutput textOut,
+      final ETextCase textCase, final boolean isLong) {
     final ArrayList<IDimension> time, objective;
     final int timeSize, objectiveSize;
     IComplexText complex;
@@ -174,10 +183,12 @@ abstract class _BehaviorClustering<CT extends NamedCluster<?>>
 
     textOut.append(
         " as simple mathematical functions. This is done for each algorithm setup on each benchmark instance based on all data (runs) available for a given setup on a specific instance."); //$NON-NLS-1$
-    textOut.appendLineBreak();
-    textOut.append("For this purpose, "); //$NON-NLS-1$
-    DimensionRelationshipModels.printModelingDescription(textOut,
-        ETextCase.IN_SENTENCE, true, false);
+    if (isLong) {
+      textOut.appendLineBreak();
+      textOut.append("For this purpose, "); //$NON-NLS-1$
+      DimensionRelationshipModels.printModelingDescription(textOut,
+          ETextCase.IN_SENTENCE, true, false);
+    }
     textOut.appendLineBreak();
     textOut.append(
         "We now cluster the data by using the obtained models and by appying "); //$NON-NLS-1$
@@ -200,57 +211,72 @@ abstract class _BehaviorClustering<CT extends NamedCluster<?>>
         _BehaviorClustering.__printModel(math, 1);
       }
       textOut.append(
-          " is the quality that a fitted model for an algorithm setup would have if it would represents the measured points used to build the model for the other setup, i.e.,"); //$NON-NLS-1$
+          " is the smaller the better the quality that a fitted model for an algorithm setup would have if it would represents the measured points used to build the model for the other setup, i.e.,"); //$NON-NLS-1$
 
-      if (complex instanceof ISectionBody) {
-        try (final IMath math = ((ISectionBody) complex).equation(null)) {
-          _BehaviorClustering.__printDistance(math);
+      if (isLong) {
+        textOut.append(", i.e.,"); //$NON-NLS-1$
+
+        if (complex instanceof ISectionBody) {
+          try (
+              final IMath math = ((ISectionBody) complex).equation(null)) {
+            _BehaviorClustering.__printDistance(math);
+          }
+        } else {
+          complex.append(' ');
+          try (final IMath math = complex.inlineMath()) {
+            _BehaviorClustering.__printDistance(math);
+          }
+          complex.append('.');
+          complex.append(' ');
         }
       } else {
-        complex.append(' ');
-        try (final IMath math = complex.inlineMath()) {
-          _BehaviorClustering.__printDistance(math);
-        }
-        complex.append('.');
-        complex.append(' ');
+        complex = null;
+        textOut.append(
+            " f and g is the quality that a fitted model for an algorithm setup would have if it would represents the measured points from the other setup, i.e., min(quality(f, pointsUsedToBuild(g)), quality(g, pointsUsedToBuild(f)). "); //$NON-NLS-1$
       }
-    } else {
-      complex = null;
-      textOut.append(
-          " f and g is the quality that a fitted model for an algorithm setup would have if it would represents the measured points from the other setup, i.e., min(quality(f, pointsUsedToBuild(g)), quality(g, pointsUsedToBuild(f)). "); //$NON-NLS-1$
-    }
 
-    if (complex != null) {
-      textOut.append("If one model ");//$NON-NLS-1$
-      try (final IMath math = complex.inlineMath()) {
-        _BehaviorClustering.__printModel(math, 0);
-      }
-      textOut.append(
-          " can better represent the points (data from the runs) ");//$NON-NLS-1$
-      try (final IMath math = complex.inlineMath()) {
-        _BehaviorClustering.__printDataUsedForModel(math, 1);
-      }
-      textOut.append(" used to fit another model ");//$NON-NLS-1$
-      try (final IMath math = complex.inlineMath()) {
-        _BehaviorClustering.__printModel(math, 1);
-      }
-      textOut.append(" than that other model, i.e., if ");//$NON-NLS-1$
-      try (final IMath math = complex.inlineMath()) {
-        try (final IMath compare = math
-            .compare(EMathComparison.LESS_OR_EQUAL)) {
-          _BehaviorClustering.__printQuality(compare, 0, 1);
-          _BehaviorClustering.__printQuality(compare, 1, 1);
+      if (complex != null) {
+        textOut.append("If one model ");//$NON-NLS-1$
+        try (final IMath math = complex.inlineMath()) {
+          _BehaviorClustering.__printModel(math, 0);
         }
+        textOut.append(
+            " can better represent the points (data from the runs) ");//$NON-NLS-1$
+        try (final IMath math = complex.inlineMath()) {
+          _BehaviorClustering.__printDataUsedForModel(math, 1);
+        }
+        textOut.append(" used to fit another model ");//$NON-NLS-1$
+        try (final IMath math = complex.inlineMath()) {
+          _BehaviorClustering.__printModel(math, 1);
+        }
+        textOut.append(" than that other model, i.e., if ");//$NON-NLS-1$
+        try (final IMath math = complex.inlineMath()) {
+          try (final IMath compare = math
+              .compare(EMathComparison.LESS_OR_EQUAL)) {
+            _BehaviorClustering.__printQuality(compare, 0, 1);
+            _BehaviorClustering.__printQuality(compare, 1, 1);
+          }
+        }
+      } else {
+        textOut.append(
+            "If one model can better represent the points of a different data set than the model originally trained on that set");//$NON-NLS-1$
       }
-    } else {
       textOut.append(
-          "If one model can better represent the points of a different data set than the model originally trained on that set");//$NON-NLS-1$
+          " (which is unlikely to occur), then the distance of the models is considered to be zero, i.e., we assume that the two algorithms have the same behavior. ");//$NON-NLS-1$
+    } else {
+      textOut.append('.');
+      textOut.append(' ');
     }
-    textOut.append(
-        " (which is unlikely to occur), then the distance of the models is considered to be zero, i.e., we assume that the two algorithms have the same behavior. ");//$NON-NLS-1$
     this._distanceAggregationText(textOut);
 
     return ETextCase.AT_SENTENCE_START;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public ETextCase printDescription(final ITextOutput textOut,
+      final ETextCase textCase) {
+    return this.__printDescription(textOut, textCase, false);
   }
 
   /**
@@ -343,7 +369,7 @@ abstract class _BehaviorClustering<CT extends NamedCluster<?>>
   /** {@inheritDoc} */
   @Override
   public void printLongDescription(final ISectionBody body) {
-    super.printLongDescription(body);
+    this.__printDescription(body, ETextCase.AT_SENTENCE_START, true);
     body.appendLineBreak();
     ClusterUtils.listClusters(this, body);
   }

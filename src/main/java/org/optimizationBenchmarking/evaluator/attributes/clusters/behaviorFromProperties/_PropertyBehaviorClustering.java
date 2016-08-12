@@ -110,6 +110,7 @@ abstract class _PropertyBehaviorClustering<CT extends NamedCluster<?>>
   @Override
   public ETextCase printDescription(final ITextOutput textOut,
       final ETextCase textCase) {
+    this._printHeader_A(textOut);
     textOut.append("First, "); //$NON-NLS-1$
     this.m_behavior.printDescription(textOut, ETextCase.IN_SENTENCE);
     return ETextCase.AT_SENTENCE_START;
@@ -140,8 +141,11 @@ abstract class _PropertyBehaviorClustering<CT extends NamedCluster<?>>
    *
    * @param body
    *          the body
+   * @param isLong
+   *          should we print the long description or the short one?
    */
-  final void _printClassification(final ISectionBody body) {
+  final void _printClassification(final ITextOutput body,
+      final boolean isLong) {
     final int trainerSize;
 
     body.append(" and the known classes are the IDs of the "); //$NON-NLS-1$
@@ -169,15 +173,19 @@ abstract class _PropertyBehaviorClustering<CT extends NamedCluster<?>>
         body.append("We tested ");//$NON-NLS-1$
         InTextNumberAppender.INSTANCE.appendTo(trainerSize,
             ETextCase.IN_SENTENCE, body);
-        body.append(" different classification methods, namely"); //$NON-NLS-1$
-        EListSequenceMode.ENUMERATION.appendSequence(ETextCase.IN_SENTENCE,
-            SemanticComponentSequenceable.wrap(
-                _PropertyBehaviorClusterer.TRAINERS, false, false, true),
-            body, ESequenceMode.AND);
-        body.append(
-            "If sufficient samples were avaible, cross-validation was used to choose classifiers with good generalization ability first. We compared their result based on the "); //$NON-NLS-1$
-        _PropertyBehaviorClusterer.CLASSIFIER_QUALITY_MEASURE
-            .printDescription(body, ETextCase.IN_SENTENCE);
+        body.append(" different classification methods"); //$NON-NLS-1$
+        if (isLong) {
+          body.append(", namely"); //$NON-NLS-1$
+          EListSequenceMode.ENUMERATION.appendSequence(
+              ETextCase.IN_SENTENCE,
+              SemanticComponentSequenceable.wrap(
+                  _PropertyBehaviorClusterer.TRAINERS, false, false, true),
+              body, ESequenceMode.AND);
+          body.append(
+              "If sufficient samples were avaible, cross-validation was used to choose classifiers with good generalization ability first. We compared their result based on the "); //$NON-NLS-1$
+          _PropertyBehaviorClusterer.CLASSIFIER_QUALITY_MEASURE
+              .printDescription(body, ETextCase.IN_SENTENCE);
+        }
         body.append(
             ". The classifier that performed best on the whole data set in terms of the "); //$NON-NLS-1$
         _PropertyBehaviorClusterer.CLASSIFIER_QUALITY_MEASURE
@@ -188,10 +196,11 @@ abstract class _PropertyBehaviorClustering<CT extends NamedCluster<?>>
       }
     }
 
-    body.append(' ');
-    this.m_classifier.render(this._getClassifierRenderer(), body);
+    if (isLong) {
+      body.append(' ');
+      this.m_classifier.render(this._getClassifierRenderer(), body);
+    }
     body.appendLineBreak();
-
   }
 
   /**
@@ -200,7 +209,7 @@ abstract class _PropertyBehaviorClustering<CT extends NamedCluster<?>>
    * @param body
    *          the target body
    */
-  final void _printHeader_A(final ISectionBody body) {
+  final void _printHeader_A(final ITextOutput body) {
     body.append("The "); //$NON-NLS-1$
     this.printLongName(body, ETextCase.IN_SENTENCE);
     body.append(

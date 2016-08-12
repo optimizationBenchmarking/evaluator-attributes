@@ -19,6 +19,8 @@ public final class ClusterUtils {
    *
    * @param cluster
    *          the cluster
+   * @param maxElementsForListing
+   *          the maximum number of instances that should be listed
    * @param textCase
    *          the text case
    * @param textOut
@@ -26,7 +28,8 @@ public final class ClusterUtils {
    * @return the next text case
    */
   public static final ETextCase listInstances(final ICluster cluster,
-      final ETextCase textCase, final ITextOutput textOut) {
+      final int maxElementsForListing, final ETextCase textCase,
+      final ITextOutput textOut) {
     ETextCase next;
 
     next = textCase.appendWord("cluster", textOut);//$NON-NLS-1$
@@ -37,7 +40,7 @@ public final class ClusterUtils {
     textOut.append(' ');
     next = TextUtils.appendElements(cluster.getInstances().getData(),
         "benchmark instance", "benchmark instances", //$NON-NLS-1$//$NON-NLS-2$
-        next, ESequenceMode.AND, textOut);
+        maxElementsForListing, next, ESequenceMode.AND, textOut);
     textOut.append('.');
     return next.nextAfterSentenceEnd();
   }
@@ -47,6 +50,8 @@ public final class ClusterUtils {
    *
    * @param cluster
    *          the cluster
+   * @param maxElementsForListing
+   *          the maximum number of experiments that should be listed
    * @param textCase
    *          the text case
    * @param textOut
@@ -54,7 +59,8 @@ public final class ClusterUtils {
    * @return the next text case
    */
   public static final ETextCase listExperiments(final ICluster cluster,
-      final ETextCase textCase, final ITextOutput textOut) {
+      final int maxElementsForListing, final ETextCase textCase,
+      final ITextOutput textOut) {
     ETextCase next;
 
     next = textCase.appendWord("cluster", textOut);//$NON-NLS-1$
@@ -65,7 +71,7 @@ public final class ClusterUtils {
     textOut.append(' ');
     next = TextUtils.appendElements(cluster.getData(), "algorithm setup", //$NON-NLS-1$
         "algorithm setups", //$NON-NLS-1$
-        next, ESequenceMode.AND, textOut);
+        maxElementsForListing, next, ESequenceMode.AND, textOut);
     textOut.append('.');
     return next.nextAfterSentenceEnd();
   }

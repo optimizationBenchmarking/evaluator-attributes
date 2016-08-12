@@ -67,6 +67,27 @@ public final class FeatureInstanceBehaviorClustering
 
   /** {@inheritDoc} */
   @Override
+  public ETextCase printDescription(final ITextOutput textOut,
+      final ETextCase textCase) {
+    this._printHeader_A(textOut);
+    textOut.append(
+        " benchmark instances on which the algorithm setups exhibit similar behavior. We then apply supervised Machine Learning, i.e., classification, to discover which benchmark instance features seem to be the reason for why a certain instance lands in one behavior cluster. The learned classifier is then used to induce the final set of clusters."); //$NON-NLS-1$
+    textOut.appendLineBreak();
+
+    super.printDescription(textOut, textCase);
+    textOut.append(
+        "We now use the single benchmark instance as vectors to be classified. Their features are, well, the benchmark instance features, namely "); //$NON-NLS-1$
+    ESequenceMode.AND.appendSequence(ETextCase.IN_SENTENCE,
+        this.getOwner().getFeatures().getData(), true, textOut);
+    this._printClassification(textOut, false);
+    textOut.append(
+        "The classifier is then applied to again classify all benchmark instances into clusters."); //$NON-NLS-1$
+
+    return textCase.nextAfterSentenceEnd();
+  }
+
+  /** {@inheritDoc} */
+  @Override
   public final void printLongDescription(final ISectionBody body) {
     final ILabel behavior, classifier;
 
@@ -75,7 +96,7 @@ public final class FeatureInstanceBehaviorClustering
 
     this._printHeader_A(body);
     body.append(
-        " benchmark instances on which the algorithm setups exhibit similar (see "); //$NON-NLS-1$
+        " benchmark instances on which the algorithm setups exhibit similar behavior (see "); //$NON-NLS-1$
     body.reference(ETextCase.IN_SENTENCE, ESequenceMode.AND, behavior);
     body.append(
         "). We then apply supervised Machine Learning, i.e., classification, to discover which benchmark instance features seem to be the reason for why a certain instance lands in one behavior cluster. The learned classifier is then used to induce the final set of clusters. This is described in "); //$NON-NLS-1$
@@ -98,7 +119,7 @@ public final class FeatureInstanceBehaviorClustering
             ". In other words, we use the single benchmark instance as vectors to be classified. Their features are, well, the benchmark instance features, namely "); //$NON-NLS-1$
         ESequenceMode.AND.appendSequence(ETextCase.IN_SENTENCE,
             this.getOwner().getFeatures().getData(), true, subBody);
-        this._printClassification(subBody);
+        this._printClassification(subBody, true);
         subBody.append(
             "The classifier is then applied to again classify all benchmark instances into clusters: "); //$NON-NLS-1$
         ClusterUtils.listClusters(this, subBody);

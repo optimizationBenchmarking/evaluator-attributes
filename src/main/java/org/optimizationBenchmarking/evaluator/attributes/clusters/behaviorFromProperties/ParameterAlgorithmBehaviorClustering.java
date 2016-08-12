@@ -67,6 +67,27 @@ public final class ParameterAlgorithmBehaviorClustering extends
 
   /** {@inheritDoc} */
   @Override
+  public ETextCase printDescription(final ITextOutput textOut,
+      final ETextCase textCase) {
+    this._printHeader_A(textOut);
+    textOut.append(
+        " algorithm setups that have similar behavior. We then apply classification to discover which algorithm setup parameters seem to be the reason for why a certain algorithm setup lands in one behavior cluster. The learned classifier is then used to induce the final set of clusters."); //$NON-NLS-1$
+    textOut.appendLineBreak();
+
+    super.printDescription(textOut, textCase);
+    textOut.append(
+        "We now use the single experiment setups as vectors to be classified. Their features are the algorithm parameters, namely "); //$NON-NLS-1$
+    ESequenceMode.AND.appendSequence(ETextCase.IN_SENTENCE,
+        this.getOwner().getParameters().getData(), true, textOut);
+    this._printClassification(textOut, false);
+    textOut.append(
+        "The classifier is then applied to again classify all algorithm setup into clusters."); //$NON-NLS-1$
+
+    return textCase.nextAfterSentenceEnd();
+  }
+
+  /** {@inheritDoc} */
+  @Override
   public final void printLongDescription(final ISectionBody body) {
     final ILabel behavior, classifier;
 
@@ -95,7 +116,9 @@ public final class ParameterAlgorithmBehaviorClustering extends
             behavior);
         subBody.append(
             ". In other words, we use the single experiment setups as vectors to be classified. Their features are the algorithm parameters, namely "); //$NON-NLS-1$
-        this._printClassification(subBody);
+        ESequenceMode.AND.appendSequence(ETextCase.IN_SENTENCE,
+            this.getOwner().getParameters().getData(), true, subBody);
+        this._printClassification(subBody, true);
         subBody.append(
             "The classifier is then applied to again classify all algorithm setups into clusters: "); //$NON-NLS-1$
         ClusterUtils.listClusters(this, subBody);

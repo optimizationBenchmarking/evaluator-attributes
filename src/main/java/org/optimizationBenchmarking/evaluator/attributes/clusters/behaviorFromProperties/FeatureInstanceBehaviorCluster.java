@@ -30,6 +30,19 @@ public final class FeatureInstanceBehaviorCluster
   @Override
   public ETextCase printDescription(final ITextOutput textOut,
       final ETextCase textCase) {
-    return ClusterUtils.listInstances(this, textCase, textOut);
+    return ClusterUtils.listInstances(this, 42, textCase, textOut);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public ETextCase printLongName(final ITextOutput textOut,
+      final ETextCase textCase) {
+    ETextCase next;
+    next = super.printLongName(textOut, textCase);
+    textOut.append(' ');
+    textOut.append('(');
+    next = ClusterUtils.listInstances(this, 3, next, textOut);
+    textOut.append(')');
+    return next;
   }
 }
