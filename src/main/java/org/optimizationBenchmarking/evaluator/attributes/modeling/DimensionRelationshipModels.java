@@ -139,7 +139,6 @@ public final class DimensionRelationshipModels {
             SemanticComponentSequenceable.wrap(fitters, false, true,
                 false),
             textOut, ESequenceMode.AND);
-        textOut.append(',');
         textOut.append(' ');
         next = textCase.appendWord("are", textOut);//$NON-NLS-1$
       }
@@ -170,7 +169,6 @@ public final class DimensionRelationshipModels {
         next = EListSequenceMode.ENUMERATION.appendSequence(next,
             SemanticComponentSequenceable.wrap(models, false, true, false),
             textOut, ESequenceMode.AND);
-        textOut.append(',');
       }
     }
 
