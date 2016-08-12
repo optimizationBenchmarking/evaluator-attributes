@@ -37,12 +37,6 @@ public final class ParameterAlgorithmBehaviorCluster
   @Override
   public ETextCase printLongName(final ITextOutput textOut,
       final ETextCase textCase) {
-    ETextCase next;
-    next = super.printLongName(textOut, textCase);
-    textOut.append(' ');
-    textOut.append('(');
-    next = ClusterUtils.listExperiments(this, 3, next, textOut);
-    textOut.append(')');
-    return next;
+    return ClusterUtils.listExperiments(this, 42, textCase, textOut);
   }
 }

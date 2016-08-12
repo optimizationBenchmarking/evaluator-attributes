@@ -36,13 +36,11 @@ public final class ClusterUtils {
     textOut.append(' ');
     next = cluster.printShortName(textOut, next);
     textOut.append(' ');
-    next = next.appendWord("contains", textOut);//$NON-NLS-1$
+    next = next.appendWord("with", textOut);//$NON-NLS-1$
     textOut.append(' ');
-    next = TextUtils.appendElements(cluster.getInstances().getData(),
+    return TextUtils.appendElements(cluster.getInstances().getData(),
         "benchmark instance", "benchmark instances", //$NON-NLS-1$//$NON-NLS-2$
         maxElementsForListing, next, ESequenceMode.AND, textOut);
-    textOut.append('.');
-    return next.nextAfterSentenceEnd();
   }
 
   /**
@@ -67,13 +65,11 @@ public final class ClusterUtils {
     textOut.append(' ');
     next = cluster.printShortName(textOut, next);
     textOut.append(' ');
-    next = next.appendWord("contains", textOut);//$NON-NLS-1$
+    next = next.appendWord("with", textOut);//$NON-NLS-1$
     textOut.append(' ');
-    next = TextUtils.appendElements(cluster.getData(), "algorithm setup", //$NON-NLS-1$
+    return TextUtils.appendElements(cluster.getData(), "algorithm setup", //$NON-NLS-1$
         "algorithm setups", //$NON-NLS-1$
         maxElementsForListing, next, ESequenceMode.AND, textOut);
-    textOut.append('.');
-    return next.nextAfterSentenceEnd();
   }
 
   /**
