@@ -2,8 +2,8 @@ package org.optimizationBenchmarking.evaluator.attributes.modeling;
 
 import java.util.logging.Logger;
 
+import org.optimizationBenchmarking.evaluator.attributes.functions.DimensionTransformation;
 import org.optimizationBenchmarking.evaluator.data.spec.EAttributeType;
-import org.optimizationBenchmarking.evaluator.data.spec.IDimension;
 import org.optimizationBenchmarking.evaluator.data.spec.IInstanceRuns;
 import org.optimizationBenchmarking.utils.ml.fitting.spec.IFittingResult;
 
@@ -26,9 +26,9 @@ public final class DimensionRelationshipAndData
    * @param dimY
    *          the model output dimension
    */
-  public DimensionRelationshipAndData(final IDimension dimX,
-      final IDimension dimY) {
-    super(EAttributeType.NEVER_STORED, dimX, dimY, 332287);
+  public DimensionRelationshipAndData(final DimensionTransformation dimX,
+      final DimensionTransformation dimY) {
+    super(EAttributeType.NEVER_STORED, dimX, dimY, false);
   }
 
   /** {@inheritDoc} */

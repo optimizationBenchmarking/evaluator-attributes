@@ -2,6 +2,7 @@ package org.optimizationBenchmarking.evaluator.attributes.clusters.behavior;
 
 import java.util.Arrays;
 
+import org.optimizationBenchmarking.evaluator.attributes.functions.DimensionTransformation;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperiment;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperimentSet;
 import org.optimizationBenchmarking.evaluator.data.spec.IInstanceRuns;
@@ -23,9 +24,15 @@ public final class InstanceBehaviorClusterer
    */
   public static final String CHOICE_INSTANCES_BY_ALGORITHM_BEHAVIOR = "instances by algorithm behavior"; //$NON-NLS-1$
 
+  /** the instance behavior clustering name */
+  private static final String NAME = "instanceBehavior";//$NON-NLS-1$
+
   /**
    * create instance behavior clusterer
    *
+   * @param transformations
+   *          the dimension transformations, or {@code null} if all
+   *          dimensions can be used directly
    * @param minClusters
    *          the minimum number of clusters ot be used, {@code -1} for
    *          undefined
@@ -33,19 +40,24 @@ public final class InstanceBehaviorClusterer
    *          the minimum number of clusters ot be used, {@code -1} for
    *          undefined
    */
-  public InstanceBehaviorClusterer(final int minClusters,
-      final int maxClusters) {
-    super(minClusters, maxClusters);
+  public InstanceBehaviorClusterer(
+      final DimensionTransformation[] transformations,
+      final int minClusters, final int maxClusters) {
+    super(transformations, minClusters, maxClusters,
+        InstanceBehaviorClusterer.NAME);
   }
 
   /**
    * create the instance behavior clusterer from a given configuration
    *
+   * @param experimentSet
+   *          the experiment set
    * @param config
    *          the configuration
    */
-  public InstanceBehaviorClusterer(final Configuration config) {
-    super(config);
+  public InstanceBehaviorClusterer(final IExperimentSet experimentSet,
+      final Configuration config) {
+    super(experimentSet, config, InstanceBehaviorClusterer.NAME);
   }
 
   /** {@inheritDoc} */
@@ -53,7 +65,8 @@ public final class InstanceBehaviorClusterer
   final InstanceBehaviorClustering _create(final IExperimentSet data,
       final int[] clustering, final INamedElementSet source,
       final ArrayListView<? extends INamedElement> names) {
-    return new InstanceBehaviorClustering(data, clustering, source, names);
+    return new InstanceBehaviorClustering(data, clustering, source, names,
+        this.m_pathComponentSuggestion);
   }
 
   /** {@inheritDoc} */

@@ -9,6 +9,8 @@ import java.util.logging.Logger;
 import org.optimizationBenchmarking.evaluator.attributes.OnlySharedInstances;
 import org.optimizationBenchmarking.evaluator.attributes.clusters.ClustererLoader;
 import org.optimizationBenchmarking.evaluator.attributes.clusters.IClustering;
+import org.optimizationBenchmarking.evaluator.attributes.functions.DimensionTransformation;
+import org.optimizationBenchmarking.evaluator.attributes.functions.DimensionTransformationParser;
 import org.optimizationBenchmarking.evaluator.attributes.modeling.DimensionRelationshipAndData;
 import org.optimizationBenchmarking.evaluator.attributes.modeling.DimensionRelationshipData;
 import org.optimizationBenchmarking.evaluator.data.spec.Attribute;
@@ -24,6 +26,7 @@ import org.optimizationBenchmarking.utils.MemoryUtils;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
 import org.optimizationBenchmarking.utils.config.Configuration;
 import org.optimizationBenchmarking.utils.hash.HashUtils;
+import org.optimizationBenchmarking.utils.math.functions.basic.Identity;
 import org.optimizationBenchmarking.utils.math.matrix.impl.DistanceMatrix;
 import org.optimizationBenchmarking.utils.ml.clustering.impl.DefaultClusterer;
 import org.optimizationBenchmarking.utils.ml.clustering.spec.IClusteringJob;
@@ -50,17 +53,35 @@ abstract class _BehaviorClusterer<CCT extends IClustering>
   private final int m_maxClusters;
 
   /**
+   * the dimension transformations, or {@code null} if all dimensions can
+   * be used directly
+   */
+  private final DimensionTransformation[] m_transformations;
+
+  /** the path component suggestion */
+  final String m_pathComponentSuggestion;
+
+  /**
    * create the clusterer
    *
+   * @param transformations
+   *          the dimension transformations, or {@code null} if all
+   *          dimensions can be used directly
    * @param minClusters
-   *          the minimum number of clusters ot be used, {@code -1} for
+   *          the minimum number of clusters to be used, {@code -1} for
    *          undefined
    * @param maxClusters
-   *          the minimum number of clusters ot be used, {@code -1} for
+   *          the minimum number of clusters to be used, {@code -1} for
    *          undefined
+   * @param baseName
+   *          the basic name
    */
-  _BehaviorClusterer(final int minClusters, final int maxClusters) {
+  _BehaviorClusterer(final DimensionTransformation[] transformations,
+      final int minClusters, final int maxClusters,
+      final String baseName) {
     super(EAttributeType.PERMANENTLY_STORED);
+
+    final MemoryTextOutput stringBuilder;
 
     if ((minClusters > 0) && (maxClusters > 0)
         && (minClusters > maxClusters)) {
@@ -75,20 +96,86 @@ abstract class _BehaviorClusterer<CCT extends IClustering>
 
     this.m_minClusters = minClusters;
     this.m_maxClusters = maxClusters;
+    this.m_transformations = transformations;
+
+    if (transformations != null) {
+      stringBuilder = new MemoryTextOutput();
+      stringBuilder.append(baseName);
+      for (final DimensionTransformation dimTrans : transformations) {
+        if ((dimTrans != null)
+            && (!(dimTrans.isIdentityTransformation()))) {
+          stringBuilder.append('_');
+          stringBuilder.append(dimTrans.getPathComponentSuggestion());
+        }
+      }
+      this.m_pathComponentSuggestion = stringBuilder.toString();
+    } else {
+      this.m_pathComponentSuggestion = baseName;
+    }
   }
 
   /**
    * create the clusterer
    *
+   * @param experimentSet
+   *          the experiment set
    * @param config
    *          the configuration
+   * @param baseName
+   *          the basic name
    */
-  _BehaviorClusterer(final Configuration config) {
-    this(
+  _BehaviorClusterer(final IExperimentSet experimentSet,
+      final Configuration config, final String baseName) {
+    this(_BehaviorClusterer.__getTransformations(experimentSet, config), //
         config.getInt(ClustererLoader.PARAM_MIN_GROUPS, -1,
             ClustererLoader.MAX_GROUPS, -1), //
         config.getInt(ClustererLoader.PARAM_MAX_GROUPS, -1,
-            ClustererLoader.MAX_GROUPS, -1));
+            ClustererLoader.MAX_GROUPS, -1),
+        baseName);
+  }
+
+  /**
+   * Get the transformation for the specified dimension
+   *
+   * @param dim
+   *          the dimension
+   * @return the transformation
+   */
+  private final DimensionTransformation __getTransformation(
+      final IDimension dim) {
+    return this.m_transformations[dim.getIndex()];
+  }
+
+  /**
+   * Get the dimension transformations from the given data
+   *
+   * @param experimentSet
+   *          the experiment set
+   * @param config
+   *          the configuration
+   * @return the transformations, or {@code null} if all dimensions can be
+   *         used directly
+   */
+  private static final DimensionTransformation[] __getTransformations(
+      final IExperimentSet experimentSet, final Configuration config) {
+    final ArrayListView<? extends IDimension> dimensions;
+    final DimensionTransformation[] transformations;
+    DimensionTransformationParser parser;
+    IDimension dimension;
+    String name;
+    int index;
+
+    dimensions = experimentSet.getDimensions().getData();
+
+    transformations = new DimensionTransformation[dimensions.size()];
+    parser = new DimensionTransformationParser(experimentSet);
+    for (index = transformations.length; (--index) >= 0;) {
+      dimension = dimensions.get(index);
+      name = dimension.getName();
+      transformations[index] = config.get(name, parser,
+          new DimensionTransformation(Identity.INSTANCE, dimension));
+    }
+    return transformations;
   }
 
   /**
@@ -171,7 +258,7 @@ abstract class _BehaviorClusterer<CCT extends IClustering>
    *          the experiment data
    * @return the attributes
    */
-  private static final DimensionRelationshipAndData[] __getFittingAttributes(
+  private final DimensionRelationshipAndData[] __getFittingAttributes(
       final IExperimentSet data) {
     final ArrayList<IDimension> time, objective;
     final ArrayList<DimensionRelationshipAndData> list;
@@ -183,7 +270,9 @@ abstract class _BehaviorClusterer<CCT extends IClustering>
 
     for (final IDimension timeDim : time) {
       for (final IDimension objDim : objective) {
-        list.add(new DimensionRelationshipAndData(timeDim, objDim));
+        list.add(new DimensionRelationshipAndData(//
+            this.__getTransformation(timeDim), //
+            this.__getTransformation(objDim)));
       }
     }
 
@@ -266,7 +355,7 @@ abstract class _BehaviorClusterer<CCT extends IClustering>
       what = null;
     }
 
-    attrs = _BehaviorClusterer.__getFittingAttributes(data);
+    attrs = this.__getFittingAttributes(data);
 
     elements = names.getData();
     size = elements.size();
@@ -381,8 +470,18 @@ abstract class _BehaviorClusterer<CCT extends IClustering>
   /** {@inheritDoc} */
   @Override
   protected int calcHashCode() {
-    return HashUtils.combineHashes(HashUtils.hashCode(this.m_maxClusters),
+    int hashCode;
+
+    hashCode = HashUtils.combineHashes(
+        HashUtils.hashCode(this.m_maxClusters),
         HashUtils.hashCode(this.m_minClusters));
+    for (final DimensionTransformation trafo : this.m_transformations) {
+      if ((trafo != null) && (!(trafo.isIdentityTransformation()))) {
+        hashCode = HashUtils.combineHashes(hashCode, trafo.hashCode());
+      }
+    }
+
+    return hashCode;
   }
 
   /** {@inheritDoc} */

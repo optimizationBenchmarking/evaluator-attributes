@@ -2,14 +2,18 @@ package org.optimizationBenchmarking.evaluator.attributes.modeling;
 
 import java.util.logging.Logger;
 
+import org.optimizationBenchmarking.evaluator.attributes.functions.DimensionTransformation;
 import org.optimizationBenchmarking.evaluator.data.spec.Attribute;
 import org.optimizationBenchmarking.evaluator.data.spec.EAttributeType;
-import org.optimizationBenchmarking.evaluator.data.spec.IDimension;
 import org.optimizationBenchmarking.evaluator.data.spec.IInstanceRuns;
 import org.optimizationBenchmarking.evaluator.data.spec.IRun;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
+import org.optimizationBenchmarking.utils.comparison.Compare;
 import org.optimizationBenchmarking.utils.hash.HashUtils;
+import org.optimizationBenchmarking.utils.math.functions.UnaryFunction;
+import org.optimizationBenchmarking.utils.math.matrix.AbstractMatrix;
 import org.optimizationBenchmarking.utils.math.matrix.impl.DoubleMatrix1D;
+import org.optimizationBenchmarking.utils.math.matrix.impl.LongMatrix1D;
 import org.optimizationBenchmarking.utils.ml.fitting.multi.MultiFunctionFitter;
 import org.optimizationBenchmarking.utils.ml.fitting.quality.WeightedRootMeanSquareError;
 import org.optimizationBenchmarking.utils.ml.fitting.spec.IFittingQualityMeasure;
@@ -22,15 +26,21 @@ import org.optimizationBenchmarking.utils.ml.fitting.spec.IFittingQualityMeasure
  */
 abstract class _ModelAttributeBase<R> extends Attribute<IInstanceRuns, R> {
 
+  /** return {@code long} data based on {@code long} data */
+  private static final int LONG_IN_LONG_OUT = 0;
+  /** return {@code double} data based on {@code long} inputs */
+  private static final int LONG_IN_DOUBLE_OUT = (_ModelAttributeBase.LONG_IN_LONG_OUT
+      + 1);
+  /** return {@code double} data based on {@code double} inputs */
+  private static final int DOUBLE_IN_DOUBLE_OUT = (_ModelAttributeBase.LONG_IN_DOUBLE_OUT
+      + 1);
+
   /** the dimension to be used as model input */
-  private final int m_dimX;
+  private final DimensionTransformation m_dimX;
   /** the dimension to be used as model output */
-  private final int m_dimY;
-  /**
-   * the dimension state: bit 0: x-dim is time? bit 1: y-dim is time, rest:
-   * distinguish classes
-   */
-  private final int m_dimTypesAndClazz;
+  private final DimensionTransformation m_dimY;
+  /** the class */
+  private final boolean m_class;
 
   /**
    * create the model attribute base.
@@ -41,20 +51,29 @@ abstract class _ModelAttributeBase<R> extends Attribute<IInstanceRuns, R> {
    *          the model input dimension
    * @param dimY
    *          the model output dimension
-   * @param dimTypesAndClass
-   *          the dimension state
+   * @param clazz
+   *          the class
    */
-  _ModelAttributeBase(final EAttributeType type, final int dimX,
-      final int dimY, final int dimTypesAndClass) {
+  _ModelAttributeBase(final EAttributeType type,
+      final DimensionTransformation dimX,
+      final DimensionTransformation dimY, final boolean clazz) {
     super(type);
 
+    if (dimX == null) {
+      throw new IllegalArgumentException("x dimension cannot be null."); //$NON-NLS-1$
+    }
+
+    if (dimY == null) {
+      throw new IllegalArgumentException("y dimension cannot be null."); //$NON-NLS-1$
+    }
+
     DimensionRelationshipModels._checkDimensions(
-        ((dimTypesAndClass & 1) != 0), //
-        ((dimTypesAndClass & 2) != 0));
+        dimX.getDimension().getDimensionType(),
+        dimY.getDimension().getDimensionType());
 
     this.m_dimX = dimX;
     this.m_dimY = dimY;
-    this.m_dimTypesAndClazz = dimTypesAndClass;
+    this.m_class = clazz;
   }
 
   /**
@@ -67,30 +86,9 @@ abstract class _ModelAttributeBase<R> extends Attribute<IInstanceRuns, R> {
    * @param copy
    *          the attribute to copy
    */
-  _ModelAttributeBase(final EAttributeType type, final int clazz,
+  _ModelAttributeBase(final EAttributeType type, final boolean clazz,
       final _ModelAttributeBase<?> copy) {
-    this(type, copy.m_dimX, copy.m_dimY,
-        ((copy.m_dimTypesAndClazz & 3) | (clazz << 2)));
-  }
-
-  /**
-   * create the model attribute base.
-   *
-   * @param type
-   *          the attribute type
-   * @param dimX
-   *          the model input dimension
-   * @param dimY
-   *          the model output dimension
-   * @param clazz
-   *          the class id
-   */
-  _ModelAttributeBase(final EAttributeType type, final IDimension dimX,
-      final IDimension dimY, final int clazz) {
-    this(type, dimX.getIndex(), dimY.getIndex(), //
-        ((dimX.getDimensionType().isTimeMeasure() ? 1 : 0) | //
-            (dimY.getDimensionType().isTimeMeasure() ? 1 : 0) | //
-            (clazz << 2)));
+    this(type, copy.m_dimX, copy.m_dimY, clazz);
   }
 
   /** {@inheritDoc} */
@@ -100,7 +98,7 @@ abstract class _ModelAttributeBase<R> extends Attribute<IInstanceRuns, R> {
         HashUtils.combineHashes(//
             HashUtils.hashCode(this.m_dimX), //
             HashUtils.hashCode(this.m_dimY)), //
-        HashUtils.hashCode(this.m_dimTypesAndClazz));//
+        HashUtils.hashCode(this.m_class));//
   }
 
   /** {@inheritDoc} */
@@ -113,11 +111,28 @@ abstract class _ModelAttributeBase<R> extends Attribute<IInstanceRuns, R> {
     }
     if (o instanceof _ModelAttributeBase) {
       eq = ((_ModelAttributeBase<?>) o);
-      return ((this.m_dimX == eq.m_dimX) && //
-          (this.m_dimY == eq.m_dimY) && //
-          (this.m_dimTypesAndClazz == eq.m_dimTypesAndClazz));
+      return ((Compare.equals(this.m_dimX, eq.m_dimX)) && //
+          (Compare.equals(this.m_dimY, eq.m_dimY)) && //
+          (this.m_class == eq.m_class));
     }
     return false;
+  }
+
+  /**
+   * compute the dimension type switch for a given dimension
+   *
+   * @param dim
+   *          the dimension
+   * @return the switch
+   */
+  private static final int __getDimSwitch(
+      final DimensionTransformation dim) {
+    if (dim.isIdentityTransformation() || dim.isLongArithmeticAccurate()) {
+      return (dim.getDimension().getDataType().isInteger()
+          ? _ModelAttributeBase.LONG_IN_LONG_OUT
+          : _ModelAttributeBase.LONG_IN_DOUBLE_OUT);
+    }
+    return _ModelAttributeBase.DOUBLE_IN_DOUBLE_OUT;
   }
 
   /**
@@ -127,33 +142,70 @@ abstract class _ModelAttributeBase<R> extends Attribute<IInstanceRuns, R> {
    *          the data
    * @return the matrix
    */
-  final DoubleMatrix1D _getDataMatrix(final IInstanceRuns data) {
+  final AbstractMatrix _getDataMatrix(final IInstanceRuns data) {
     final ArrayListView<? extends IRun> rawData;
-    final double[] matrixData;
+    final double[] doubleMatrixData;
+    final long[] longMatrixData;
+    final UnaryFunction x, y;
+    final int xFormat, yFormat, xIndex, yIndex;
 
-    int m, i, j;
+    int totalRows, outIndex, inIndex;
 
     rawData = data.getData();
-    m = 0;
+    totalRows = 0;
     for (final IRun run : rawData) {
-      m += run.m();
+      totalRows += run.m();
     }
 
-    i = (m << 1);
-    matrixData = new double[i];
-    for (final IRun run : rawData) {
-      for (j = run.m(); (--j) >= 0;) {
-        matrixData[--i] = run.getDouble(j, this.m_dimY);
-        matrixData[--i] = run.getDouble(j, this.m_dimX);
+    x = this.m_dimX.use(data);
+    xFormat = _ModelAttributeBase.__getDimSwitch(this.m_dimX);
+    xIndex = this.m_dimX.getDimension().getIndex();
+
+    y = this.m_dimY.use(data);
+    yFormat = _ModelAttributeBase.__getDimSwitch(this.m_dimY);
+    yIndex = this.m_dimX.getDimension().getIndex();
+
+    outIndex = (totalRows << 1);
+
+    if (Math.max(xFormat,
+        yFormat) >= _ModelAttributeBase.LONG_IN_DOUBLE_OUT) {
+
+      doubleMatrixData = new double[outIndex];
+      for (final IRun run : rawData) {
+        for (inIndex = run.m(); (--inIndex) >= 0;) {
+          doubleMatrixData[--outIndex] = //
+          ((yFormat <= _ModelAttributeBase.LONG_IN_DOUBLE_OUT)//
+              ? y.computeAsDouble(run.getLong(inIndex, yIndex))//
+              : y.computeAsDouble(run.getDouble(inIndex, yIndex)));
+          doubleMatrixData[--outIndex] = //
+          ((xFormat <= _ModelAttributeBase.LONG_IN_DOUBLE_OUT)//
+              ? x.computeAsDouble(run.getLong(inIndex, xIndex))//
+              : x.computeAsDouble(run.getDouble(inIndex, xIndex)));
+        }
+      }
+
+      if (outIndex == 0) {
+        return new DoubleMatrix1D(doubleMatrixData, totalRows, 2);
+      }
+    } else {
+
+      longMatrixData = new long[outIndex];
+      for (final IRun run : rawData) {
+        for (inIndex = run.m(); (--inIndex) >= 0;) {
+          longMatrixData[--outIndex] = y
+              .computeAsLong(run.getLong(inIndex, yIndex));
+
+          longMatrixData[--outIndex] = x
+              .computeAsLong(run.getLong(inIndex, xIndex));
+        }
+      }
+
+      if (outIndex == 0) {
+        return new LongMatrix1D(longMatrixData, totalRows, 2);
       }
     }
 
-    if (i != 0) {
-      throw new IllegalStateException(
-          "The lengths of the runs changed???"); //$NON-NLS-1$
-    }
-
-    return new DoubleMatrix1D(matrixData, m, 2);
+    throw new IllegalStateException("The lengths of the runs changed?"); //$NON-NLS-1$
   }
 
   /**
@@ -163,7 +215,7 @@ abstract class _ModelAttributeBase<R> extends Attribute<IInstanceRuns, R> {
    *          the matrix
    * @return the measure
    */
-  final IFittingQualityMeasure _getMeasure(final DoubleMatrix1D matrix) {
+  final IFittingQualityMeasure _getMeasure(final AbstractMatrix matrix) {
     return new WeightedRootMeanSquareError(matrix);
   }
 
@@ -178,7 +230,7 @@ abstract class _ModelAttributeBase<R> extends Attribute<IInstanceRuns, R> {
    */
   final DimensionRelationshipData _compute(final IInstanceRuns data,
       final Logger logger) {
-    final DoubleMatrix1D matrix;
+    final AbstractMatrix matrix;
     final IFittingQualityMeasure measure;
 
     matrix = this._getDataMatrix(data);
@@ -189,8 +241,7 @@ abstract class _ModelAttributeBase<R> extends Attribute<IInstanceRuns, R> {
             .setLogger(logger)//
             .setFitters(DimensionRelationshipModels._getFitters())//
             .setFunctionsToFit(DimensionRelationshipModels.getModels(//
-                ((this.m_dimTypesAndClazz & 1) != 0), //
-                ((this.m_dimTypesAndClazz & 2) != 0)))//
+                this.m_dimX.getDimension(), this.m_dimY.getDimension()))//
             .setQualityMeasure(measure)//
             .setPoints(matrix).create().call(), //
         measure);

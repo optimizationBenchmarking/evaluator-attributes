@@ -30,11 +30,14 @@ public final class FeatureInstanceBehaviorClusterer
   /**
    * create the instance behavior clusterer from a given configuration
    *
+   * @param experimentSet
+   *          the experiment set
    * @param config
    *          the configuration
    */
-  public FeatureInstanceBehaviorClusterer(final Configuration config) {
-    super(new InstanceBehaviorClusterer(config));
+  public FeatureInstanceBehaviorClusterer(
+      final IExperimentSet experimentSet, final Configuration config) {
+    super(new InstanceBehaviorClusterer(experimentSet, config));
   }
 
   /** {@inheritDoc} */

@@ -87,6 +87,11 @@ abstract class _ClassifierRenderer
     final ArrayListView<? extends IPropertyValue> data;
 
     property = this._getProperty(featureIndex);
+    if (property == null) {
+      throw new IllegalArgumentException(//
+          "There is no property with index " //$NON-NLS-1$
+              + featureIndex);
+    }
     type = property.getPrimitiveType();
 
     if (type != null) {

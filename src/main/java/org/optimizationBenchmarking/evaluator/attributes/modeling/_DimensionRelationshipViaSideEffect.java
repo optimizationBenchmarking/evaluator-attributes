@@ -23,7 +23,7 @@ final class _DimensionRelationshipViaSideEffect
    */
   public _DimensionRelationshipViaSideEffect(
       final DimensionRelationshipAndData owner) {
-    super(EAttributeType.PERMANENTLY_STORED, 112261, owner);
+    super(EAttributeType.PERMANENTLY_STORED, true, owner);
   }
 
   /** {@inheritDoc} */

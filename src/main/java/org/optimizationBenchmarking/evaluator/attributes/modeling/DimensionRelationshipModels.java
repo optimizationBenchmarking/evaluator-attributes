@@ -1,5 +1,6 @@
 package org.optimizationBenchmarking.evaluator.attributes.modeling;
 
+import org.optimizationBenchmarking.evaluator.data.spec.EDimensionType;
 import org.optimizationBenchmarking.evaluator.data.spec.IDimension;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
 import org.optimizationBenchmarking.utils.document.impl.EListSequenceMode;
@@ -30,6 +31,28 @@ public final class DimensionRelationshipModels {
   /**
    * Check whether the given modeling constellation is viable
    *
+   * @param x
+   *          the type of the {@code x} (or input) dimension
+   * @param y
+   *          the type of the {@code y} (or output) dimension
+   */
+  static final void _checkDimensions(final EDimensionType x,
+      final EDimensionType y) {
+    if (x == null) {
+      throw new IllegalArgumentException(
+          "x dimension type cannot be null.");//$NON-NLS-1$
+    }
+    if (y == null) {
+      throw new IllegalArgumentException(
+          "y dimension type cannot be null.");//$NON-NLS-1$
+    }
+    DimensionRelationshipModels.__checkDimensions(x.isTimeMeasure(),
+        y.isTimeMeasure());
+  }
+
+  /**
+   * Check whether the given modeling constellation is viable
+   *
    * @param isXTime
    *          is the {@code x}-dimension a time dimension ({@code true}) or
    *          an objective dimension ({@code false})
@@ -37,7 +60,7 @@ public final class DimensionRelationshipModels {
    *          is the {@code y}-dimension a time dimension ({@code true}) or
    *          an objective dimension ({@code false})
    */
-  static final void _checkDimensions(final boolean isXTime,
+  private static final void __checkDimensions(final boolean isXTime,
       final boolean isYTime) {
     if (isYTime && (!isXTime)) {
       throw new IllegalArgumentException(//
@@ -49,16 +72,31 @@ public final class DimensionRelationshipModels {
    * Obtain the models for a given dimension relationship
    *
    * @param x
-   *          the input dimension
+   *          the {@code x} dimension type
    * @param y
-   *          the output dimension
+   *          the {@code y} dimension type
+   * @return the list of models
+   */
+  public static final ArrayListView<ParametricUnaryFunction> getModels(
+      final EDimensionType x, final EDimensionType y) {
+    DimensionRelationshipModels._checkDimensions(x, y);
+    return DimensionRelationshipModels.getModels(x.isTimeMeasure(),
+        y.isTimeMeasure());
+  }
+
+  /**
+   * Obtain the models for a given dimension relationship
+   *
+   * @param x
+   *          the {@code x} dimension
+   * @param y
+   *          the {@code y} dimension
    * @return the list of models
    */
   public static final ArrayListView<ParametricUnaryFunction> getModels(
       final IDimension x, final IDimension y) {
-    return DimensionRelationshipModels.getModels(
-        x.getDimensionType().isTimeMeasure(),
-        y.getDimensionType().isTimeMeasure());
+    return DimensionRelationshipModels.getModels(x.getDimensionType(),
+        y.getDimensionType());
   }
 
   /**
@@ -74,7 +112,7 @@ public final class DimensionRelationshipModels {
    */
   public static final ArrayListView<ParametricUnaryFunction> getModels(
       final boolean isXTime, final boolean isYTime) {
-    DimensionRelationshipModels._checkDimensions(isXTime, isYTime);
+    DimensionRelationshipModels.__checkDimensions(isXTime, isYTime);
     if (isXTime == isYTime) {
       return __EqualType.MODELS;
     }

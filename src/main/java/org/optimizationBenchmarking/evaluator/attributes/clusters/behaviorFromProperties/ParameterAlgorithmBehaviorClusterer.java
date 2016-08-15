@@ -31,11 +31,14 @@ public final class ParameterAlgorithmBehaviorClusterer
   /**
    * create the instance behavior clusterer from a given configuration
    *
+   * @param experimentSet
+   *          the experiment set
    * @param config
    *          the configuration
    */
-  public ParameterAlgorithmBehaviorClusterer(final Configuration config) {
-    super(new AlgorithmBehaviorClusterer(config));
+  public ParameterAlgorithmBehaviorClusterer(
+      final IExperimentSet experimentSet, final Configuration config) {
+    super(new AlgorithmBehaviorClusterer(experimentSet, config));
   }
 
   /** {@inheritDoc} */

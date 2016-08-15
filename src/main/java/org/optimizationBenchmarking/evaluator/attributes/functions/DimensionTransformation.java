@@ -35,7 +35,7 @@ public final class DimensionTransformation extends Transformation
    * @param dimension
    *          the dimension
    */
-  DimensionTransformation(final UnaryFunction function,
+  public DimensionTransformation(final UnaryFunction function,
       final IDimension dimension) {
     super(function);
 

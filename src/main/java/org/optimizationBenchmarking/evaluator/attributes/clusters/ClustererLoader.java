@@ -55,16 +55,16 @@ public final class ClustererLoader {
         return PropertyValueSelector.configure(data, config);
       }
       case InstanceBehaviorClusterer.CHOICE_INSTANCES_BY_ALGORITHM_BEHAVIOR: {
-        return new InstanceBehaviorClusterer(config);
+        return new InstanceBehaviorClusterer(data, config);
       }
       case FeatureInstanceBehaviorClusterer.CHOICE_INSTANCES_BY_ALGORITHM_BEHAVIOR_AND_FEATURES: {
-        return new FeatureInstanceBehaviorClusterer(config);
+        return new FeatureInstanceBehaviorClusterer(data, config);
       }
       case AlgorithmBehaviorClusterer.CHOICE_ALGORITHMS_BY_ALGORITHM_BEHAVIOR: {
-        return new AlgorithmBehaviorClusterer(config);
+        return new AlgorithmBehaviorClusterer(data, config);
       }
       case ParameterAlgorithmBehaviorClusterer.CHOICE_ALGORITHMS_BY_ALGORITHM_BEHAVIOR_AND_PARAMETERS: {
-        return new ParameterAlgorithmBehaviorClusterer(config);
+        return new ParameterAlgorithmBehaviorClusterer(data, config);
       }
       default: {
         throw new IllegalArgumentException(((//

@@ -3,12 +3,14 @@ package test.junit.org.optimizationBenchmarking.evaluator.attributes.modeling;
 import java.util.Random;
 
 import org.junit.Assert;
+import org.optimizationBenchmarking.evaluator.attributes.functions.DimensionTransformation;
 import org.optimizationBenchmarking.evaluator.attributes.modeling.DimensionRelationship;
 import org.optimizationBenchmarking.evaluator.data.spec.IDimension;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperimentSet;
 import org.optimizationBenchmarking.evaluator.data.spec.IInstanceRuns;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
 import org.optimizationBenchmarking.utils.math.MathUtils;
+import org.optimizationBenchmarking.utils.math.functions.basic.Identity;
 import org.optimizationBenchmarking.utils.ml.fitting.impl.DefaultFunctionFitter;
 import org.optimizationBenchmarking.utils.ml.fitting.multi.MultiFunctionFitter;
 import org.optimizationBenchmarking.utils.ml.fitting.spec.IFittingResult;
@@ -101,6 +103,8 @@ public class DimensionRelationshipTest extends
       dimB = temp;
     }
 
-    return new DimensionRelationship(dimA, dimB);
+    return new DimensionRelationship(
+        new DimensionTransformation(Identity.INSTANCE, dimA),
+        new DimensionTransformation(Identity.INSTANCE, dimB));
   }
 }

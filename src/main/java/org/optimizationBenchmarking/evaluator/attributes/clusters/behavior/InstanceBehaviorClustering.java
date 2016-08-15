@@ -15,6 +15,9 @@ import org.optimizationBenchmarking.utils.text.textOutput.ITextOutput;
 public final class InstanceBehaviorClustering
     extends _BehaviorClustering<InstanceBehaviorCluster> {
 
+  /** the path component suggestion */
+  private final String m_pathComponentSuggestion;
+
   /**
    * create the instance behavior clustering
    *
@@ -26,11 +29,16 @@ public final class InstanceBehaviorClustering
    *          the source where to draw the named elements from
    * @param names
    *          the names
+   * @param pathComponentSuggestion
+   *          the path component suggestion
    */
   InstanceBehaviorClustering(final IExperimentSet owner,
       final int[] clusters, final INamedElementSet source,
-      final ArrayListView<? extends INamedElement> names) {
+      final ArrayListView<? extends INamedElement> names,
+      final String pathComponentSuggestion) {
     super(owner, clusters, source, names);
+    this.m_pathComponentSuggestion = (pathComponentSuggestion
+        + this.getData().size());
   }
 
   /** {@inheritDoc} */
@@ -76,6 +84,6 @@ public final class InstanceBehaviorClustering
   /** {@inheritDoc} */
   @Override
   public final String getPathComponentSuggestion() {
-    return "instanceBehavior" + this.getData().size(); //$NON-NLS-1$
+    return this.m_pathComponentSuggestion;
   }
 }

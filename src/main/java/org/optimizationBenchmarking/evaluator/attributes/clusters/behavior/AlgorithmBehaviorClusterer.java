@@ -2,6 +2,7 @@ package org.optimizationBenchmarking.evaluator.attributes.clusters.behavior;
 
 import java.util.Arrays;
 
+import org.optimizationBenchmarking.evaluator.attributes.functions.DimensionTransformation;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperiment;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperimentSet;
 import org.optimizationBenchmarking.evaluator.data.spec.IInstance;
@@ -24,9 +25,14 @@ public final class AlgorithmBehaviorClusterer
    */
   public static final String CHOICE_ALGORITHMS_BY_ALGORITHM_BEHAVIOR = "algorithms by behavior"; //$NON-NLS-1$
 
+  /** the algorithm behavior clustering name */
+  private static final String NAME = "algorithmBehavior";//$NON-NLS-1$
+
   /**
    * create algorithm behavior clusterer
    *
+   * @param transformations
+   *          the dimension transformations
    * @param minClusters
    *          the minimum number of clusters ot be used, {@code -1} for
    *          undefined
@@ -34,19 +40,24 @@ public final class AlgorithmBehaviorClusterer
    *          the minimum number of clusters ot be used, {@code -1} for
    *          undefined
    */
-  public AlgorithmBehaviorClusterer(final int minClusters,
-      final int maxClusters) {
-    super(minClusters, maxClusters);
+  public AlgorithmBehaviorClusterer(
+      final DimensionTransformation[] transformations,
+      final int minClusters, final int maxClusters) {
+    super(transformations, minClusters, maxClusters,
+        AlgorithmBehaviorClusterer.NAME);
   }
 
   /**
    * create the algorithm behavior clusterer from a given configuration
    *
+   * @param experimentSet
+   *          the experiment set
    * @param config
    *          the configuration
    */
-  public AlgorithmBehaviorClusterer(final Configuration config) {
-    super(config);
+  public AlgorithmBehaviorClusterer(final IExperimentSet experimentSet,
+      final Configuration config) {
+    super(experimentSet, config, AlgorithmBehaviorClusterer.NAME);
   }
 
   /** {@inheritDoc} */
@@ -54,8 +65,8 @@ public final class AlgorithmBehaviorClusterer
   final AlgorithmBehaviorClustering _create(final IExperimentSet data,
       final int[] clustering, final INamedElementSet source,
       final ArrayListView<? extends INamedElement> names) {
-    return new AlgorithmBehaviorClustering(data, clustering, source,
-        names);
+    return new AlgorithmBehaviorClustering(data, clustering, source, names,
+        this.m_pathComponentSuggestion);
   }
 
   /** {@inheritDoc} */
