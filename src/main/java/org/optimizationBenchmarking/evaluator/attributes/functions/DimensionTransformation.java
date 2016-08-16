@@ -1,11 +1,13 @@
 package org.optimizationBenchmarking.evaluator.attributes.functions;
 
 import org.optimizationBenchmarking.evaluator.data.spec.IDimension;
+import org.optimizationBenchmarking.utils.comparison.Compare;
 import org.optimizationBenchmarking.utils.document.impl.SemanticComponentUtils;
 import org.optimizationBenchmarking.utils.document.spec.IComplexText;
 import org.optimizationBenchmarking.utils.document.spec.IMath;
 import org.optimizationBenchmarking.utils.document.spec.IParameterRenderer;
 import org.optimizationBenchmarking.utils.document.spec.ISemanticMathComponent;
+import org.optimizationBenchmarking.utils.hash.HashUtils;
 import org.optimizationBenchmarking.utils.io.paths.PathUtils;
 import org.optimizationBenchmarking.utils.math.functions.UnaryFunction;
 import org.optimizationBenchmarking.utils.math.functions.basic.Identity;
@@ -175,6 +177,32 @@ public final class DimensionTransformation extends Transformation
     mto = new MemoryTextOutput();
     this.mathRender(mto, DefaultParameterRenderer.INSTANCE);
     return mto.toString();
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public final int hashCode() {
+    if (this.m_hashCode == 0) {
+      this.m_hashCode = HashUtils.combineHashes(//
+          HashUtils.hashCode(this.m_func), //
+          HashUtils.hashCode(this.m_dimension));
+    }
+    return this.m_hashCode;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public final boolean equals(final Object o) {
+    final DimensionTransformation other;
+    if (o == this) {
+      return true;
+    }
+    if ((o != null) && (o.getClass() == this.getClass())) {
+      other = ((DimensionTransformation) o);
+      return Compare.equals(this.m_func, other.m_func) && Compare
+          .equals(this.m_dimension.getName(), other.m_dimension.getName());
+    }
+    return false;
   }
 
   /** The internal parameter renderer class. */

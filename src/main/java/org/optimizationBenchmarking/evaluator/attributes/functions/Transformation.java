@@ -3,7 +3,7 @@ package org.optimizationBenchmarking.evaluator.attributes.functions;
 import org.optimizationBenchmarking.evaluator.data.spec.IDataElement;
 import org.optimizationBenchmarking.utils.ICloneable;
 import org.optimizationBenchmarking.utils.comparison.Compare;
-import org.optimizationBenchmarking.utils.hash.HashObject;
+import org.optimizationBenchmarking.utils.hash.HashUtils;
 import org.optimizationBenchmarking.utils.math.functions.UnaryFunction;
 import org.optimizationBenchmarking.utils.math.functions.basic.Identity;
 import org.optimizationBenchmarking.utils.math.text.DefaultParameterRenderer;
@@ -14,10 +14,13 @@ import org.optimizationBenchmarking.utils.text.textOutput.MemoryTextOutput;
  * and transforms potentially them based on information obtain from
  * experiment parameters or instance features.
  */
-public class Transformation extends HashObject {
+public class Transformation {
 
   /** the function to be applied to the input data */
   final UnaryFunction m_func;
+
+  /** the internal hash code */
+  int m_hashCode;
 
   /**
    * Create the data transformation
@@ -41,12 +44,6 @@ public class Transformation extends HashObject {
    */
   public Transformation() {
     this(Identity.INSTANCE);
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  protected int calcHashCode() {
-    return this.m_func.hashCode();
   }
 
   /**
@@ -115,11 +112,20 @@ public class Transformation extends HashObject {
 
   /** {@inheritDoc} */
   @Override
-  public final boolean equals(final Object o) {
+  public int hashCode() {
+    if (this.m_hashCode == 0) {
+      this.m_hashCode = HashUtils.hashCode(this.m_func);
+    }
+    return this.m_hashCode;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public boolean equals(final Object o) {
     if (o == this) {
       return true;
     }
-    if (o instanceof Transformation) {
+    if ((o != null) && (o.getClass() == this.getClass())) {
       return Compare.equals(this.m_func, ((Transformation) o).m_func);
     }
     return false;

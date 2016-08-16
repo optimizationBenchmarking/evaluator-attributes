@@ -16,7 +16,6 @@ import org.optimizationBenchmarking.evaluator.attributes.modeling.DimensionRelat
 import org.optimizationBenchmarking.evaluator.data.spec.Attribute;
 import org.optimizationBenchmarking.evaluator.data.spec.EAttributeType;
 import org.optimizationBenchmarking.evaluator.data.spec.EDimensionType;
-import org.optimizationBenchmarking.evaluator.data.spec.IDataElement;
 import org.optimizationBenchmarking.evaluator.data.spec.IDimension;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperimentSet;
 import org.optimizationBenchmarking.evaluator.data.spec.IInstanceRuns;
@@ -55,8 +54,7 @@ abstract class _BehaviorClusterer<CCT extends IClustering>
   private final int m_maxClusters;
 
   /**
-   * the dimension transformations, or {@code null} if all dimensions can
-   * be used directly
+   * the dimension transformations
    */
   private final DimensionTransformation[] m_transformations;
 
@@ -70,8 +68,7 @@ abstract class _BehaviorClusterer<CCT extends IClustering>
    * create the clusterer
    *
    * @param transformations
-   *          the dimension transformations, or {@code null} if all
-   *          dimensions can be used directly
+   *          the dimension transformations
    * @param minClusters
    *          the minimum number of clusters to be used, {@code -1} for
    *          undefined
@@ -166,32 +163,18 @@ abstract class _BehaviorClusterer<CCT extends IClustering>
    *          the experiment set
    * @param config
    *          the configuration
-   * @return the transformations, or {@code null} if all dimensions can be
-   *         used directly
+   * @return the transformations
    */
   private static final DimensionTransformation[] __getTransformations(
       final IExperimentSet experimentSet, final Configuration config) {
     final ArrayListView<? extends IDimension> dimensions;
     final DimensionTransformation[] transformations;
     DimensionTransformationParser parser;
-    IDataElement element;
-    IExperimentSet top;
     IDimension dimension;
     String name;
     int index;
 
-    top = null;
-    for (element = experimentSet; element != null; element = element
-        .getOwner()) {
-      if (element instanceof IExperimentSet) {
-        top = ((IExperimentSet) element);
-      }
-    }
-    if (top == null) {
-      throw new IllegalArgumentException("Did not find experiment set?"); //$NON-NLS-1$
-    }
-
-    dimensions = top.getDimensions().getData();
+    dimensions = experimentSet.getDimensions().getData();
 
     transformations = new DimensionTransformation[dimensions.size()];
     parser = new DimensionTransformationParser(experimentSet);

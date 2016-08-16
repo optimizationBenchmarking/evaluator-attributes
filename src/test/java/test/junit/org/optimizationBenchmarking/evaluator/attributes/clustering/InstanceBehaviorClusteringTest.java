@@ -3,6 +3,11 @@ package test.junit.org.optimizationBenchmarking.evaluator.attributes.clustering;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.optimizationBenchmarking.evaluator.attributes.clusters.behavior.InstanceBehaviorClusterer;
+import org.optimizationBenchmarking.evaluator.attributes.functions.DimensionTransformation;
+import org.optimizationBenchmarking.evaluator.data.spec.IDimension;
+import org.optimizationBenchmarking.evaluator.data.spec.IExperimentSet;
+import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
+import org.optimizationBenchmarking.utils.math.functions.basic.Identity;
 import org.optimizationBenchmarking.utils.ml.clustering.impl.DefaultClusterer;
 
 import shared.junit.CategorySlowTests;
@@ -13,7 +18,41 @@ public class InstanceBehaviorClusteringTest extends ClusteringTest {
 
   /** create */
   public InstanceBehaviorClusteringTest() {
-    super(new InstanceBehaviorClusterer(null, -1, -1));
+    super(null);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  protected InstanceBehaviorClusterer getAttribute(
+      final IExperimentSet experimentSet, final IExperimentSet data) {
+    return new InstanceBehaviorClusterer(
+        InstanceBehaviorClusteringTest.__getTransformations(experimentSet),
+        -1, -1);
+  }
+
+  /**
+   * Get the dimension transformations from the given data
+   *
+   * @param experimentSet
+   *          the experiment set
+   * @return the transformations
+   */
+  private static final DimensionTransformation[] __getTransformations(
+      final IExperimentSet experimentSet) {
+    final ArrayListView<? extends IDimension> dimensions;
+    final DimensionTransformation[] transformations;
+    IDimension dimension;
+    int index;
+
+    dimensions = experimentSet.getDimensions().getData();
+
+    transformations = new DimensionTransformation[dimensions.size()];
+    for (index = transformations.length; (--index) >= 0;) {
+      dimension = dimensions.get(index);
+      transformations[index] = new DimensionTransformation(
+          Identity.INSTANCE, dimension);
+    }
+    return transformations;
   }
 
   /** {@inheritDoc} */
