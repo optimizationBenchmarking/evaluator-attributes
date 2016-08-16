@@ -20,6 +20,7 @@ import org.optimizationBenchmarking.evaluator.data.spec.IPropertySetting;
 import org.optimizationBenchmarking.evaluator.data.spec.IPropertyValue;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
 import org.optimizationBenchmarking.utils.comparison.Compare;
+import org.optimizationBenchmarking.utils.hash.HashUtils;
 import org.optimizationBenchmarking.utils.ml.classification.impl.DefaultClassifierTrainer;
 import org.optimizationBenchmarking.utils.ml.classification.impl.abstr.ClassificationTools;
 import org.optimizationBenchmarking.utils.ml.classification.impl.multi.MultiClassifierTrainer;
@@ -45,11 +46,11 @@ abstract class _PropertyBehaviorClusterer<ET extends INamedElement>
   static final IClassifierQualityMeasure<?> CLASSIFIER_QUALITY_MEASURE = MCC.INSTANCE;
 
   /** the used trainers */
-  static final ArrayListView<IClassifierTrainer> TRAINERS = DefaultClassifierTrainer
-      .getAllInstance();
+  static final ArrayListView<IClassifierTrainer> TRAINERS = //
+  DefaultClassifierTrainer.getAllInstance();
 
   /** the behavior clusterer */
-  final Attribute<IExperimentSet, ? extends IClustering> m_behaviorClusterer;
+  private final Attribute<IExperimentSet, ? extends IClustering> m_behaviorClusterer;
 
   /**
    * create the clusterer
@@ -339,6 +340,13 @@ abstract class _PropertyBehaviorClusterer<ET extends INamedElement>
       return Compare.equals(this.m_behaviorClusterer,
           ((_PropertyBehaviorClusterer) o).m_behaviorClusterer);
     }
-    return true;
+    return false;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public final int hashCode() {
+    return HashUtils.combineHashes(this.getClass().hashCode(),
+        this.m_behaviorClusterer.hashCode());
   }
 }

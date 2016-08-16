@@ -45,7 +45,7 @@ import org.optimizationBenchmarking.utils.text.TextUtils;
  * </li>
  * </ul>
  */
-public class StatisticsAtSelection
+public final class StatisticsAtSelection
     extends Attribute<IDataElement, Number> {
 
   /** the instance-runs based statistics */
@@ -58,6 +58,9 @@ public class StatisticsAtSelection
    * s.
    */
   private final StatisticalParameter m_aggregate;
+
+  /** the hash code */
+  private final int m_hashCode;
 
   /**
    * Create a statistics computer for a given selection criterion
@@ -86,6 +89,9 @@ public class StatisticsAtSelection
     this.m_runs = new InstanceRunsStatisticsAtSelection(selection,
         dimension, parameter);
     this.m_aggregate = ((aggregate == null) ? Median.INSTANCE : aggregate);
+    this.m_hashCode = HashUtils.combineHashes(//
+        HashUtils.hashCode(this.m_aggregate), //
+        HashUtils.hashCode(this.m_runs));
   }
 
   /** {@inheritDoc} */
@@ -162,10 +168,8 @@ public class StatisticsAtSelection
 
   /** {@inheritDoc} */
   @Override
-  protected final int calcHashCode() {
-    return HashUtils.combineHashes(//
-        HashUtils.hashCode(this.m_aggregate), //
-        HashUtils.hashCode(this.m_runs));
+  public final int hashCode() {
+    return this.m_hashCode;
   }
 
   /** {@inheritDoc} */

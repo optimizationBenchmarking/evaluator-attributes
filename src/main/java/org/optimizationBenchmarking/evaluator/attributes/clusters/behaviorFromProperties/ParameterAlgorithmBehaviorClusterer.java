@@ -12,7 +12,6 @@ import org.optimizationBenchmarking.evaluator.data.spec.IProperty;
 import org.optimizationBenchmarking.evaluator.data.spec.IPropertySetting;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
 import org.optimizationBenchmarking.utils.config.Configuration;
-import org.optimizationBenchmarking.utils.hash.HashUtils;
 import org.optimizationBenchmarking.utils.ml.classification.spec.IClassifier;
 
 /**
@@ -39,13 +38,6 @@ public final class ParameterAlgorithmBehaviorClusterer
   public ParameterAlgorithmBehaviorClusterer(
       final IExperimentSet experimentSet, final Configuration config) {
     super(new AlgorithmBehaviorClusterer(experimentSet, config));
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  protected final int calcHashCode() {
-    return HashUtils.combineHashes(
-        HashUtils.hashCode(this.m_behaviorClusterer), 177634489);
   }
 
   /** {@inheritDoc} */

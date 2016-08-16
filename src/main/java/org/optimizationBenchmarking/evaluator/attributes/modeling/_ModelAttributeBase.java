@@ -41,6 +41,8 @@ abstract class _ModelAttributeBase<R> extends Attribute<IInstanceRuns, R> {
   private final DimensionTransformation m_dimY;
   /** the class */
   private final boolean m_class;
+  /** the internal hash code */
+  private final int m_hashCode;
 
   /**
    * create the model attribute base.
@@ -74,6 +76,11 @@ abstract class _ModelAttributeBase<R> extends Attribute<IInstanceRuns, R> {
     this.m_dimX = dimX;
     this.m_dimY = dimY;
     this.m_class = clazz;
+    this.m_hashCode = HashUtils.combineHashes(//
+        HashUtils.combineHashes(//
+            HashUtils.hashCode(this.m_dimX), //
+            HashUtils.hashCode(this.m_dimY)), //
+        HashUtils.hashCode(this.m_class));
   }
 
   /**
@@ -93,12 +100,8 @@ abstract class _ModelAttributeBase<R> extends Attribute<IInstanceRuns, R> {
 
   /** {@inheritDoc} */
   @Override
-  protected final int calcHashCode() {
-    return HashUtils.combineHashes(//
-        HashUtils.combineHashes(//
-            HashUtils.hashCode(this.m_dimX), //
-            HashUtils.hashCode(this.m_dimY)), //
-        HashUtils.hashCode(this.m_class));//
+  public final int hashCode() {
+    return this.m_hashCode;
   }
 
   /** {@inheritDoc} */

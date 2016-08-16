@@ -13,6 +13,7 @@ import org.optimizationBenchmarking.utils.comparison.Compare;
 import org.optimizationBenchmarking.utils.document.spec.IMath;
 import org.optimizationBenchmarking.utils.document.spec.IParameterRenderer;
 import org.optimizationBenchmarking.utils.document.spec.IText;
+import org.optimizationBenchmarking.utils.hash.HashUtils;
 import org.optimizationBenchmarking.utils.math.NumericalTypes;
 import org.optimizationBenchmarking.utils.parsers.NumberParser;
 import org.optimizationBenchmarking.utils.text.textOutput.ITextOutput;
@@ -285,5 +286,32 @@ final class _BoundConstant extends _DataBasedConstant {
       name.append(this.m_upper ? _BoundConstant.UPPER_BOUND_END
           : _BoundConstant.LOWER_BOUND_END);
     }
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public final int hashCode() {
+    return HashUtils.combineHashes(
+        HashUtils.combineHashes(HashUtils.hashCode(this.m_upper),
+            HashUtils.hashCode(this.m_defaultBound)),
+        HashUtils.combineHashes(HashUtils.hashCode(this.m_dimension),
+            645643529));
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public final boolean equals(final Object o) {
+    final _BoundConstant constant;
+    if (o == this) {
+      return true;
+    }
+    if (o instanceof _BoundConstant) {
+      constant = ((_BoundConstant) o);
+      return (this.m_upper == constant.m_upper)
+          && Compare.equals(this.m_defaultBound, constant.m_defaultBound)
+          && Compare.equals(this.m_dimension.getName(),
+              constant.m_dimension.getName());
+    }
+    return false;
   }
 }

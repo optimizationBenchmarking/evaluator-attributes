@@ -5,7 +5,6 @@ import org.optimizationBenchmarking.evaluator.data.spec.EAttributeType;
 import org.optimizationBenchmarking.evaluator.data.spec.IElementSet;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperiment;
 import org.optimizationBenchmarking.evaluator.data.spec.IInstanceRuns;
-import org.optimizationBenchmarking.utils.comparison.Compare;
 import org.optimizationBenchmarking.utils.document.impl.SemanticComponentUtils;
 import org.optimizationBenchmarking.utils.document.spec.IComplexText;
 import org.optimizationBenchmarking.utils.document.spec.IMath;
@@ -92,6 +91,9 @@ public abstract class FunctionAttribute<DT extends IElementSet>
    * suggestions
    */
   private transient IParameterRenderer m_yAxisPathComponentRenderer;
+
+  /** the inner hash code */
+  private transient int m_hashCode;
 
   /**
    * Create the function attribute
@@ -241,8 +243,11 @@ public abstract class FunctionAttribute<DT extends IElementSet>
     return this.yAxisGetPathComponentSuggestion();
   }
 
-  /** {@inheritDoc} */
-  @Override
+  /**
+   * compute the hash code
+   *
+   * @return the hash code
+   */
   protected int calcHashCode() {
     return HashUtils.combineHashes(//
         HashUtils.combineHashes(//
@@ -251,6 +256,18 @@ public abstract class FunctionAttribute<DT extends IElementSet>
         HashUtils.combineHashes(//
             HashUtils.hashCode(this.m_yAxisInputTransformation), //
             HashUtils.hashCode(this.m_yAxisOutputTransformation)));
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public int hashCode() {
+    final int hashCode;
+
+    hashCode = this.m_hashCode;
+    if (hashCode == 0) {
+      return (this.m_hashCode = this.calcHashCode());
+    }
+    return hashCode;
   }
 
   /**
@@ -274,7 +291,7 @@ public abstract class FunctionAttribute<DT extends IElementSet>
     if (o == null) {
       return false;
     }
-    if (Compare.equals(o.getClass(), this.getClass())) {
+    if (o.getClass() == this.getClass()) {
       other = ((FunctionAttribute<DT>) o);
       return ((this.m_xAxisTransformation.equals(//
           other.m_xAxisTransformation))

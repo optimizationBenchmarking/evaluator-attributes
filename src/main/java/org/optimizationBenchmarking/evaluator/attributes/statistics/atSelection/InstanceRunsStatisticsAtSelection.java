@@ -18,7 +18,7 @@ import org.optimizationBenchmarking.utils.math.statistics.parameters.Statistical
  * {@link org.optimizationBenchmarking.evaluator.data.spec.IInstanceRuns}
  * set.
  */
-public class InstanceRunsStatisticsAtSelection
+public final class InstanceRunsStatisticsAtSelection
     extends Attribute<IInstanceRuns, Number> {
 
   /** the selection criterion */
@@ -35,6 +35,9 @@ public class InstanceRunsStatisticsAtSelection
    * {@link org.optimizationBenchmarking.evaluator.data.spec.IInstanceRuns}
    */
   private final StatisticalParameter m_parameter;
+
+  /** the hash code */
+  private final int m_hashCode;
 
   /**
    * Create a statistics computer for a given selection criterion
@@ -68,6 +71,11 @@ public class InstanceRunsStatisticsAtSelection
     this.m_dimensionIndex = dimension.getIndex();
     this.m_isDimensionInt = dimension.getDataType().isInteger();
     this.m_parameter = parameter;
+    this.m_hashCode = HashUtils.combineHashes(
+        HashUtils.combineHashes(//
+            HashUtils.hashCode(this.m_dimensionIndex), //
+            HashUtils.hashCode(this.m_parameter)), //
+        HashUtils.hashCode(this.m_selection));
   }
 
   /** {@inheritDoc} */
@@ -93,12 +101,8 @@ public class InstanceRunsStatisticsAtSelection
 
   /** {@inheritDoc} */
   @Override
-  protected final int calcHashCode() {
-    return HashUtils.combineHashes(
-        HashUtils.combineHashes(//
-            HashUtils.hashCode(this.m_dimensionIndex), //
-            HashUtils.hashCode(this.m_parameter)), //
-        HashUtils.hashCode(this.m_selection));
+  public final int hashCode() {
+    return this.m_hashCode;
   }
 
   /** {@inheritDoc} */

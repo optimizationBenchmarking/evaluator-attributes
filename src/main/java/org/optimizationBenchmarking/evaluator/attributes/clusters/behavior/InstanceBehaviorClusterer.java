@@ -10,7 +10,6 @@ import org.optimizationBenchmarking.evaluator.data.spec.INamedElement;
 import org.optimizationBenchmarking.evaluator.data.spec.INamedElementSet;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
 import org.optimizationBenchmarking.utils.config.Configuration;
-import org.optimizationBenchmarking.utils.hash.HashUtils;
 
 /**
  * A clusterer for clustering via instance behavior.
@@ -128,11 +127,5 @@ public final class InstanceBehaviorClusterer
       strings[index] = experiments.get(index).getName();
     }
     return strings;
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  protected final int calcHashCode() {
-    return HashUtils.combineHashes(74346553, super.calcHashCode());
   }
 }

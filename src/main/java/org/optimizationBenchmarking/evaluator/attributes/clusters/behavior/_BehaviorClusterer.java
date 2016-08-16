@@ -16,6 +16,7 @@ import org.optimizationBenchmarking.evaluator.attributes.modeling.DimensionRelat
 import org.optimizationBenchmarking.evaluator.data.spec.Attribute;
 import org.optimizationBenchmarking.evaluator.data.spec.EAttributeType;
 import org.optimizationBenchmarking.evaluator.data.spec.EDimensionType;
+import org.optimizationBenchmarking.evaluator.data.spec.IDataElement;
 import org.optimizationBenchmarking.evaluator.data.spec.IDimension;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperimentSet;
 import org.optimizationBenchmarking.evaluator.data.spec.IInstanceRuns;
@@ -24,6 +25,7 @@ import org.optimizationBenchmarking.evaluator.data.spec.INamedElement;
 import org.optimizationBenchmarking.evaluator.data.spec.INamedElementSet;
 import org.optimizationBenchmarking.utils.MemoryUtils;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
+import org.optimizationBenchmarking.utils.comparison.Compare;
 import org.optimizationBenchmarking.utils.config.Configuration;
 import org.optimizationBenchmarking.utils.hash.HashUtils;
 import org.optimizationBenchmarking.utils.math.functions.basic.Identity;
@@ -61,6 +63,9 @@ abstract class _BehaviorClusterer<CCT extends IClustering>
   /** the path component suggestion */
   final String m_pathComponentSuggestion;
 
+  /** the hash code */
+  private final int m_hashCode;
+
   /**
    * create the clusterer
    *
@@ -82,6 +87,7 @@ abstract class _BehaviorClusterer<CCT extends IClustering>
     super(EAttributeType.PERMANENTLY_STORED);
 
     final MemoryTextOutput stringBuilder;
+    int hashCode;
 
     if ((minClusters > 0) && (maxClusters > 0)
         && (minClusters > maxClusters)) {
@@ -94,24 +100,31 @@ abstract class _BehaviorClusterer<CCT extends IClustering>
           this.toString()) + '.');
     }
 
+    if ((transformations == null) || (transformations.length <= 0)) {
+      throw new IllegalArgumentException(
+          "Transformations cannot be null or empty."); //$NON-NLS-1$
+    }
+
     this.m_minClusters = minClusters;
     this.m_maxClusters = maxClusters;
     this.m_transformations = transformations;
 
-    if (transformations != null) {
-      stringBuilder = new MemoryTextOutput();
-      stringBuilder.append(baseName);
-      for (final DimensionTransformation dimTrans : transformations) {
-        if ((dimTrans != null)
-            && (!(dimTrans.isIdentityTransformation()))) {
-          stringBuilder.append('_');
-          stringBuilder.append(dimTrans.getPathComponentSuggestion());
-        }
+    stringBuilder = new MemoryTextOutput();
+    stringBuilder.append(baseName);
+    hashCode = HashUtils.combineHashes(this.getClass().hashCode(), //
+        HashUtils.combineHashes(//
+            HashUtils.hashCode(this.m_maxClusters),
+            HashUtils.hashCode(this.m_minClusters)));
+    for (final DimensionTransformation dimTrans : transformations) {
+      if (!(dimTrans.isIdentityTransformation())) {
+        stringBuilder.append('_');
+        stringBuilder.append(dimTrans.getPathComponentSuggestion());
+        hashCode = HashUtils.combineHashes(hashCode,
+            HashUtils.hashCode(dimTrans));
       }
-      this.m_pathComponentSuggestion = stringBuilder.toString();
-    } else {
-      this.m_pathComponentSuggestion = baseName;
     }
+    this.m_pathComponentSuggestion = stringBuilder.toString();
+    this.m_hashCode = hashCode;
   }
 
   /**
@@ -161,11 +174,24 @@ abstract class _BehaviorClusterer<CCT extends IClustering>
     final ArrayListView<? extends IDimension> dimensions;
     final DimensionTransformation[] transformations;
     DimensionTransformationParser parser;
+    IDataElement element;
+    IExperimentSet top;
     IDimension dimension;
     String name;
     int index;
 
-    dimensions = experimentSet.getDimensions().getData();
+    top = null;
+    for (element = experimentSet; element != null; element = element
+        .getOwner()) {
+      if (element instanceof IExperimentSet) {
+        top = ((IExperimentSet) element);
+      }
+    }
+    if (top == null) {
+      throw new IllegalArgumentException("Did not find experiment set?"); //$NON-NLS-1$
+    }
+
+    dimensions = top.getDimensions().getData();
 
     transformations = new DimensionTransformation[dimensions.size()];
     parser = new DimensionTransformationParser(experimentSet);
@@ -453,6 +479,8 @@ abstract class _BehaviorClusterer<CCT extends IClustering>
   @Override
   public final boolean equals(final Object o) {
     _BehaviorClusterer<CCT> other;
+    int index;
+
     if (o == null) {
       return false;
     }
@@ -461,27 +489,29 @@ abstract class _BehaviorClusterer<CCT extends IClustering>
     }
     if (o.getClass() == this.getClass()) {
       other = ((_BehaviorClusterer<CCT>) o);
-      return ((this.m_minClusters == other.m_minClusters)//
-          && (this.m_maxClusters == other.m_maxClusters));
+      if ((this.m_minClusters == other.m_minClusters)//
+          && (this.m_maxClusters == other.m_maxClusters)) {
+
+        index = this.m_transformations.length;
+        if (index == other.m_transformations.length) {
+          for (; (--index) >= 0;) {
+            if (!(Compare.equals(this.m_transformations[index],
+                other.m_transformations[index]))) {
+              return false;
+            }
+          }
+          return true;
+        }
+
+      }
     }
-    return true;
+    return false;
   }
 
   /** {@inheritDoc} */
   @Override
-  protected int calcHashCode() {
-    int hashCode;
-
-    hashCode = HashUtils.combineHashes(
-        HashUtils.hashCode(this.m_maxClusters),
-        HashUtils.hashCode(this.m_minClusters));
-    for (final DimensionTransformation trafo : this.m_transformations) {
-      if ((trafo != null) && (!(trafo.isIdentityTransformation()))) {
-        hashCode = HashUtils.combineHashes(hashCode, trafo.hashCode());
-      }
-    }
-
-    return hashCode;
+  public final int hashCode() {
+    return this.m_hashCode;
   }
 
   /** {@inheritDoc} */

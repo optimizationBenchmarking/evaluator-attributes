@@ -89,6 +89,9 @@ public final class PropertyValueGrouper
    */
   private final int m_maxGroups;
 
+  /** the hash code of this attribute */
+  private final int m_hashCode;
+
   /**
    * create the property value grouper
    *
@@ -127,6 +130,14 @@ public final class PropertyValueGrouper
     this.m_groupingParameter = groupingParameter;
     this.m_minGroups = minGroups;
     this.m_maxGroups = maxGroups;
+
+    this.m_hashCode = HashUtils.combineHashes(//
+        HashUtils.combineHashes(//
+            HashUtils.hashCode(this.m_groupingMode), //
+            HashUtils.hashCode(this.m_groupingParameter)), //
+        HashUtils.combineHashes(//
+            HashUtils.hashCode(this.m_minGroups), //
+            HashUtils.hashCode(this.m_maxGroups)));//
   }
 
   /**
@@ -167,14 +178,26 @@ public final class PropertyValueGrouper
 
   /** {@inheritDoc} */
   @Override
-  protected final int calcHashCode() {
-    return HashUtils.combineHashes(//
-        HashUtils.combineHashes(//
-            HashUtils.hashCode(this.m_groupingMode), //
-            HashUtils.hashCode(this.m_groupingParameter)), //
-        HashUtils.combineHashes(//
-            HashUtils.hashCode(this.m_minGroups), //
-            HashUtils.hashCode(this.m_maxGroups)));
+  public final int hashCode() {
+    return this.m_hashCode;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public final boolean equals(final Object o) {
+    final PropertyValueGrouper grouper;
+    if (o == this) {
+      return true;
+    }
+    if (o instanceof PropertyValueGrouper) {
+      grouper = ((PropertyValueGrouper) o);
+      return ((this.m_groupingMode == grouper.m_groupingMode) && //
+          (this.m_maxGroups == grouper.m_maxGroups) && //
+          (this.m_minGroups == grouper.m_minGroups) && //
+          Compare.equals(this.m_groupingParameter,
+              grouper.m_groupingParameter));
+    }
+    return false;
   }
 
   /**

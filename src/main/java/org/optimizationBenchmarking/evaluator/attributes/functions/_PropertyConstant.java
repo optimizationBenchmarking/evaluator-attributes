@@ -1,8 +1,10 @@
 package org.optimizationBenchmarking.evaluator.attributes.functions;
 
 import org.optimizationBenchmarking.evaluator.data.spec.IProperty;
+import org.optimizationBenchmarking.utils.comparison.Compare;
 import org.optimizationBenchmarking.utils.document.spec.IMath;
 import org.optimizationBenchmarking.utils.document.spec.IParameterRenderer;
+import org.optimizationBenchmarking.utils.hash.HashUtils;
 import org.optimizationBenchmarking.utils.reflection.EPrimitiveType;
 import org.optimizationBenchmarking.utils.text.textOutput.ITextOutput;
 
@@ -70,13 +72,14 @@ abstract class _PropertyConstant extends _DataBasedConstant {
   /** {@inheritDoc} */
   @Override
   public final int hashCode() {
-    return (this.m_property.hashCode() ^ 3453479);
+    return HashUtils.combineHashes(this.m_property.hashCode(), 3453479);
   }
 
   /** {@inheritDoc} */
   @Override
   public final boolean equals(final Object o) {
     return ((o == this) || ((o instanceof _PropertyConstant) && //
-        (this.m_property.equals(((_PropertyConstant) o).m_property))));
+        (Compare.equals(this.m_property.getName(),
+            ((_PropertyConstant) o).m_property.getName()))));
   }
 }

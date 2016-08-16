@@ -11,7 +11,6 @@ import org.optimizationBenchmarking.evaluator.data.spec.INamedElement;
 import org.optimizationBenchmarking.evaluator.data.spec.INamedElementSet;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
 import org.optimizationBenchmarking.utils.config.Configuration;
-import org.optimizationBenchmarking.utils.hash.HashUtils;
 
 /**
  * A clusterer for clustering via algorithm behavior.
@@ -118,11 +117,5 @@ public final class AlgorithmBehaviorClusterer
       strings[index] = instances.get(index).getName();
     }
     return strings;
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  protected final int calcHashCode() {
-    return HashUtils.combineHashes(973543481, super.calcHashCode());
   }
 }

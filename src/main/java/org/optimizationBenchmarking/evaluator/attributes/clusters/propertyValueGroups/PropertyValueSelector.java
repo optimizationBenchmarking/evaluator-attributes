@@ -30,6 +30,9 @@ public final class PropertyValueSelector
   /** the grouper to apply */
   private final PropertyValueGrouper m_grouper;
 
+  /** the hash code */
+  private final int m_hashCode;
+
   /**
    * Create the property-based selection
    *
@@ -53,20 +56,22 @@ public final class PropertyValueSelector
     }
 
     this.m_grouper = grouper;
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  protected final int calcHashCode() {
-    return HashUtils.combineHashes(//
+    this.m_hashCode = HashUtils.combineHashes(//
         HashUtils.hashCode(this.m_property), //
         HashUtils.hashCode(this.m_grouper));
   }
 
   /** {@inheritDoc} */
   @Override
+  public final int hashCode() {
+    return this.m_hashCode;
+  }
+
+  /** {@inheritDoc} */
+  @Override
   public final boolean equals(final Object o) {
     final PropertyValueSelector selector;
+
     if (o == this) {
       return true;
     }
