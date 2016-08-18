@@ -11,6 +11,7 @@ import org.optimizationBenchmarking.evaluator.data.spec.IInstanceRuns;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
 import org.optimizationBenchmarking.utils.math.MathUtils;
 import org.optimizationBenchmarking.utils.math.functions.basic.Identity;
+import org.optimizationBenchmarking.utils.math.functions.power.Sqr;
 import org.optimizationBenchmarking.utils.ml.fitting.impl.DefaultFunctionFitter;
 import org.optimizationBenchmarking.utils.ml.fitting.multi.MultiFunctionFitter;
 import org.optimizationBenchmarking.utils.ml.fitting.spec.IFittingResult;
@@ -103,8 +104,10 @@ public class DimensionRelationshipTest extends
       dimB = temp;
     }
 
-    return new DimensionRelationship(
-        new DimensionTransformation(Identity.INSTANCE, dimA),
-        new DimensionTransformation(Identity.INSTANCE, dimB));
+    return new DimensionRelationship(new DimensionTransformation(
+        (random.nextBoolean() ? Identity.INSTANCE : Sqr.INSTANCE), dimA),
+        new DimensionTransformation(
+            (random.nextBoolean() ? Identity.INSTANCE : Sqr.INSTANCE),
+            dimB));
   }
 }

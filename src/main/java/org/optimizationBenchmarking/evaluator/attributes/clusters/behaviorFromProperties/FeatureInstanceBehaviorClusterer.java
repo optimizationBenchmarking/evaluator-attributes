@@ -5,6 +5,7 @@ import java.util.LinkedHashSet;
 import org.optimizationBenchmarking.evaluator.attributes.clusters.ICluster;
 import org.optimizationBenchmarking.evaluator.attributes.clusters.IClustering;
 import org.optimizationBenchmarking.evaluator.attributes.clusters.behavior.InstanceBehaviorClusterer;
+import org.optimizationBenchmarking.evaluator.attributes.functions.DimensionTransformation;
 import org.optimizationBenchmarking.evaluator.data.impl.shadow.DataSelection;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperimentSet;
 import org.optimizationBenchmarking.evaluator.data.spec.IInstance;
@@ -37,6 +38,26 @@ public final class FeatureInstanceBehaviorClusterer
   public FeatureInstanceBehaviorClusterer(
       final IExperimentSet experimentSet, final Configuration config) {
     super(new InstanceBehaviorClusterer(experimentSet, config));
+  }
+
+  /**
+   * create instance behavior clusterer
+   *
+   * @param transformations
+   *          the dimension transformations, or {@code null} if all
+   *          dimensions can be used directly
+   * @param minClusters
+   *          the minimum number of clusters ot be used, {@code -1} for
+   *          undefined
+   * @param maxClusters
+   *          the minimum number of clusters ot be used, {@code -1} for
+   *          undefined
+   */
+  public FeatureInstanceBehaviorClusterer(
+      final DimensionTransformation[] transformations,
+      final int minClusters, final int maxClusters) {
+    super(new InstanceBehaviorClusterer(transformations, minClusters,
+        maxClusters));
   }
 
   /** {@inheritDoc} */

@@ -2,7 +2,7 @@ package test.junit.org.optimizationBenchmarking.evaluator.attributes.clustering;
 
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.optimizationBenchmarking.evaluator.attributes.clusters.behavior.InstanceBehaviorClusterer;
+import org.optimizationBenchmarking.evaluator.attributes.clusters.behaviorFromProperties.ParameterAlgorithmBehaviorClusterer;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperimentSet;
 import org.optimizationBenchmarking.utils.ml.clustering.impl.DefaultClusterer;
 
@@ -10,18 +10,19 @@ import shared.junit.CategorySlowTests;
 import test.junit.org.optimizationBenchmarking.evaluator.attributes.modeling.DimensionRelationshipTest;
 
 /** Test the clustering by instance behavior */
-public class InstanceBehaviorClusteringTest extends ClusteringTest {
+public class ParameterAlgorithmBehaviorClusteringTest
+    extends ClusteringTest {
 
   /** create */
-  public InstanceBehaviorClusteringTest() {
+  public ParameterAlgorithmBehaviorClusteringTest() {
     super(null);
   }
 
   /** {@inheritDoc} */
   @Override
-  protected InstanceBehaviorClusterer getAttribute(
+  protected ParameterAlgorithmBehaviorClusterer getAttribute(
       final IExperimentSet experimentSet, final IExperimentSet data) {
-    return new InstanceBehaviorClusterer(
+    return new ParameterAlgorithmBehaviorClusterer(
         ClusteringTest.getTransformations(experimentSet), -1, -1);
   }
 

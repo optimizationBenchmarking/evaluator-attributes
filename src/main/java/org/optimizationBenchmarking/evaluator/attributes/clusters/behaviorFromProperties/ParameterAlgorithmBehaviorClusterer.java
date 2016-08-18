@@ -5,6 +5,7 @@ import java.util.LinkedHashSet;
 import org.optimizationBenchmarking.evaluator.attributes.clusters.ICluster;
 import org.optimizationBenchmarking.evaluator.attributes.clusters.IClustering;
 import org.optimizationBenchmarking.evaluator.attributes.clusters.behavior.AlgorithmBehaviorClusterer;
+import org.optimizationBenchmarking.evaluator.attributes.functions.DimensionTransformation;
 import org.optimizationBenchmarking.evaluator.data.impl.shadow.DataSelection;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperiment;
 import org.optimizationBenchmarking.evaluator.data.spec.IExperimentSet;
@@ -38,6 +39,25 @@ public final class ParameterAlgorithmBehaviorClusterer
   public ParameterAlgorithmBehaviorClusterer(
       final IExperimentSet experimentSet, final Configuration config) {
     super(new AlgorithmBehaviorClusterer(experimentSet, config));
+  }
+
+  /**
+   * create algorithm behavior clusterer
+   *
+   * @param transformations
+   *          the dimension transformations
+   * @param minClusters
+   *          the minimum number of clusters ot be used, {@code -1} for
+   *          undefined
+   * @param maxClusters
+   *          the minimum number of clusters ot be used, {@code -1} for
+   *          undefined
+   */
+  public ParameterAlgorithmBehaviorClusterer(
+      final DimensionTransformation[] transformations,
+      final int minClusters, final int maxClusters) {
+    super(new AlgorithmBehaviorClusterer(transformations, minClusters,
+        maxClusters));
   }
 
   /** {@inheritDoc} */
