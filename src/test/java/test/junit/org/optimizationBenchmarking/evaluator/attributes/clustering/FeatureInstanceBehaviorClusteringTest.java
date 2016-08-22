@@ -1,5 +1,6 @@
 package test.junit.org.optimizationBenchmarking.evaluator.attributes.clustering;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.optimizationBenchmarking.evaluator.attributes.clusters.behaviorFromProperties.FeatureInstanceBehaviorClusterer;
@@ -57,8 +58,8 @@ public class FeatureInstanceBehaviorClusteringTest extends ClusteringTest {
 
   /** {@inheritDoc} */
   @Override
-  @Test(timeout = 36000000)
+  @Ignore
   public void testAttributeOnRandomData() {
-    super.testAttributeOnRandomData();
+    // do nothing
   }
 }
