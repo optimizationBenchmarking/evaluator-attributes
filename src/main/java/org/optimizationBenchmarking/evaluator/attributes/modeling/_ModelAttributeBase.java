@@ -166,7 +166,7 @@ abstract class _ModelAttributeBase<R> extends Attribute<IInstanceRuns, R> {
 
     y = this.m_dimY.use(data);
     yFormat = _ModelAttributeBase.__getDimSwitch(this.m_dimY);
-    yIndex = this.m_dimX.getDimension().getIndex();
+    yIndex = this.m_dimY.getDimension().getIndex();
 
     outIndex = (totalRows << 1);
 
