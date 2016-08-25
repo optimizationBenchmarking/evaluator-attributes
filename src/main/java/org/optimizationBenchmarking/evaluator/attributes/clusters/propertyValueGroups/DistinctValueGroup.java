@@ -66,7 +66,7 @@ public final class DistinctValueGroup
   /** {@inheritDoc} */
   @Override
   public final String getPathComponentSuggestion() {
-    return ('=' + String.valueOf(this.m_value));
+    return String.valueOf(this.m_value);
   }
 
   /** {@inheritDoc} */
