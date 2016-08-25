@@ -35,9 +35,9 @@ public class FeatureInstanceBehaviorClusteringTest extends ClusteringTest {
 
   /** {@inheritDoc} */
   @Override
-  @Ignore
+  @Test(timeout = 36000000)
   public void testAttributeOnExample1() {
-    // do nothing
+    super.testAttributeOnExample1();
   }
 
   /** {@inheritDoc} */
