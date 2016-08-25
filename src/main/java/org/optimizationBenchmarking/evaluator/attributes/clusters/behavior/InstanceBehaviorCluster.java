@@ -40,6 +40,6 @@ public class InstanceBehaviorCluster
   @Override
   public ETextCase printLongName(final ITextOutput textOut,
       final ETextCase textCase) {
-    return ClusterUtils.listInstances(this, 42, textCase, textOut);
+    return ClusterUtils.listInstances(this, 3, textCase, textOut);
   }
 }
