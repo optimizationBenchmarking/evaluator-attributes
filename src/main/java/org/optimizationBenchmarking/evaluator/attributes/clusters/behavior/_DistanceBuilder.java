@@ -71,7 +71,7 @@ final class _DistanceBuilder extends DistanceMatrixBuilderJob {
     }
 
     if (orig <= 0d) {
-      orig = Double.MIN_NORMAL;
+      return dist;// orig = Double.MIN_NORMAL;
     }
     return Math.max(0d, (dist / orig));
   }
