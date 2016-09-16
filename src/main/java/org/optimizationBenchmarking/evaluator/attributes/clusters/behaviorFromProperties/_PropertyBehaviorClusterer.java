@@ -175,7 +175,7 @@ abstract class _PropertyBehaviorClusterer<ET extends INamedElement>
       allElements.addAll(elements);
       for (final ET element : elements) {
         values = new double[propertySize];
-        _PropertyBehaviorClusterer.__fillIn(properties,
+        _PropertyBehaviorClusterer.__fillIn(
             this._getPropertySetting(element), featureTypes, values);
         samples.add(new ClassifiedSample(index, values));
       }
@@ -243,8 +243,6 @@ abstract class _PropertyBehaviorClusterer<ET extends INamedElement>
    * transform a property setting into a feature vector, i.e., feature
    * values to {@code double}s
    *
-   * @param properties
-   *          the properties
    * @param setting
    *          the property setting
    * @param featureTypes
@@ -252,56 +250,52 @@ abstract class _PropertyBehaviorClusterer<ET extends INamedElement>
    * @param dest
    *          the destination array
    */
-  private static final void __fillIn(
-      final ArrayListView<? extends IProperty> properties,
-      final IPropertySetting setting, final EFeatureType[] featureTypes,
-      final double[] dest) {
+  @SuppressWarnings("unchecked")
+  private static final void __fillIn(final IPropertySetting setting,
+      final EFeatureType[] featureTypes, final double[] dest) {
     int index, valueIndex;
     Object value;
-    IPropertyValue propertyValue;
 
     index = (-1);
-    main: for (final IProperty property : properties) {
-      value = setting.get(property);
+    main: for (final IPropertyValue propertyValue : ((Iterable<IPropertyValue>) setting)) {
       ++index;
+
+      if (propertyValue.isGeneralized()
+          || ((propertyValue instanceof IParameterValue)
+              && (((IParameterValue) propertyValue).isUnspecified()))) {
+        dest[index] = ClassificationTools.UNSPECIFIED_DOUBLE;
+        continue;
+      }
+
+      value = propertyValue.getValue();
       switch (featureTypes[index]) {
         case NUMERICAL: {
           if (value instanceof Number) {
-            dest[index] = ((Number) value).doubleValue();
+            dest[index] = ClassificationTools
+                .featureNumericalToDouble(((Number) value).doubleValue());
             continue main;
           }
           throw new IllegalStateException(//
-              "Numerical property '" + property + //$NON-NLS-1$
+              "Numerical property '" + propertyValue.getOwner() + //$NON-NLS-1$
                   "' with value '" + value + //$NON-NLS-1$
-                  "'. Really?");//$NON-NLS-1$
+                  "', {" + propertyValue + //$NON-NLS-1$
+                  "}. Really?");//$NON-NLS-1$
         }
         case BOOLEAN: {
           if (value instanceof Boolean) {
             dest[index] = ClassificationTools
-                .featureBooleanToDouble(((Boolean) value).booleanValue());
+                .featureBooleanToDouble((Boolean) value);
             continue main;
           }
           throw new IllegalStateException(//
-              "Boolean property '" + property + //$NON-NLS-1$
+              "Boolean property '" + propertyValue.getOwner() + //$NON-NLS-1$
                   "' with value '" + value + //$NON-NLS-1$
-                  "'. Really?");//$NON-NLS-1$
+                  "', {" + propertyValue + //$NON-NLS-1$
+                  "}. Really?");//$NON-NLS-1$
         }
         case NOMINAL: {
-          propertyValue = property.findValue(value);
-          if (propertyValue == null) {
-            throw new IllegalStateException((//
-                "Cannot find value '" + value + //$NON-NLS-1$
-                    "' of nominal property '" + property + //$NON-NLS-1$
-                    '\'')
-                + '.');
-          }
-          if ((propertyValue instanceof IParameterValue) && //
-              (((IParameterValue) propertyValue).isUnspecified())) {
-            dest[index] = dest[index] = ClassificationTools
-                .featureNominalToDouble(property.getData().size());
-            continue main;
-          }
-          valueIndex = property.getData().indexOf(propertyValue);
+          valueIndex = propertyValue.getOwner().getData()
+              .indexOf(propertyValue);
           if (valueIndex >= 0) {
             dest[index] = ClassificationTools
                 .featureNominalToDouble(valueIndex);
@@ -311,14 +305,15 @@ abstract class _PropertyBehaviorClusterer<ET extends INamedElement>
           throw new IllegalStateException((//
               "Cannot find value '" + value + //$NON-NLS-1$
                   "' of property value '" + propertyValue + //$NON-NLS-1$
-                  "' of nominal property '" + property + //$NON-NLS-1$
+                  "' of nominal property '" + propertyValue.getOwner() + //$NON-NLS-1$
                   '\'')
               + '.');
         }
         default: {
           throw new IllegalArgumentException((//
               "Unknown type '" + featureTypes[index]//$NON-NLS-1$
-                  + "' for property '" + property //$NON-NLS-1$
+                  + "' of property value '" + propertyValue //$NON-NLS-1$
+                  + "' for property '" + propertyValue.getOwner() //$NON-NLS-1$
                   + '\'')
               + '.');
         }

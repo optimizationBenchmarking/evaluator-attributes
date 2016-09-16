@@ -1,6 +1,5 @@
 package org.optimizationBenchmarking.evaluator.attributes.clusters.behaviorFromProperties;
 
-import org.optimizationBenchmarking.evaluator.data.spec.IParameter;
 import org.optimizationBenchmarking.evaluator.data.spec.IProperty;
 import org.optimizationBenchmarking.evaluator.data.spec.IPropertyValue;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
@@ -83,7 +82,7 @@ abstract class _ClassifierRenderer
     final short _short;
     final int _int;
     final long _long;
-    final Object unspecified;
+    final double useValue;
     final ArrayListView<? extends IPropertyValue> data;
 
     property = this._getProperty(featureIndex);
@@ -94,17 +93,27 @@ abstract class _ClassifierRenderer
     }
     type = property.getPrimitiveType();
 
+    if (ClassificationTools.featureDoubleIsUnspecified(featureValue)) {
+      throw new IllegalArgumentException("Feature " + property//$NON-NLS-1$
+          + " is unspecified, but such cases should have been handled already.");//$NON-NLS-1$
+    }
+
+    if (type == EPrimitiveType.BOOLEAN) {
+      textOut.append(
+          ClassificationTools.featureDoubleToBoolean(featureValue));
+      return;
+
+    }
+
     if (type != null) {
+      useValue = ClassificationTools
+          .featureDoubleToNumerical(featureValue);
+
       switch (type) {
-        case BOOLEAN: {
-          textOut.append(
-              ClassificationTools.featureDoubleToBoolean(featureValue));
-          return;
-        }
 
         case BYTE: {
-          _byte = ((byte) featureValue);
-          if (_byte == featureValue) {
+          _byte = ((byte) useValue);
+          if (_byte == useValue) {
             textOut.append(_byte);
             return;
           }
@@ -112,8 +121,8 @@ abstract class _ClassifierRenderer
 
           //$FALL-THROUGH$
         case SHORT: {
-          _short = ((short) featureValue);
-          if (_short == featureValue) {
+          _short = ((short) useValue);
+          if (_short == useValue) {
             textOut.append(_short);
             return;
           }
@@ -121,8 +130,8 @@ abstract class _ClassifierRenderer
 
           //$FALL-THROUGH$
         case INT: {
-          _int = ((int) featureValue);
-          if (_int == featureValue) {
+          _int = ((int) useValue);
+          if (_int == useValue) {
             textOut.append(_int);
             return;
           }
@@ -130,8 +139,8 @@ abstract class _ClassifierRenderer
 
           //$FALL-THROUGH$
         case LONG: {
-          _long = ((long) featureValue);
-          if (_long == featureValue) {
+          _long = ((long) useValue);
+          if (_long == useValue) {
             textOut.append(_long);
             return;
           }
@@ -140,7 +149,7 @@ abstract class _ClassifierRenderer
           //$FALL-THROUGH$
         case FLOAT:
         case DOUBLE: {
-          textOut.append(featureValue);
+          textOut.append(useValue);
           return;
         }
       }
@@ -152,14 +161,6 @@ abstract class _ClassifierRenderer
       textOut.append(data.get(_int).getValue());
       return;
     }
-    if (property instanceof IParameter) {
-      unspecified = ((IParameter) property).getUnspecified().getValue();
-      if (unspecified != null) {
-        textOut.append(unspecified);
-        return;
-      }
-    }
-
     throw new IllegalArgumentException(((((//
     "Invalid (double-encoded) value '" + featureValue) //$NON-NLS-1$
         + "' for property '") + property.getName()) //$NON-NLS-1$
