@@ -31,7 +31,6 @@ abstract class _PropertyBehaviorClustering<CT extends NamedCluster<?>>
 
   /** the clusters */
   private final ArrayListView<CT> m_clusters;
-
   /** the behavior clustering underlying this clustering */
   final IClustering m_behavior;
   /** the obtained classifier */
@@ -182,7 +181,7 @@ abstract class _PropertyBehaviorClustering<CT extends NamedCluster<?>>
                   _PropertyBehaviorClusterer.TRAINERS, false, false, true),
               body, ESequenceMode.AND);
           body.append(
-              "If sufficient samples were avaible, cross-validation was used to choose classifiers with good generalization ability first. We compared their result based on the "); //$NON-NLS-1$
+              "If sufficient samples were available, cross-validation was used to choose classifiers with good generalization ability first. We compared their result based on the "); //$NON-NLS-1$
           _PropertyBehaviorClusterer.CLASSIFIER_QUALITY_MEASURE
               .printDescription(body, ETextCase.IN_SENTENCE);
         }
