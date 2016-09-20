@@ -30,9 +30,9 @@ final class _BoundConstant extends _DataBasedConstant {
   /** the dimension */
   private final IDimension m_dimension;
   /** the end for the upper bound of the given dimension */
-  static final String UPPER_BOUND_END = ".max"; //$NON-NLS-1$
+  static final String UPPER_BOUND_END = ".up"; //$NON-NLS-1$
   /** the end for the lower bound of the given dimension */
-  static final String LOWER_BOUND_END = ".min"; //$NON-NLS-1$
+  static final String LOWER_BOUND_END = ".low"; //$NON-NLS-1$
 
   /**
    * {@code true} if we want the upper bound, {@code false} for the lower
@@ -281,8 +281,8 @@ final class _BoundConstant extends _DataBasedConstant {
   @Override
   public final void mathRender(final IMath out,
       final IParameterRenderer renderer) {
-    this.m_dimension.mathRender(out, renderer);
     try (final IText name = out.name()) {
+      this.m_dimension.mathRender(name, renderer);
       name.append(this.m_upper ? _BoundConstant.UPPER_BOUND_END
           : _BoundConstant.LOWER_BOUND_END);
     }
