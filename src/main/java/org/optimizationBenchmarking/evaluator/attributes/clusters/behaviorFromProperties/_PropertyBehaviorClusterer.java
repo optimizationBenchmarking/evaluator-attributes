@@ -22,7 +22,6 @@ import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
 import org.optimizationBenchmarking.utils.comparison.Compare;
 import org.optimizationBenchmarking.utils.hash.HashUtils;
 import org.optimizationBenchmarking.utils.ml.classification.impl.DefaultClassifierTrainer;
-import org.optimizationBenchmarking.utils.ml.classification.impl.abstr.ClassificationTools;
 import org.optimizationBenchmarking.utils.ml.classification.impl.multi.MultiClassifierTrainer;
 import org.optimizationBenchmarking.utils.ml.classification.impl.quality.MCC;
 import org.optimizationBenchmarking.utils.ml.classification.spec.ClassifiedSample;
@@ -263,7 +262,7 @@ abstract class _PropertyBehaviorClusterer<ET extends INamedElement>
       if (propertyValue.isGeneralized()
           || ((propertyValue instanceof IParameterValue)
               && (((IParameterValue) propertyValue).isUnspecified()))) {
-        dest[index] = ClassificationTools.UNSPECIFIED_DOUBLE;
+        dest[index] = EFeatureType.UNSPECIFIED_DOUBLE;
         continue;
       }
 
@@ -271,7 +270,7 @@ abstract class _PropertyBehaviorClusterer<ET extends INamedElement>
       switch (featureTypes[index]) {
         case NUMERICAL: {
           if (value instanceof Number) {
-            dest[index] = ClassificationTools
+            dest[index] = EFeatureType
                 .featureNumericalToDouble(((Number) value).doubleValue());
             continue main;
           }
@@ -283,7 +282,7 @@ abstract class _PropertyBehaviorClusterer<ET extends INamedElement>
         }
         case BOOLEAN: {
           if (value instanceof Boolean) {
-            dest[index] = ClassificationTools
+            dest[index] = EFeatureType
                 .featureBooleanToDouble((Boolean) value);
             continue main;
           }
@@ -297,8 +296,7 @@ abstract class _PropertyBehaviorClusterer<ET extends INamedElement>
           valueIndex = propertyValue.getOwner().getData()
               .indexOf(propertyValue);
           if (valueIndex >= 0) {
-            dest[index] = ClassificationTools
-                .featureNominalToDouble(valueIndex);
+            dest[index] = EFeatureType.featureNominalToDouble(valueIndex);
             continue main;
           }
 

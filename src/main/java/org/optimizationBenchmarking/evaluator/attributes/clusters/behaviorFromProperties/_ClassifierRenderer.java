@@ -3,7 +3,7 @@ package org.optimizationBenchmarking.evaluator.attributes.clusters.behaviorFromP
 import org.optimizationBenchmarking.evaluator.data.spec.IProperty;
 import org.optimizationBenchmarking.evaluator.data.spec.IPropertyValue;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
-import org.optimizationBenchmarking.utils.ml.classification.impl.abstr.ClassificationTools;
+import org.optimizationBenchmarking.utils.ml.classification.spec.EFeatureType;
 import org.optimizationBenchmarking.utils.ml.classification.spec.IClassifierParameterRenderer;
 import org.optimizationBenchmarking.utils.reflection.EPrimitiveType;
 import org.optimizationBenchmarking.utils.text.ETextCase;
@@ -93,21 +93,19 @@ abstract class _ClassifierRenderer
     }
     type = property.getPrimitiveType();
 
-    if (ClassificationTools.featureDoubleIsUnspecified(featureValue)) {
+    if (EFeatureType.featureDoubleIsUnspecified(featureValue)) {
       throw new IllegalArgumentException("Feature " + property//$NON-NLS-1$
           + " is unspecified, but such cases should have been handled already.");//$NON-NLS-1$
     }
 
     if (type == EPrimitiveType.BOOLEAN) {
-      textOut.append(
-          ClassificationTools.featureDoubleToBoolean(featureValue));
+      textOut.append(EFeatureType.featureDoubleToBoolean(featureValue));
       return;
 
     }
 
     if (type != null) {
-      useValue = ClassificationTools
-          .featureDoubleToNumerical(featureValue);
+      useValue = EFeatureType.featureDoubleToNumerical(featureValue);
 
       switch (type) {
 
@@ -155,7 +153,7 @@ abstract class _ClassifierRenderer
       }
     }
 
-    _int = ClassificationTools.featureDoubleToNominal(featureValue);
+    _int = EFeatureType.featureDoubleToNominal(featureValue);
     data = property.getData();
     if ((_int >= 0) && (_int < property.getData().size())) {
       textOut.append(data.get(_int).getValue());
