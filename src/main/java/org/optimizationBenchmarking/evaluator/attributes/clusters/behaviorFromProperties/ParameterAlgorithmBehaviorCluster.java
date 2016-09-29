@@ -30,7 +30,7 @@ public final class ParameterAlgorithmBehaviorCluster
   @Override
   public ETextCase printDescription(final ITextOutput textOut,
       final ETextCase textCase) {
-    return ClusterUtils.listExperiments(this, 42, textCase, textOut);
+    return ClusterUtils.listExperiments(this, 1000, textCase, textOut);
   }
 
   /** {@inheritDoc} */
