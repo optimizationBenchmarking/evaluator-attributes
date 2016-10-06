@@ -478,6 +478,11 @@ abstract class _BehaviorClusterer<CCT extends IClustering>
         index = this.m_transformations.length;
         if (index == other.m_transformations.length) {
           for (; (--index) >= 0;) {
+            if (this.m_transformations[index].isIdentityTransformation() && //
+                other.m_transformations[index]
+                    .isIdentityTransformation()) {
+              continue;
+            }
             if (!(Compare.equals(this.m_transformations[index],
                 other.m_transformations[index]))) {
               return false;
@@ -485,7 +490,6 @@ abstract class _BehaviorClusterer<CCT extends IClustering>
           }
           return true;
         }
-
       }
     }
     return false;

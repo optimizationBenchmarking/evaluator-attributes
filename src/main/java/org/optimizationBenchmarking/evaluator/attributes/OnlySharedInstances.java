@@ -38,7 +38,7 @@ public final class OnlySharedInstances
 
   /** create the instance of this attribute */
   private OnlySharedInstances() {
-    super(EAttributeType.TEMPORARILY_STORED);
+    super(EAttributeType.PERMANENTLY_STORED);
   }
 
   /** {@inheritDoc} */

@@ -199,8 +199,9 @@ public final class DimensionTransformation extends Transformation
     }
     if ((o != null) && (o.getClass() == this.getClass())) {
       other = ((DimensionTransformation) o);
-      return Compare.equals(this.m_func, other.m_func) && Compare
-          .equals(this.m_dimension.getName(), other.m_dimension.getName());
+      return Compare.equals(this.m_func, other.m_func) && //
+          Compare.equals(this.m_dimension.getName(),
+              other.m_dimension.getName());
     }
     return false;
   }
