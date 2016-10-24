@@ -1,5 +1,6 @@
 package org.optimizationBenchmarking.evaluator.attributes.clusters;
 
+import org.optimizationBenchmarking.evaluator.data.spec.IExperimentSet;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
 import org.optimizationBenchmarking.utils.document.spec.IList;
 import org.optimizationBenchmarking.utils.document.spec.ISectionBody;
@@ -10,6 +11,7 @@ import org.optimizationBenchmarking.utils.text.ETextCase;
 import org.optimizationBenchmarking.utils.text.TextUtils;
 import org.optimizationBenchmarking.utils.text.numbers.InTextNumberAppender;
 import org.optimizationBenchmarking.utils.text.textOutput.ITextOutput;
+import org.optimizationBenchmarking.utils.text.textOutput.MemoryTextOutput;
 
 /** Some utilities for the clusters */
 public final class ClusterUtils {
@@ -111,6 +113,36 @@ public final class ClusterUtils {
         }
       }
     }
+  }
+
+  /**
+   * return a string with the data identity, for debugging purposes.
+   *
+   * @param data
+   *          the data
+   * @return the identity
+   */
+  public static final String dataIdentityString(
+      final IExperimentSet data) {
+    final MemoryTextOutput mto;
+
+    mto = new MemoryTextOutput();
+
+    mto.append('[');
+    mto.append(data.getData().size());
+    mto.append(" experiments, ");//$NON-NLS-1$
+    mto.append(data.getInstances().getData().size());
+    mto.append(" instances, ");//$NON-NLS-1$
+    mto.append(data.getParameters().getData().size());
+    mto.append(" parameters, ");//$NON-NLS-1$
+    mto.append(data.getFeatures().getData().size());
+    mto.append(" features, ");//$NON-NLS-1$
+    mto.append(data.getDimensions().getData().size());
+    mto.append(" dimensions, #");//$NON-NLS-1$
+    mto.append(System.identityHashCode(data));
+    mto.append('/');
+    mto.append(data.hashCode());
+    return mto.toString();
   }
 
   /** the forbidden constructor */

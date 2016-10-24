@@ -14,6 +14,7 @@ import org.optimizationBenchmarking.evaluator.data.spec.IPropertySetting;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
 import org.optimizationBenchmarking.utils.config.Configuration;
 import org.optimizationBenchmarking.utils.ml.classification.spec.IClassifier;
+import org.optimizationBenchmarking.utils.text.textOutput.ITextOutput;
 
 /**
  * A clusterer for clustering via instance behavior and instance features.
@@ -38,6 +39,14 @@ public final class FeatureInstanceBehaviorClusterer
   public FeatureInstanceBehaviorClusterer(
       final IExperimentSet experimentSet, final Configuration config) {
     super(new InstanceBehaviorClusterer(experimentSet, config));
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public void toText(final ITextOutput textOut) {
+    textOut.append(
+        FeatureInstanceBehaviorClusterer.CHOICE_INSTANCES_BY_ALGORITHM_BEHAVIOR_AND_FEATURES);
+    super.toText(textOut);
   }
 
   /**

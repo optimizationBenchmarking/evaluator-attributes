@@ -11,6 +11,7 @@ import org.optimizationBenchmarking.evaluator.data.spec.INamedElement;
 import org.optimizationBenchmarking.evaluator.data.spec.INamedElementSet;
 import org.optimizationBenchmarking.utils.collections.lists.ArrayListView;
 import org.optimizationBenchmarking.utils.config.Configuration;
+import org.optimizationBenchmarking.utils.text.textOutput.ITextOutput;
 
 /**
  * A clusterer for clustering via algorithm behavior.
@@ -76,9 +77,10 @@ public final class AlgorithmBehaviorClusterer
 
   /** {@inheritDoc} */
   @Override
-  public final String toString() {
-    return (AlgorithmBehaviorClusterer.CHOICE_ALGORITHMS_BY_ALGORITHM_BEHAVIOR
-        + super.toString());
+  public final void toText(final ITextOutput textOut) {
+    textOut.append(
+        AlgorithmBehaviorClusterer.CHOICE_ALGORITHMS_BY_ALGORITHM_BEHAVIOR);
+    super.toText(textOut);
   }
 
   /** {@inheritDoc} */

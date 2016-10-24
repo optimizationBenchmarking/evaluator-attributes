@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.optimizationBenchmarking.evaluator.attributes.OnlySharedInstances;
+import org.optimizationBenchmarking.evaluator.attributes.clusters.ClusterUtils;
 import org.optimizationBenchmarking.evaluator.attributes.clusters.ClustererLoader;
 import org.optimizationBenchmarking.evaluator.attributes.clusters.IClustering;
 import org.optimizationBenchmarking.evaluator.attributes.functions.DimensionTransformation;
@@ -29,10 +30,13 @@ import org.optimizationBenchmarking.utils.config.Configuration;
 import org.optimizationBenchmarking.utils.hash.HashUtils;
 import org.optimizationBenchmarking.utils.math.functions.basic.Identity;
 import org.optimizationBenchmarking.utils.math.matrix.impl.DistanceMatrix;
+import org.optimizationBenchmarking.utils.math.text.ABCParameterRenderer;
 import org.optimizationBenchmarking.utils.ml.clustering.impl.DefaultClusterer;
 import org.optimizationBenchmarking.utils.ml.clustering.spec.IClusteringJob;
 import org.optimizationBenchmarking.utils.ml.clustering.spec.IDistanceClusteringJobBuilder;
 import org.optimizationBenchmarking.utils.parallel.Execute;
+import org.optimizationBenchmarking.utils.text.ITextable;
+import org.optimizationBenchmarking.utils.text.textOutput.ITextOutput;
 import org.optimizationBenchmarking.utils.text.textOutput.MemoryTextOutput;
 
 /**
@@ -42,7 +46,7 @@ import org.optimizationBenchmarking.utils.text.textOutput.MemoryTextOutput;
  *          the clustering type
  */
 abstract class _BehaviorClusterer<CCT extends IClustering>
-    extends Attribute<IExperimentSet, CCT> {
+    extends Attribute<IExperimentSet, CCT> implements ITextable {
 
   /**
    * the minimum number of clusters ot be used, {@code -1} for undefined
@@ -334,10 +338,12 @@ abstract class _BehaviorClusterer<CCT extends IClustering>
     int[] clusters;
     MemoryTextOutput textOut;
     IClusteringJob job;
+    String name;
 
     shared = OnlySharedInstances.INSTANCE.get(data, logger);
     names = this._getElementsToCluster(shared);
 
+    name = null;
     if (names.getData().isEmpty()) {
       throw new IllegalArgumentException(//
           "There is not even one benchmark instance for which all experiments contain at least one run. Since there is no such instance, there is no basis for behavior-based clustering.");//$NON-NLS-1$
@@ -347,15 +353,18 @@ abstract class _BehaviorClusterer<CCT extends IClustering>
     Arrays.sort(categories);
     shared = null;
 
-    if ((logger != null) && (logger.isLoggable(Level.FINE))) {
+    if ((logger != null) && (logger.isLoggable(Level.INFO))) {
+      name = this.toString();
       what = ((" the set of " + names.getData().size()) + //$NON-NLS-1$
           ((names instanceof IInstanceSet)//
               ? " instances" //$NON-NLS-1$
               : ((names instanceof IExperimentSet)//
                   ? " experiments" //$NON-NLS-1$
                   : "? i am confused?")));//$NON-NLS-1$
-      logger.fine("Beginning to cluster" + what + //$NON-NLS-1$
-          " based on algorithm runtime behavior.");//$NON-NLS-1$
+      logger.info("Beginning to cluster" + what + //$NON-NLS-1$
+          " based on algorithm runtime behavior using " + //$NON-NLS-1$
+          name + " on dataset " + //$NON-NLS-1$
+          ClusterUtils.dataIdentityString(data));
       if (logger.isLoggable(Level.FINER)) {
         logger.finer(//
             "First, we model the runtime behavior of each algorithm on each benchmark instance for each runtime/objective dimension pair.");//$NON-NLS-1$
@@ -438,10 +447,15 @@ abstract class _BehaviorClusterer<CCT extends IClustering>
         elements);
     clusters = null;
     if ((logger != null) && (what != null)
-        && (logger.isLoggable(Level.FINE))) {
+        && (logger.isLoggable(Level.INFO))) {
+      if (name == null) {
+        name = this.toString();
+      }
       logger.fine("Finished clustering" + what + //$NON-NLS-1$
           " based on algorithm performance fingerprints, obtained "//$NON-NLS-1$
-          + result.getData().size() + " clusters.");//$NON-NLS-1$
+          + result.getData().size() + " clusters using "//$NON-NLS-1$
+          + name + " on dataset " + //$NON-NLS-1$
+          ClusterUtils.dataIdentityString(data));
     }
 
     return result;
@@ -503,23 +517,53 @@ abstract class _BehaviorClusterer<CCT extends IClustering>
 
   /** {@inheritDoc} */
   @Override
-  public String toString() {
+  public void toText(final ITextOutput textOut) {
+    char next;
+
+    next = '[';
+    if (this.m_transformations != null) {
+      for (final DimensionTransformation trafo : this.m_transformations) {
+        textOut.append(next);
+        next = ',';
+        if (trafo != null) {
+          trafo.mathRender(textOut, ABCParameterRenderer.INSTANCE);
+          textOut.append('#');
+          textOut.append(System.identityHashCode(trafo));
+          textOut.append('/');
+          textOut.append(trafo.hashCode());
+        } else {
+          textOut.append("null"); //$NON-NLS-1$
+        }
+      }
+      textOut.append(']');
+    } else {
+      textOut.append("null"); //$NON-NLS-1$
+    }
+    if ((this.m_minClusters <= 0) && (this.m_maxClusters <= 0)) {
+      textOut.append(" into 0 clusters! #"); //$NON-NLS-1$
+    } else {
+      textOut.append(" into [");//$NON-NLS-1$
+      if (this.m_minClusters > 0) {
+        textOut.append(this.m_minClusters);
+      }
+      textOut.append(',');
+      if (this.m_maxClusters > 0) {
+        textOut.append(this.m_maxClusters);
+      }
+      textOut.append("] groups #");//$NON-NLS-1$
+    }
+    textOut.append(System.identityHashCode(this));
+    textOut.append('/');
+    textOut.append(this.hashCode());
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public final String toString() {
     final MemoryTextOutput textOut;
 
-    if ((this.m_minClusters <= 0) && (this.m_maxClusters <= 0)) {
-      return ""; //$NON-NLS-1$
-    }
-
     textOut = new MemoryTextOutput();
-    textOut.append("into [");//$NON-NLS-1$
-    if (this.m_minClusters > 0) {
-      textOut.append(this.m_minClusters);
-    }
-    textOut.append(',');
-    if (this.m_maxClusters > 0) {
-      textOut.append(this.m_maxClusters);
-    }
-    textOut.append("] groups");//$NON-NLS-1$
+    this.toText(textOut);
     return textOut.toString();
   }
 }

@@ -5,6 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.optimizationBenchmarking.evaluator.attributes.clusters.ClusterUtils;
 import org.optimizationBenchmarking.evaluator.attributes.clusters.ICluster;
 import org.optimizationBenchmarking.evaluator.attributes.clusters.IClustering;
 import org.optimizationBenchmarking.evaluator.data.impl.shadow.DataSelection;
@@ -31,6 +32,9 @@ import org.optimizationBenchmarking.utils.ml.classification.spec.IClassifierQual
 import org.optimizationBenchmarking.utils.ml.classification.spec.IClassifierTrainer;
 import org.optimizationBenchmarking.utils.ml.classification.spec.IClassifierTrainingJob;
 import org.optimizationBenchmarking.utils.reflection.EPrimitiveType;
+import org.optimizationBenchmarking.utils.text.ITextable;
+import org.optimizationBenchmarking.utils.text.textOutput.ITextOutput;
+import org.optimizationBenchmarking.utils.text.textOutput.MemoryTextOutput;
 
 /**
  * the base class for property-based behavior clustering
@@ -39,7 +43,7 @@ import org.optimizationBenchmarking.utils.reflection.EPrimitiveType;
  *          the element type
  */
 abstract class _PropertyBehaviorClusterer<ET extends INamedElement>
-    extends Attribute<IExperimentSet, IClustering> {
+    extends Attribute<IExperimentSet, IClustering> implements ITextable {
 
   /** the MCC classifier measure */
   static final IClassifierQualityMeasure<?> CLASSIFIER_QUALITY_MEASURE = MCC.INSTANCE;
@@ -65,6 +69,32 @@ abstract class _PropertyBehaviorClusterer<ET extends INamedElement>
           "Behavior clusterer cannot be null."); //$NON-NLS-1$
     }
     this.m_behaviorClusterer = behaviorClusterer;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public void toText(final ITextOutput textOut) {
+    textOut.append(' ');
+    if (this.m_behaviorClusterer instanceof ITextable) {
+      ((ITextable) (this.m_behaviorClusterer)).toText(textOut);
+    } else {
+      textOut.append(this.m_behaviorClusterer.toString());
+    }
+    textOut.append(' ');
+    textOut.append('#');
+    textOut.append(System.identityHashCode(this));
+    textOut.append('/');
+    textOut.append(this.hashCode());
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public final String toString() {
+    final MemoryTextOutput textOut;
+
+    textOut = new MemoryTextOutput();
+    this.toText(textOut);
+    return textOut.toString();
   }
 
   /**
@@ -119,10 +149,15 @@ abstract class _PropertyBehaviorClusterer<ET extends INamedElement>
     IClassifierTrainingJob job;
     DataSelection[] selections;
     DataSelection selection;
+    String name;
 
+    name = null;
     if ((logger != null) && (logger.isLoggable(Level.INFO))) {
+      name = this.toString();
       logger.info(
-          "Beginning the process of behavior modeling, clustering of models, and applying classification to map features to clusters."); //$NON-NLS-1$
+          "Beginning the process of behavior modeling, clustering of models, and applying classification to map features to clusters using "//$NON-NLS-1$
+              + name + " on dataset " + //$NON-NLS-1$
+              ClusterUtils.dataIdentityString(data));
     }
 
     clustering = this.m_behaviorClusterer.get(data, logger);
@@ -132,8 +167,13 @@ abstract class _PropertyBehaviorClusterer<ET extends INamedElement>
     // anyway.
     if ((clusterSize = clusters.size()) <= 1) {
       if ((logger != null) && (logger.isLoggable(Level.INFO))) {
+        if (name == null) {
+          name = this.toString();
+        }
         logger.info(
-            "Found only a single behavior cluster, so we can skip classification and just return the single cluster."); //$NON-NLS-1$
+            "Found only a single behavior cluster, so we can skip classification and just return the single cluster using "//$NON-NLS-1$
+                + name + " on dataset " + //$NON-NLS-1$
+                ClusterUtils.dataIdentityString(data));
       }
       return clustering;
     }
@@ -143,8 +183,13 @@ abstract class _PropertyBehaviorClusterer<ET extends INamedElement>
     if ((properties == null)
         || ((propertySize = properties.size()) <= 0)) {
       if ((logger != null) && (logger.isLoggable(Level.INFO))) {
+        if (name == null) {
+          name = this.toString();
+        }
         logger.info(
-            "There are no properties that can be used for classification, so we return the behavior clusters."); //$NON-NLS-1$
+            "There are no properties that can be used for classification, so we return the behavior clusters using " //$NON-NLS-1$
+                + name + " on dataset " + //$NON-NLS-1$
+                ClusterUtils.dataIdentityString(data));
       }
       return clustering;
     }
@@ -216,6 +261,16 @@ abstract class _PropertyBehaviorClusterer<ET extends INamedElement>
       }
     }
     allElements = null;
+
+    if ((logger != null) && (logger.isLoggable(Level.INFO))) {
+      if (name == null) {
+        name = this.toString();
+      }
+      logger.info("Obtained " + selections.length + //$NON-NLS-1$
+          " clusters using " + name//$NON-NLS-1$
+          + " on dataset " + //$NON-NLS-1$
+          ClusterUtils.dataIdentityString(data));
+    }
 
     return this._createClustering(data, clustering, classifier,
         selections);
