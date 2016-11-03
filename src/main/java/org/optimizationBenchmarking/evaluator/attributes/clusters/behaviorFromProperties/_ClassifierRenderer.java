@@ -95,17 +95,35 @@ abstract class _ClassifierRenderer
 
     if (EFeatureType.featureDoubleIsUnspecified(featureValue)) {
       throw new IllegalArgumentException("Feature " + property//$NON-NLS-1$
+          + " at index " + featureIndex//$NON-NLS-1$
           + " is unspecified, but such cases should have been handled already.");//$NON-NLS-1$
     }
 
     if (type == EPrimitiveType.BOOLEAN) {
-      textOut.append(EFeatureType.featureDoubleToBoolean(featureValue));
+      try {
+        textOut.append(EFeatureType.featureDoubleToBoolean(featureValue));
+      } catch (final IllegalArgumentException except) {
+        throw new IllegalArgumentException(//
+            "Cannot render feature value " + featureValue + //$NON-NLS-1$
+                " as a Boolean for feature of type " + type + //$NON-NLS-1$
+                " for property at index " + featureIndex + //$NON-NLS-1$
+                " and name " + property.getName(), //$NON-NLS-1$
+            except);
+      }
       return;
-
     }
 
     if (type != null) {
-      useValue = EFeatureType.featureDoubleToNumerical(featureValue);
+      try {
+        useValue = EFeatureType.featureDoubleToNumerical(featureValue);
+      } catch (final IllegalArgumentException except) {
+        throw new IllegalArgumentException(//
+            "Cannot convert feature value " + featureValue + //$NON-NLS-1$
+                " to a double for feature of type " + type + //$NON-NLS-1$
+                " for property at index " + featureIndex + //$NON-NLS-1$
+                " and name " + property.getName(), //$NON-NLS-1$
+            except);
+      }
 
       switch (type) {
 
@@ -153,15 +171,38 @@ abstract class _ClassifierRenderer
       }
     }
 
-    _int = EFeatureType.featureDoubleToNominal(featureValue);
-    data = property.getData();
-    if ((_int >= 0) && (_int < property.getData().size())) {
-      textOut.append(data.get(_int).getValue());
-      return;
+    try {
+      _int = EFeatureType.featureDoubleToNominal(featureValue);
+    } catch (final IllegalArgumentException except) {
+      throw new IllegalArgumentException(//
+          "Cannot render feature value " + featureValue + //$NON-NLS-1$
+              " as nominal feature of type " + type + //$NON-NLS-1$
+              " for property at index " + featureIndex + //$NON-NLS-1$
+              " and name " + property.getName(), //$NON-NLS-1$
+          except);
     }
+
+    try {
+      data = property.getData();
+      if ((_int >= 0) && (_int < property.getData().size())) {
+        textOut.append(data.get(_int).getValue());
+        return;
+      }
+    } catch (final IllegalArgumentException except) {
+      throw new IllegalArgumentException(//
+          "Illegal nominal feature value " + _int + //$NON-NLS-1$
+              " translated from " + featureValue + //$NON-NLS-1$
+              " of type " + type + //$NON-NLS-1$
+              " for property at index " + featureIndex + //$NON-NLS-1$
+              " and name " + property.getName(), //$NON-NLS-1$
+          except);
+    }
+
     throw new IllegalArgumentException(((((//
     "Invalid (double-encoded) value '" + featureValue) //$NON-NLS-1$
-        + "' for property '") + property.getName()) //$NON-NLS-1$
-        + '\'') + '.');
+        + " of type " + type + //$NON-NLS-1$
+        " translating to nominal " + _int + //$NON-NLS-1$
+        "' for property '") + property.getName()) //$NON-NLS-1$
+        + "' at index " + featureIndex) + '.'); //$NON-NLS-1$
   }
 }
