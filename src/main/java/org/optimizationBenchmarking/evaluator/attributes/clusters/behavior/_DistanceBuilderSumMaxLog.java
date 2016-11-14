@@ -70,11 +70,10 @@ final class _DistanceBuilderSumMaxLog extends DistanceMatrixBuilderJob {
       return 0d;
     }
 
-    if (orig <= 0d) {
-      return dist;// orig = Double.MIN_NORMAL;
+    if (orig > 0d) {
+      dist /= orig;// orig = Double.MIN_NORMAL;
     }
-    return Math.max(0d,
-        (Math.log(Math.E + Math.max(0d, (dist / orig))) - 1d));
+    return Math.max(0d, (Math.log(Math.E + Math.max(0d, dist)) - 1d));
   }
 
   /** {@inheritDoc} */
@@ -88,6 +87,8 @@ final class _DistanceBuilderSumMaxLog extends DistanceMatrixBuilderJob {
     int index1, index2;
 
     sum = this.m_sum;
+    sum.reset();
+
     index1 = (-1);
     for (final DimensionRelationshipData[] dataA : this.m_data[i]) {
       dataB = this.m_data[j][++index1];
@@ -111,31 +112,6 @@ final class _DistanceBuilderSumMaxLog extends DistanceMatrixBuilderJob {
       appendTo.append(sum.doubleValue());
     }
   }
-
-  // /** {@inheritDoc} */
-  // @Override
-  // protected final double getDistance(int i, int j) {
-  // DimensionRelationshipData[] dataB;
-  // DimensionRelationshipData b;
-  // double max, current;
-  // int index1, index2;
-  //
-  // max = Double.NEGATIVE_INFINITY;
-  // index1 = (-1);
-  // for (DimensionRelationshipData[] dataA : this.m_data[i]) {
-  // dataB = this.m_data[j][++index1];
-  // index2 = (-1);
-  // for (DimensionRelationshipData a : dataA) {
-  // b = dataB[++index2];
-  // current = Math.min(__dist(a, b), __dist(b, a));
-  // if (current > max) {
-  // max = current;
-  // }
-  // }
-  // }
-  //
-  // return max;
-  // }
 
   /** {@inheritDoc} */
   @Override
