@@ -9,12 +9,12 @@ import org.optimizationBenchmarking.utils.math.statistics.aggregate.StableSum;
 import org.optimizationBenchmarking.utils.reflection.EPrimitiveType;
 
 /** the distance matrix builder. */
-final class _DistanceBuilder extends DistanceMatrixBuilderJob {
+final class _DistanceBuilderSumMaxLog extends DistanceMatrixBuilderJob {
 
   /** the data matrix */
   private final DimensionRelationshipData[][][] m_data;
 
-  /** the sum aggregate */
+  /** the sum */
   private final StableSum m_sum;
 
   /**
@@ -23,7 +23,7 @@ final class _DistanceBuilder extends DistanceMatrixBuilderJob {
    * @param data
    *          the data
    */
-  _DistanceBuilder(final DimensionRelationshipData[][][] data) {
+  _DistanceBuilderSumMaxLog(final DimensionRelationshipData[][][] data) {
     super();
     this.m_data = data;
     this.m_sum = new StableSum();
@@ -73,7 +73,8 @@ final class _DistanceBuilder extends DistanceMatrixBuilderJob {
     if (orig <= 0d) {
       return dist;// orig = Double.MIN_NORMAL;
     }
-    return Math.max(0d, (dist / orig));
+    return Math.max(0d,
+        (Math.log(Math.E + Math.max(0d, (dist / orig))) - 1d));
   }
 
   /** {@inheritDoc} */
@@ -81,24 +82,34 @@ final class _DistanceBuilder extends DistanceMatrixBuilderJob {
   protected final void setDistance(final int i, final int j,
       final IAggregate appendTo) {
     final StableSum sum;
+    double max, value;
     DimensionRelationshipData[] dataB;
     DimensionRelationshipData b;
     int index1, index2;
 
     sum = this.m_sum;
-    sum.reset();
     index1 = (-1);
     for (final DimensionRelationshipData[] dataA : this.m_data[i]) {
       dataB = this.m_data[j][++index1];
       index2 = (-1);
+
+      max = 0d;
       for (final DimensionRelationshipData a : dataA) {
         b = dataB[++index2];
-        sum.append(Math.min(_DistanceBuilder.__dist(a, b),
-            _DistanceBuilder.__dist(b, a)));
+        value = (Math.min(_DistanceBuilderSumMaxLog.__dist(a, b),
+            _DistanceBuilderSumMaxLog.__dist(b, a)));
+        if ((value < Double.POSITIVE_INFINITY) && (value > max)) {
+          max = value;
+        }
       }
+      sum.append(max);
     }
 
-    appendTo.append(sum.doubleValue());
+    if (sum.isInteger()) {
+      appendTo.append(sum.longValue());
+    } else {
+      appendTo.append(sum.doubleValue());
+    }
   }
 
   // /** {@inheritDoc} */

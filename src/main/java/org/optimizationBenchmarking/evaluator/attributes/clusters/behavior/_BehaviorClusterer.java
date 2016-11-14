@@ -395,7 +395,7 @@ abstract class _BehaviorClusterer<CCT extends IClustering>
           "Modeling completed, now computing a distance matrix which represents how well models for one instance runs set can represent the data from another one.");//$NON-NLS-1$
     }
 
-    distances = new _DistanceBuilder(fittings).call();
+    distances = new _DistanceBuilderSumMaxLog(fittings).call();
     fittings = null;
 
     if ((logger != null) && (what != null)
